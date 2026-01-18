@@ -21,17 +21,17 @@ export const gateway = createOpenAI({
 });
 
 /**
- * Available Claude 4.5 models via Vercel AI Gateway
+ * Claude 4.5 family models via Vercel AI Gateway
  */
 export const models = {
   // Claude Opus 4.5 - Most capable, best for complex reasoning
   opus: gateway('anthropic/claude-opus-4-5-20250514'),
 
-  // Claude Sonnet 4 - Balanced performance and cost
-  sonnet: gateway('anthropic/claude-sonnet-4-20250514'),
+  // Claude Sonnet 4.5 - Balanced performance and cost
+  sonnet: gateway('anthropic/claude-sonnet-4-5-20250514'),
 
-  // Claude Haiku - Fast and cost-effective
-  haiku: gateway('anthropic/claude-haiku-3-5-20241022'),
+  // Claude Haiku 4.5 - Fast and cost-effective
+  haiku: gateway('anthropic/claude-haiku-4-5-20250514'),
 } as const;
 
 /**
