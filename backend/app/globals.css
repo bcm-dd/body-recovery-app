@@ -298,6 +298,7 @@ body {
 .text-center { text-align: center; }
 .text-primary { color: var(--text-primary); }
 .text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
 .text-success { color: var(--success); }
 .text-warning { color: var(--warning); }
 .text-error { color: var(--error); }
