@@ -43,6 +43,7 @@ export interface ButtonProps extends Omit<PressableProps, 'style'> {
   haptic?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  accessibilityHint?: string;
 }
 
 // ============================================================================
@@ -63,6 +64,7 @@ export function Button({
   haptic = true,
   style,
   textStyle,
+  accessibilityHint,
   onPress,
   ...pressableProps
 }: ButtonProps) {
@@ -177,6 +179,13 @@ export function Button({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={isDisabled}
+      accessibilityRole="button"
+      accessibilityLabel={loading ? `${title}, loading` : title}
+      accessibilityState={{
+        disabled: isDisabled,
+        busy: loading,
+      }}
+      accessibilityHint={accessibilityHint}
       style={[
         styles.button,
         {

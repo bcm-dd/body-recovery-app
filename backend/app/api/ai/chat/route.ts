@@ -8,6 +8,7 @@ import { NextRequest } from 'next/server';
 import { anthropic } from '@ai-sdk/anthropic';
 import { streamText } from 'ai';
 import { z } from 'zod';
+import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
 
 // Request validation
 const chatRequestSchema = z.object({
@@ -25,6 +26,9 @@ const chatRequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Authenticate user
+    const user = await requireAuth(request);
+
     const body = await request.json();
     const { messages, context } = chatRequestSchema.parse(body);
 
@@ -39,6 +43,10 @@ export async function POST(request: NextRequest) {
     return result.toDataStreamResponse();
   } catch (error) {
     console.error('AI chat error:', error);
+
+    if (error instanceof AuthError) {
+      return unauthorizedResponse(error.message);
+    }
 
     if (error instanceof z.ZodError) {
       return new Response(

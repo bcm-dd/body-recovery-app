@@ -8,6 +8,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { anthropic } from '@ai-sdk/anthropic';
 import { generateObject } from 'ai';
 import { z } from 'zod';
+import { db, injuries, workouts } from '@/db';
+import { eq, desc, and, or, isNull, gte } from 'drizzle-orm';
+import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
 
 // Request validation
 const generateRequestSchema = z.object({
@@ -37,15 +40,52 @@ const workoutSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Get user from auth session
-    const userId = 'demo-user-id';
+    // Authenticate user
+    const user = await requireAuth(request);
+    const userId = user.id;
 
     const body = await request.json();
     const { date, preferences } = generateRequestSchema.parse(body);
 
-    // TODO: Fetch actual user data
-    const constraints: string[] = []; // Would come from body model
-    const recentWorkouts: string[] = []; // Would come from DB
+    // Fetch active injuries and their constraints
+    const activeInjuries = await db
+      .select()
+      .from(injuries)
+      .where(
+        and(
+          eq(injuries.userId, userId),
+          or(
+            eq(injuries.status, 'active'),
+            eq(injuries.status, 'recovering')
+          )
+        )
+      );
+
+    // Build constraints from injuries
+    const constraints: string[] = activeInjuries.flatMap(injury => {
+      const injuryConstraints: string[] = [];
+      if (injury.bodyRegion) {
+        injuryConstraints.push(`Avoid exercises that stress the ${injury.bodyRegion}`);
+      }
+      if (injury.severity === 'severe') {
+        injuryConstraints.push(`${injury.bodyRegion}: Complete rest recommended`);
+      } else if (injury.severity === 'moderate') {
+        injuryConstraints.push(`${injury.bodyRegion}: Light exercises only, avoid impact`);
+      }
+      return injuryConstraints;
+    });
+
+    // Fetch recent workouts for variety
+    const recentWorkoutData = await db
+      .select()
+      .from(workouts)
+      .where(eq(workouts.userId, userId))
+      .orderBy(desc(workouts.date))
+      .limit(5);
+
+    const recentWorkouts = recentWorkoutData.map(w =>
+      `${w.date}: ${w.status || 'General'} workout`
+    );
 
     const result = await generateObject({
       model: anthropic('claude-sonnet-4-20250514'),
@@ -81,6 +121,10 @@ Include notes for form cues where helpful.`,
     });
   } catch (error) {
     console.error('Workout generation error:', error);
+
+    if (error instanceof AuthError) {
+      return unauthorizedResponse(error.message);
+    }
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

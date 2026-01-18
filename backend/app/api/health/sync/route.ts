@@ -6,8 +6,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db, healthSnapshots } from '@/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 import { z } from 'zod';
+import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
 
 // Request validation
 const healthSyncSchema = z.object({
@@ -24,8 +25,9 @@ const healthSyncSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Get user from auth session
-    const userId = 'demo-user-id';
+    // Authenticate user
+    const user = await requireAuth(request);
+    const userId = user.id;
 
     const body = await request.json();
     const { snapshots } = healthSyncSchema.parse(body);
@@ -73,6 +75,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Health sync error:', error);
 
+    if (error instanceof AuthError) {
+      return unauthorizedResponse(error.message);
+    }
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: { code: 'VALIDATION_ERROR', message: 'Invalid input', details: error.errors } },
@@ -87,32 +93,29 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function calculateReadiness(snapshot: any) {
-  // Simplified readiness calculation
-  let score = 70; // Base score
+function calculateReadiness(snapshot: {
+  sleepDuration?: number;
+  sleepQuality?: number;
+  hrv?: number;
+  restingHr?: number;
+  steps?: number;
+  activeCalories?: number;
+}) {
+  // Factor scores (0-100 each)
+  const factors = {
+    sleep: calculateSleepFactor(snapshot.sleepDuration, snapshot.sleepQuality),
+    recovery: calculateRecoveryFactor(snapshot.hrv, snapshot.restingHr),
+    load: calculateLoadFactor(snapshot.steps, snapshot.activeCalories),
+    body: 100, // Default until injury data is integrated
+  };
 
-  if (snapshot.sleepDuration) {
-    if (snapshot.sleepDuration >= 7 && snapshot.sleepDuration <= 9) {
-      score += 10;
-    } else if (snapshot.sleepDuration < 6) {
-      score -= 15;
-    }
-  }
-
-  if (snapshot.sleepQuality) {
-    score += (snapshot.sleepQuality - 70) / 5;
-  }
-
-  if (snapshot.hrv) {
-    // Assume baseline of 50ms
-    if (snapshot.hrv > 50) {
-      score += 10;
-    } else if (snapshot.hrv < 40) {
-      score -= 10;
-    }
-  }
-
-  score = Math.max(0, Math.min(100, Math.round(score)));
+  // Weighted average: 30% sleep, 30% recovery, 25% load, 15% body
+  const score = Math.round(
+    factors.sleep * 0.30 +
+    factors.recovery * 0.30 +
+    factors.load * 0.25 +
+    factors.body * 0.15
+  );
 
   let recommendation: string;
   if (score >= 75) recommendation = 'full';
@@ -122,12 +125,72 @@ function calculateReadiness(snapshot: any) {
 
   return {
     score,
-    factors: {
-      sleep: Math.round(score * 0.9 + Math.random() * 10),
-      recovery: Math.round(score * 0.8 + Math.random() * 15),
-      load: Math.round(70 + Math.random() * 20),
-      body: 100,
-    },
+    factors,
     recommendation,
   };
+}
+
+function calculateSleepFactor(duration?: number, quality?: number): number {
+  let score = 70; // Base
+
+  if (duration !== undefined) {
+    if (duration >= 7 && duration <= 9) {
+      score += 20;
+    } else if (duration >= 6 && duration < 7) {
+      score += 5;
+    } else if (duration > 9) {
+      score += 10;
+    } else if (duration < 6) {
+      score -= 20;
+    }
+  }
+
+  if (quality !== undefined) {
+    // Quality is 0-100
+    score += (quality - 70) / 3;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function calculateRecoveryFactor(hrv?: number, restingHr?: number): number {
+  let score = 70; // Base
+
+  if (hrv !== undefined) {
+    // HRV baseline assumption: 50ms is average
+    if (hrv >= 60) score += 20;
+    else if (hrv >= 50) score += 10;
+    else if (hrv >= 40) score -= 5;
+    else score -= 15;
+  }
+
+  if (restingHr !== undefined) {
+    // Resting HR baseline assumption: 60 bpm is average
+    if (restingHr <= 55) score += 10;
+    else if (restingHr <= 65) score += 5;
+    else if (restingHr > 75) score -= 10;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function calculateLoadFactor(steps?: number, activeCalories?: number): number {
+  // Load factor: higher load = lower readiness (need recovery)
+  let score = 85; // Base - assume moderate activity
+
+  if (steps !== undefined) {
+    // 7500 steps is "moderate" baseline
+    if (steps > 15000) score -= 20;
+    else if (steps > 10000) score -= 10;
+    else if (steps < 3000) score += 5;
+  }
+
+  if (activeCalories !== undefined) {
+    // 400 cal is moderate baseline
+    if (activeCalories > 800) score -= 15;
+    else if (activeCalories > 500) score -= 5;
+    else if (activeCalories < 200) score += 5;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(score)));
 }
