@@ -8,6 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createUser, findUserByEmail } from '@/lib/auth';
+import { checkRateLimit, rateLimitedResponse, rateLimitConfigs } from '@/lib/rate-limit';
+import { sanitizeString, sanitizeEmail } from '@/lib/sanitize';
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -16,6 +18,13 @@ const registerSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limit by IP
+  const ip = request.headers.get('x-forwarded-for') || 'anonymous';
+  const rateLimit = await checkRateLimit(`register:${ip}`, rateLimitConfigs.strict);
+  if (rateLimit.limited) {
+    return rateLimitedResponse(rateLimit.resetAt);
+  }
+
   try {
     const body = await request.json();
 
@@ -30,8 +39,12 @@ export async function POST(request: NextRequest) {
 
     const { name, email, password } = parsed.data;
 
+    // Sanitize name and email to prevent XSS
+    const sanitizedName = sanitizeString(name);
+    const sanitizedEmail = sanitizeEmail(email);
+
     // Check if user already exists
-    const existingUser = findUserByEmail(email);
+    const existingUser = await findUserByEmail(sanitizedEmail);
     if (existingUser) {
       return NextResponse.json(
         { error: 'An account with this email already exists' },
@@ -40,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create user
-    const user = createUser(email, password, name);
+    const user = await createUser(sanitizedEmail, password, sanitizedName);
     if (!user) {
       return NextResponse.json(
         { error: 'Failed to create account' },

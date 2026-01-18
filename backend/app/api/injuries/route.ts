@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
 import { getUserInjuries, saveInjury, updateInjury, deleteInjury } from '@/lib/store';
+import { sanitizeString } from '@/lib/sanitize';
 import type { InjuryInput, InjuryUpdate } from '@/lib/types';
 
 // Validation schemas
@@ -110,14 +111,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedInput = injuryInputSchema.parse(body);
 
+    // Sanitize text fields to prevent XSS
+    const sanitizedData = {
+      ...validatedInput,
+      description: sanitizeString(validatedInput.description),
+      clinicalNotes: sanitizeString(validatedInput.clinicalNotes),
+    };
+
     const injuryInput: InjuryInput = {
-      bodyRegion: validatedInput.bodyRegion,
-      description: validatedInput.description,
-      severity: validatedInput.severity,
-      status: validatedInput.status,
-      constraints: validatedInput.constraints,
-      clinicalNotes: validatedInput.clinicalNotes,
-      startDate: validatedInput.startDate,
+      bodyRegion: sanitizedData.bodyRegion,
+      description: sanitizedData.description || undefined,
+      severity: sanitizedData.severity,
+      status: sanitizedData.status,
+      constraints: sanitizedData.constraints,
+      clinicalNotes: sanitizedData.clinicalNotes || undefined,
+      startDate: sanitizedData.startDate,
     };
 
     // Save injury to store

@@ -9,6 +9,7 @@ import { streamText } from 'ai';
 import { z } from 'zod';
 import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
 import { taskModels } from '@/lib/ai';
+import { checkRateLimit, rateLimitedResponse, rateLimitConfigs } from '@/lib/rate-limit';
 
 // Request validation
 const chatRequestSchema = z.object({
@@ -25,6 +26,13 @@ const chatRequestSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Rate limit by IP
+  const ip = request.headers.get('x-forwarded-for') || 'anonymous';
+  const rateLimit = await checkRateLimit(`chat:${ip}`, rateLimitConfigs.standard);
+  if (rateLimit.limited) {
+    return rateLimitedResponse(rateLimit.resetAt);
+  }
+
   try {
     // Authenticate user
     const user = await requireAuth(request);

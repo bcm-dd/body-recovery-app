@@ -8,6 +8,8 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
+import { kv } from '@vercel/kv';
 
 // Types
 export interface User {
@@ -23,55 +25,77 @@ const credentialsSchema = z.object({
   password: z.string().min(6),
 });
 
-// Mock user store - in production, this would be a database
-// For MVP, we store users in memory (resets on server restart)
+// In-memory user store - fallback for local development when KV is unavailable
 const users: Map<string, { id: string; email: string; name: string; password: string }> = new Map();
 
-// Pre-seed with a demo user
+// Pre-seed with a demo user (password is hashed)
 users.set('demo@example.com', {
   id: 'demo-user-1',
   email: 'demo@example.com',
   name: 'Demo User',
-  password: 'password123',
+  password: bcrypt.hashSync('password123', 10),
 });
 
 /**
- * Find user by email
+ * Find user by email - uses KV storage with in-memory fallback for local dev
  */
-export function findUserByEmail(email: string) {
-  return users.get(email.toLowerCase()) || null;
+export async function findUserByEmail(email: string) {
+  const normalizedEmail = email.toLowerCase();
+
+  // Try KV storage first
+  try {
+    const kvUser = await kv.get<{ id: string; email: string; name: string; password: string }>('user:' + normalizedEmail);
+    if (kvUser) return kvUser;
+  } catch {
+    // KV unavailable, fall through to in-memory
+  }
+
+  // Fallback to in-memory store (for local development)
+  return users.get(normalizedEmail) || null;
 }
 
 /**
- * Create a new user
+ * Create a new user - uses KV storage with in-memory fallback for local dev
  */
-export function createUser(email: string, password: string, name: string) {
+export async function createUser(email: string, password: string, name: string) {
   const normalizedEmail = email.toLowerCase();
 
-  if (users.has(normalizedEmail)) {
+  // Check if user already exists
+  const existingUser = await findUserByEmail(normalizedEmail);
+  if (existingUser) {
     return null; // User already exists
   }
 
+  // Hash password before storing
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   const newUser = {
-    id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    id: `user-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
     email: normalizedEmail,
     name,
-    password,
+    password: hashedPassword,
   };
 
-  users.set(normalizedEmail, newUser);
+  // Try to persist to KV storage
+  try {
+    await kv.set('user:' + normalizedEmail, newUser);
+  } catch {
+    // KV unavailable, store in memory as fallback (for local development)
+    users.set(normalizedEmail, newUser);
+  }
+
   return newUser;
 }
 
 /**
- * Validate user credentials
+ * Validate user credentials using bcrypt for secure password comparison
  */
-export function validateCredentials(email: string, password: string) {
-  const user = findUserByEmail(email);
+export async function validateCredentials(email: string, password: string) {
+  const user = await findUserByEmail(email);
   if (!user) return null;
 
-  // Simple password comparison - in production, use bcrypt
-  if (user.password !== password) return null;
+  // Secure password comparison using bcrypt
+  if (!bcrypt.compareSync(password, user.password)) return null;
 
   return {
     id: user.id,
@@ -111,7 +135,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         const { email, password } = parsed.data;
-        const user = validateCredentials(email, password);
+        const user = await validateCredentials(email, password);
 
         if (!user) {
           return null;
@@ -196,8 +220,8 @@ export async function requireAuth(request: Request): Promise<AuthUser> {
 
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice(7);
-    // For demo/development, accept 'demo' token
-    if (token === 'demo') {
+    // For demo/development only, accept 'demo' token (disabled in production)
+    if (process.env.NODE_ENV !== 'production' && token === 'demo') {
       return { id: 'demo-user-1', email: 'demo@example.com' };
     }
   }

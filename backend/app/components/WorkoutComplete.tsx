@@ -60,6 +60,7 @@ function Confetti() {
       {particles.map((particle) => (
         <div
           key={particle.id}
+          className="confetti-piece"
           style={{
             position: 'absolute',
             left: `${particle.x}%`,
@@ -68,24 +69,12 @@ function Confetti() {
             height: particle.size,
             borderRadius: particle.id % 3 === 0 ? '50%' : particle.id % 3 === 1 ? '2px' : 0,
             background: particle.color,
-            animation: `confetti-fall ${particle.duration}s ease-out forwards`,
+            animationDuration: `${particle.duration}s`,
             animationDelay: `${particle.delay}s`,
             transform: `rotate(${Math.random() * 360}deg)`,
           }}
         />
       ))}
-      <style jsx>{`
-        @keyframes confetti-fall {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh) rotate(720deg);
-            opacity: 0;
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -248,29 +237,6 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
           </button>
         </Link>
       </div>
-
-      {/* Keyframe animations */}
-      <style jsx>{`
-        @keyframes pulse-ring {
-          0% {
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
-            transform: scale(0.9);
-          }
-          50% {
-            box-shadow: 0 0 0 30px rgba(16, 185, 129, 0);
-            transform: scale(1);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-            transform: scale(1);
-          }
-        }
-        @keyframes check-draw {
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
-      `}</style>
     </div>
   );
 }
