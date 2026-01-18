@@ -314,3 +314,88 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* Accessibility: Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Accessibility: Focus visible styles */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+.body-region-target:focus-visible {
+  outline: none;
+}
+
+.list-item:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Accessibility: Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in {
+    animation: none;
+  }
+
+  .skeleton {
+    animation: none;
+    background: var(--bg-tertiary);
+  }
+}
+
+/* Accessibility: Ensure sufficient color contrast for badges in dark mode */
+@media (prefers-color-scheme: dark) {
+  .badge-success {
+    background: #065F46;
+    color: #D1FAE5;
+  }
+
+  .badge-warning {
+    background: #92400E;
+    color: #FEF3C7;
+  }
+
+  .badge-error {
+    background: #991B1B;
+    color: #FEE2E2;
+  }
+}

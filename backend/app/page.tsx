@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ReadinessRing } from './components/ReadinessRing';
+import { LoadingSpinner, Skeleton } from './components/LoadingSpinner';
 
 // Mock data - would come from API in production
 const mockReadiness = {
@@ -27,6 +28,8 @@ const mockWorkout = {
 export default function TodayPage() {
   const [greeting, setGreeting] = useState('Good morning');
   const [date, setDate] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [readinessData, setReadinessData] = useState<typeof mockReadiness | null>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -39,6 +42,17 @@ export default function TodayPage() {
       month: 'long',
       day: 'numeric',
     }));
+
+    // Simulate API call for readiness data
+    const loadReadinessData = async () => {
+      setIsLoading(true);
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setReadinessData(mockReadiness);
+      setIsLoading(false);
+    };
+
+    loadReadinessData();
   }, []);
 
   return (
@@ -53,19 +67,31 @@ export default function TodayPage() {
       <div className="card">
         <div className="card-header">
           <h2 className="card-title">Today's Readiness</h2>
-          <span className={`badge ${getReadinessBadge(mockReadiness.recommendation)}`}>
-            {getReadinessLabel(mockReadiness.recommendation)}
-          </span>
+          {isLoading ? (
+            <Skeleton width={100} height={24} borderRadius="var(--radius-full)" />
+          ) : readinessData ? (
+            <span className={`badge ${getReadinessBadge(readinessData.recommendation)}`}>
+              {getReadinessLabel(readinessData.recommendation)}
+            </span>
+          ) : null}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem 0' }}>
-          <ReadinessRing
-            score={mockReadiness.score}
-            factors={mockReadiness.factors}
-            size={200}
-          />
+          {isLoading ? (
+            <LoadingSpinner size="large" label="Calculating readiness..." />
+          ) : readinessData ? (
+            <ReadinessRing
+              score={readinessData.score}
+              factors={readinessData.factors}
+              size={200}
+            />
+          ) : null}
         </div>
         <p className="text-secondary text-center" style={{ marginTop: '0.5rem' }}>
-          {getReadinessMessage(mockReadiness.recommendation)}
+          {isLoading ? (
+            <Skeleton width="80%" height={16} style={{ margin: '0 auto' }} />
+          ) : readinessData ? (
+            getReadinessMessage(readinessData.recommendation)
+          ) : null}
         </p>
       </div>
 

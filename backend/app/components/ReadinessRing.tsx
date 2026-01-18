@@ -28,15 +28,29 @@ export function ReadinessRing({ score, factors, size = 200 }: ReadinessRingProps
   };
 
   const factorList = [
-    { key: 'sleep', label: '😴', value: factors.sleep },
-    { key: 'recovery', label: '💚', value: factors.recovery },
-    { key: 'load', label: '🏋️', value: factors.load },
-    { key: 'body', label: '🫀', value: factors.body },
+    { key: 'sleep', label: '😴', name: 'Sleep', value: factors.sleep },
+    { key: 'recovery', label: '💚', name: 'Recovery', value: factors.recovery },
+    { key: 'load', label: '🏋️', name: 'Training Load', value: factors.load },
+    { key: 'body', label: '🫀', name: 'Body Status', value: factors.body },
   ];
 
+  // Generate accessible description
+  const getScoreDescription = (value: number) => {
+    if (value >= 75) return 'high';
+    if (value >= 55) return 'moderate';
+    return 'low';
+  };
+
+  const accessibleDescription = `Readiness score: ${score} out of 100 (${getScoreDescription(score)}). ` +
+    factorList.map(f => `${f.name}: ${f.value}% (${getScoreDescription(f.value)})`).join('. ');
+
   return (
-    <div style={{ position: 'relative', width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <div
+      style={{ position: 'relative', width: size, height: size }}
+      role="img"
+      aria-label={accessibleDescription}
+    >
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
         {/* Background ring */}
         <circle
           cx={center}
@@ -74,7 +88,8 @@ export function ReadinessRing({ score, factors, size = 200 }: ReadinessRingProps
           const indicatorSize = 24;
 
           return (
-            <g key={factor.key}>
+            <g key={factor.key} role="img" aria-label={`${factor.name}: ${factor.value}%`}>
+              <title>{`${factor.name}: ${factor.value}% (${getScoreDescription(factor.value)})`}</title>
               <circle
                 cx={x}
                 cy={y}
@@ -88,6 +103,7 @@ export function ReadinessRing({ score, factors, size = 200 }: ReadinessRingProps
                 textAnchor="middle"
                 dominantBaseline="central"
                 style={{ fontSize: indicatorSize * 0.6 }}
+                aria-hidden="true"
               >
                 {factor.label}
               </text>

@@ -57,7 +57,7 @@ export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav style={styles.navBar}>
+    <nav style={styles.navBar} aria-label="Main navigation">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         return (
@@ -68,8 +68,11 @@ export function Navigation() {
               ...styles.navItem,
               ...(isActive ? styles.navItemActive : {}),
             }}
+            aria-current={isActive ? 'page' : undefined}
+            aria-label={item.label}
+            className="nav-link"
           >
-            <span style={styles.navIcon}>{item.icon}</span>
+            <span style={styles.navIcon} aria-hidden="true">{item.icon}</span>
             <span style={styles.navLabel}>{item.label}</span>
           </Link>
         );

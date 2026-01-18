@@ -1,7 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { EmptyState } from '../components/EmptyState';
+import { WorkoutComplete } from '../components/WorkoutComplete';
 
 const mockExercises = [
   { id: '1', name: 'Bench Press', sets: 4, reps: 8, weight: 135, completed: false },
@@ -12,14 +15,45 @@ const mockExercises = [
   { id: '6', name: 'Overhead Tricep Extension', sets: 3, reps: 12, weight: 30, completed: false },
 ];
 
+// Set to true to simulate no scheduled workout scenario
+const SIMULATE_NO_WORKOUT = false;
+
 export default function WorkoutPage() {
   const [exercises, setExercises] = useState(mockExercises);
   const [isStarted, setIsStarted] = useState(false);
   const [currentExercise, setCurrentExercise] = useState(0);
   const [currentSet, setCurrentSet] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasScheduledWorkout, setHasScheduledWorkout] = useState(true);
+  const [showComplete, setShowComplete] = useState(false);
+  const [workoutStartTime, setWorkoutStartTime] = useState<Date | null>(null);
 
   const completedCount = exercises.filter(e => e.completed).length;
   const progress = (completedCount / exercises.length) * 100;
+  const allCompleted = completedCount === exercises.length && exercises.length > 0;
+  const totalSets = exercises.reduce((sum, e) => sum + e.sets, 0);
+
+  // Simulate loading workout data
+  useEffect(() => {
+    const loadWorkout = async () => {
+      setIsLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setHasScheduledWorkout(!SIMULATE_NO_WORKOUT);
+      setIsLoading(false);
+    };
+    loadWorkout();
+  }, []);
+
+  // Check if workout is complete
+  useEffect(() => {
+    if (allCompleted && isStarted && !showComplete) {
+      // Small delay before showing completion screen
+      const timer = setTimeout(() => {
+        setShowComplete(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [allCompleted, isStarted, showComplete]);
 
   const handleCompleteSet = () => {
     const exercise = exercises[currentExercise];
@@ -36,6 +70,68 @@ export default function WorkoutPage() {
       setCurrentSet(prev => prev + 1);
     }
   };
+
+  const handleStartWorkout = () => {
+    setIsStarted(true);
+    setWorkoutStartTime(new Date());
+  };
+
+  const getWorkoutDuration = () => {
+    if (!workoutStartTime) return 0;
+    return Math.round((new Date().getTime() - workoutStartTime.getTime()) / 60000);
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="animate-fade-in" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <LoadingSpinner size="large" label="Loading workout..." />
+      </div>
+    );
+  }
+
+  // Show empty state when no workout is scheduled
+  if (!hasScheduledWorkout) {
+    return (
+      <div className="animate-fade-in">
+        <header className="screen-header">
+          <Link href="/" style={{ color: 'var(--brand-primary)', textDecoration: 'none', fontSize: '0.875rem' }}>
+            ← Back
+          </Link>
+          <h1 className="screen-title">Workout</h1>
+        </header>
+        <EmptyState
+          icon="📅"
+          title="No Workout Scheduled"
+          description="You don't have a workout planned for today. Take a rest day or browse our workout library."
+          action={{
+            label: 'Browse Workouts',
+            onClick: () => setHasScheduledWorkout(true),
+          }}
+          secondaryAction={{
+            label: 'Create Custom Workout',
+            variant: 'ghost',
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Show workout complete celebration
+  if (showComplete) {
+    return (
+      <WorkoutComplete
+        workoutName="Upper Body Strength"
+        stats={{
+          duration: getWorkoutDuration() || 45,
+          exercisesCompleted: exercises.length,
+          totalSets: totalSets,
+          caloriesBurned: 320,
+        }}
+        onClose={() => setShowComplete(false)}
+      />
+    );
+  }
 
   if (!isStarted) {
     return (
@@ -76,7 +172,7 @@ export default function WorkoutPage() {
         </div>
 
         <div style={{ padding: '1rem 1.5rem', position: 'sticky', bottom: 80, background: 'var(--bg-primary)' }}>
-          <button className="btn btn-primary btn-full btn-lg" onClick={() => setIsStarted(true)}>
+          <button className="btn btn-primary btn-full btn-lg" onClick={handleStartWorkout}>
             Start Workout
           </button>
         </div>

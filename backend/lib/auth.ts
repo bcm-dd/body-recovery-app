@@ -1,149 +1,219 @@
 /**
- * Authentication utilities for Movement & Recovery Companion
+ * Authentication configuration for Movement & Recovery Companion
  *
- * Provides JWT-based authentication with secure token handling.
+ * Uses NextAuth.js with credentials provider for email/password authentication.
+ * JWT-based sessions for stateless authentication.
  */
 
-import { NextRequest } from 'next/server';
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 
 // Types
-export interface AuthUser {
+export interface User {
   id: string;
   email: string;
-  createdAt: Date;
+  name: string;
+  isGuest?: boolean;
 }
 
-export interface AuthResult {
-  user: AuthUser | null;
-  error: string | null;
-}
-
-// JWT payload schema
-const jwtPayloadSchema = z.object({
-  sub: z.string(), // user id
+// Validation schemas
+const credentialsSchema = z.object({
   email: z.string().email(),
-  iat: z.number(),
-  exp: z.number(),
+  password: z.string().min(6),
+});
+
+// Mock user store - in production, this would be a database
+// For MVP, we store users in memory (resets on server restart)
+const users: Map<string, { id: string; email: string; name: string; password: string }> = new Map();
+
+// Pre-seed with a demo user
+users.set('demo@example.com', {
+  id: 'demo-user-1',
+  email: 'demo@example.com',
+  name: 'Demo User',
+  password: 'password123',
 });
 
 /**
- * Extract and validate user from request Authorization header
- *
- * In production, this would verify JWT signature with a secret.
- * For MVP, we decode and validate the payload structure.
+ * Find user by email
  */
-export async function getAuthUser(request: NextRequest): Promise<AuthResult> {
-  try {
-    const authHeader = request.headers.get('Authorization');
-
-    if (!authHeader) {
-      return { user: null, error: 'Missing Authorization header' };
-    }
-
-    if (!authHeader.startsWith('Bearer ')) {
-      return { user: null, error: 'Invalid Authorization format. Expected: Bearer <token>' };
-    }
-
-    const token = authHeader.slice(7);
-
-    if (!token) {
-      return { user: null, error: 'Empty token' };
-    }
-
-    // Decode JWT (base64url encoded payload)
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      return { user: null, error: 'Invalid token format' };
-    }
-
-    const payloadBase64 = parts[1];
-    const payloadJson = Buffer.from(payloadBase64, 'base64url').toString('utf8');
-    const payload = JSON.parse(payloadJson);
-
-    // Validate payload structure
-    const validatedPayload = jwtPayloadSchema.parse(payload);
-
-    // Check expiration
-    const now = Math.floor(Date.now() / 1000);
-    if (validatedPayload.exp < now) {
-      return { user: null, error: 'Token expired' };
-    }
-
-    return {
-      user: {
-        id: validatedPayload.sub,
-        email: validatedPayload.email,
-        createdAt: new Date(validatedPayload.iat * 1000),
-      },
-      error: null,
-    };
-  } catch (error) {
-    console.error('Auth error:', error);
-    return { user: null, error: 'Invalid token' };
-  }
+export function findUserByEmail(email: string) {
+  return users.get(email.toLowerCase()) || null;
 }
 
 /**
- * Require authentication - returns user or throws error response
+ * Create a new user
  */
-export async function requireAuth(request: NextRequest): Promise<AuthUser> {
-  const { user, error } = await getAuthUser(request);
+export function createUser(email: string, password: string, name: string) {
+  const normalizedEmail = email.toLowerCase();
 
-  if (!user) {
-    throw new AuthError(error || 'Unauthorized', 401);
+  if (users.has(normalizedEmail)) {
+    return null; // User already exists
   }
 
-  return user;
-}
-
-/**
- * Custom error class for auth failures
- */
-export class AuthError extends Error {
-  statusCode: number;
-
-  constructor(message: string, statusCode: number = 401) {
-    super(message);
-    this.name = 'AuthError';
-    this.statusCode = statusCode;
-  }
-}
-
-/**
- * Create an unauthorized response
- */
-export function unauthorizedResponse(message: string = 'Unauthorized') {
-  return new Response(
-    JSON.stringify({
-      error: {
-        code: 'UNAUTHORIZED',
-        message
-      }
-    }),
-    {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    }
-  );
-}
-
-/**
- * Generate a simple JWT token for development/testing
- * In production, use a proper JWT library with signing
- */
-export function generateDevToken(userId: string, email: string): string {
-  const header = { alg: 'none', typ: 'JWT' };
-  const now = Math.floor(Date.now() / 1000);
-  const payload = {
-    sub: userId,
-    email,
-    iat: now,
-    exp: now + 86400 * 30, // 30 days
+  const newUser = {
+    id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    email: normalizedEmail,
+    name,
+    password,
   };
 
-  const headerBase64 = Buffer.from(JSON.stringify(header)).toString('base64url');
-  const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  users.set(normalizedEmail, newUser);
+  return newUser;
+}
 
-  return `${headerBase64}.${payloadBase64}.`;
+/**
+ * Validate user credentials
+ */
+export function validateCredentials(email: string, password: string) {
+  const user = findUserByEmail(email);
+  if (!user) return null;
+
+  // Simple password comparison - in production, use bcrypt
+  if (user.password !== password) return null;
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+  };
+}
+
+/**
+ * NextAuth configuration
+ */
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers: [
+    Credentials({
+      name: 'credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+        isGuest: { label: 'Guest Mode', type: 'text' },
+        name: { label: 'Name', type: 'text' },
+      },
+      async authorize(credentials) {
+        // Handle guest login
+        if (credentials?.isGuest === 'true') {
+          return {
+            id: `guest-${Date.now()}`,
+            email: 'guest@demo.local',
+            name: 'Guest User',
+            isGuest: true,
+          };
+        }
+
+        // Validate credentials
+        const parsed = credentialsSchema.safeParse(credentials);
+        if (!parsed.success) {
+          return null;
+        }
+
+        const { email, password } = parsed.data;
+        const user = validateCredentials(email, password);
+
+        if (!user) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isGuest: false,
+        };
+      },
+    }),
+  ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  pages: {
+    signIn: '/login',
+    error: '/login',
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      // Initial sign in
+      if (user) {
+        token.id = user.id;
+        token.isGuest = (user as User).isGuest || false;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Add user id and guest status to session
+      if (session.user) {
+        session.user.id = token.id as string;
+        (session.user as User).isGuest = token.isGuest as boolean;
+      }
+      return session;
+    },
+  },
+  trustHost: true,
+});
+
+// Re-export auth as getSession for convenience
+export const getSession = auth;
+
+/**
+ * Auth error class for consistent error handling
+ */
+export class AuthError extends Error {
+  constructor(message: string, public status: number = 401) {
+    super(message);
+    this.name = 'AuthError';
+  }
+}
+
+/**
+ * Helper to create unauthorized response
+ */
+export function unauthorizedResponse(message = 'Unauthorized') {
+  return new Response(JSON.stringify({ error: message }), {
+    status: 401,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Auth user interface for API routes
+ */
+export interface AuthUser {
+  id: string;
+  email?: string;
+}
+
+/**
+ * Require authentication for API routes
+ * Returns user object if authenticated, throws AuthError otherwise
+ */
+export async function requireAuth(request: Request): Promise<AuthUser> {
+  // Check for Authorization header (Bearer token or simple auth)
+  const authHeader = request.headers.get('Authorization');
+
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.slice(7);
+    // For demo/development, accept 'demo' token
+    if (token === 'demo') {
+      return { id: 'demo-user-1', email: 'demo@example.com' };
+    }
+  }
+
+  // Try to get session from NextAuth
+  try {
+    const session = await auth();
+    if (session?.user?.id) {
+      return {
+        id: session.user.id as string,
+        email: session.user.email || undefined,
+      };
+    }
+  } catch {
+    // Session check failed
+  }
+
+  throw new AuthError('Authentication required');
 }

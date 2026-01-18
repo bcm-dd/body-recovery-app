@@ -1,11 +1,22 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Navigation } from './components/Navigation';
+import { Providers } from './components/Providers';
 
 export const metadata: Metadata = {
   title: 'Movement & Recovery Companion',
   description: 'AI-driven movement coaching with clinical context',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -29,12 +40,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="app-container">
-          <main className="main-content">
-            {children}
-          </main>
-          <Navigation />
-        </div>
+        <Providers>
+          <div className="app-container">
+            <main className="main-content">
+              {children}
+            </main>
+            <Navigation />
+          </div>
+        </Providers>
       </body>
     </html>
   );

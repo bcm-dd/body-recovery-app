@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { LoadingSpinner, Skeleton, LoadingListItem, StatCardSkeleton } from '../components/LoadingSpinner';
 
 const mockStats = {
   workoutsThisMonth: 12,
@@ -21,8 +24,60 @@ const mockWeeklyProgress = [
   { day: 'Sun', completed: false, readiness: 85 },
 ];
 
+type Stats = typeof mockStats;
+type WeeklyProgress = typeof mockWeeklyProgress;
+
 export default function ProfilePage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'progress' | 'settings'>('progress');
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [weeklyProgress, setWeeklyProgress] = useState<WeeklyProgress | null>(null);
+
+  // Simulate loading stats data
+  useEffect(() => {
+    const loadStats = async () => {
+      setIsLoadingStats(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setStats(mockStats);
+      setWeeklyProgress(mockWeeklyProgress);
+      setIsLoadingStats(false);
+    };
+    loadStats();
+  }, []);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    await signOut({ redirect: false });
+    router.push('/login');
+  };
+
+  // Get user info from session or use defaults
+  const userName = session?.user?.name || 'Guest User';
+  const userEmail = session?.user?.email || '';
+  const userInitials = userName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+  const isGuest = !session || (session.user as { isGuest?: boolean })?.isGuest;
+
+  // Loading state
+  if (status === 'loading') {
+    return (
+      <div className="animate-fade-in">
+        <header className="screen-header">
+          <h1 className="screen-title">Profile</h1>
+        </header>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
+          <div className="skeleton" style={{ width: 200, height: 200, borderRadius: '50%' }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in">
@@ -44,11 +99,18 @@ export default function ProfilePage() {
           color: 'white',
           fontWeight: 700,
         }}>
-          JD
+          {userInitials}
         </div>
         <div>
-          <h2 style={{ fontWeight: 600, marginBottom: '0.25rem' }}>John Doe</h2>
-          <p className="text-secondary">Training for 3 months</p>
+          <h2 style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{userName}</h2>
+          <p className="text-secondary">
+            {isGuest ? 'Guest Mode' : userEmail || 'Training for 3 months'}
+          </p>
+          {isGuest && (
+            <p className="text-tertiary" style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
+              Sign up to save your progress
+            </p>
+          )}
         </div>
       </div>
 
@@ -84,10 +146,21 @@ export default function ProfilePage() {
           {/* Stats grid */}
           <div className="section">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-              <StatCard label="This Month" value={mockStats.workoutsThisMonth} icon="📅" />
-              <StatCard label="Total Workouts" value={mockStats.totalWorkouts} icon="💪" />
-              <StatCard label="Current Streak" value={`${mockStats.currentStreak} days`} icon="🔥" />
-              <StatCard label="Avg Readiness" value={mockStats.avgReadiness} icon="📊" />
+              {isLoadingStats ? (
+                <>
+                  <StatCardSkeleton />
+                  <StatCardSkeleton />
+                  <StatCardSkeleton />
+                  <StatCardSkeleton />
+                </>
+              ) : stats ? (
+                <>
+                  <StatCard label="This Month" value={stats.workoutsThisMonth} icon="📅" />
+                  <StatCard label="Total Workouts" value={stats.totalWorkouts} icon="💪" />
+                  <StatCard label="Current Streak" value={`${stats.currentStreak} days`} icon="🔥" />
+                  <StatCard label="Avg Readiness" value={stats.avgReadiness} icon="📊" />
+                </>
+              ) : null}
             </div>
           </div>
 
@@ -95,61 +168,78 @@ export default function ProfilePage() {
           <div className="section">
             <h3 className="section-title">This Week</h3>
             <div className="card" style={{ margin: 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', height: 120 }}>
-                {mockWeeklyProgress.map((day, i) => (
-                  <div key={day.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                    <div style={{
-                      flex: 1,
-                      width: '60%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'flex-end',
-                    }}>
+              {isLoadingStats ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 120 }}>
+                  <LoadingSpinner size="medium" label="Loading progress..." />
+                </div>
+              ) : weeklyProgress ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between', height: 120 }}>
+                  {weeklyProgress.map((day) => (
+                    <div key={day.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
                       <div style={{
-                        height: `${day.readiness}%`,
-                        background: day.completed
-                          ? 'var(--brand-primary)'
-                          : 'var(--bg-tertiary)',
-                        borderRadius: 4,
-                        minHeight: 8,
-                      }} />
+                        flex: 1,
+                        width: '60%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                      }}>
+                        <div style={{
+                          height: `${day.readiness}%`,
+                          background: day.completed
+                            ? 'var(--brand-primary)'
+                            : 'var(--bg-tertiary)',
+                          borderRadius: 4,
+                          minHeight: 8,
+                          transition: 'height 0.5s ease-out',
+                        }} />
+                      </div>
+                      <div className="text-tertiary" style={{ fontSize: '0.625rem', marginTop: '0.5rem' }}>
+                        {day.day}
+                      </div>
                     </div>
-                    <div className="text-tertiary" style={{ fontSize: '0.625rem', marginTop: '0.5rem' }}>
-                      {day.day}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </div>
 
           {/* Personal bests */}
           <div className="section">
             <h3 className="section-title">Personal Bests</h3>
-            <div className="list-item">
-              <span style={{ fontSize: '1.5rem' }}>🏋️</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500 }}>Bench Press</div>
-                <div className="text-secondary" style={{ fontSize: '0.875rem' }}>185 lbs × 5</div>
-              </div>
-              <span className="text-secondary" style={{ fontSize: '0.75rem' }}>2 weeks ago</span>
-            </div>
-            <div className="list-item">
-              <span style={{ fontSize: '1.5rem' }}>🦵</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500 }}>Squat</div>
-                <div className="text-secondary" style={{ fontSize: '0.875rem' }}>225 lbs × 5</div>
-              </div>
-              <span className="text-secondary" style={{ fontSize: '0.75rem' }}>1 week ago</span>
-            </div>
-            <div className="list-item">
-              <span style={{ fontSize: '1.5rem' }}>💪</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500 }}>Deadlift</div>
-                <div className="text-secondary" style={{ fontSize: '0.875rem' }}>275 lbs × 3</div>
-              </div>
-              <span className="text-secondary" style={{ fontSize: '0.75rem' }}>3 days ago</span>
-            </div>
+            {isLoadingStats ? (
+              <>
+                <LoadingListItem />
+                <LoadingListItem />
+                <LoadingListItem />
+              </>
+            ) : (
+              <>
+                <div className="list-item">
+                  <span style={{ fontSize: '1.5rem' }}>🏋️</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 500 }}>Bench Press</div>
+                    <div className="text-secondary" style={{ fontSize: '0.875rem' }}>185 lbs x 5</div>
+                  </div>
+                  <span className="text-secondary" style={{ fontSize: '0.75rem' }}>2 weeks ago</span>
+                </div>
+                <div className="list-item">
+                  <span style={{ fontSize: '1.5rem' }}>🦵</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 500 }}>Squat</div>
+                    <div className="text-secondary" style={{ fontSize: '0.875rem' }}>225 lbs x 5</div>
+                  </div>
+                  <span className="text-secondary" style={{ fontSize: '0.75rem' }}>1 week ago</span>
+                </div>
+                <div className="list-item">
+                  <span style={{ fontSize: '1.5rem' }}>💪</span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 500 }}>Deadlift</div>
+                    <div className="text-secondary" style={{ fontSize: '0.875rem' }}>275 lbs x 3</div>
+                  </div>
+                  <span className="text-secondary" style={{ fontSize: '0.75rem' }}>3 days ago</span>
+                </div>
+              </>
+            )}
           </div>
         </>
       ) : (
@@ -178,8 +268,13 @@ export default function ProfilePage() {
           </div>
 
           <div className="section">
-            <button className="btn btn-secondary btn-full" style={{ color: 'var(--error)' }}>
-              Sign Out
+            <button
+              className="btn btn-secondary btn-full"
+              style={{ color: 'var(--error)', opacity: isSigningOut ? 0.7 : 1 }}
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+            >
+              {isSigningOut ? 'Signing Out...' : 'Sign Out'}
             </button>
           </div>
         </>

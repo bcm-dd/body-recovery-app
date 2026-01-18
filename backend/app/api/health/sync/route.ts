@@ -2,13 +2,15 @@
  * Health Sync API - Movement & Recovery Companion
  *
  * Receives health data from mobile devices and returns readiness.
+ * Uses Vercel KV for fast storage with Postgres fallback.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db, healthSnapshots } from '@/db';
-import { eq, and, desc } from 'drizzle-orm';
 import { z } from 'zod';
 import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
+import { saveUserReadiness, saveHealthSnapshot } from '@/lib/store';
+import type { ReadinessInput } from '@/lib/types';
 
 // Request validation
 const healthSyncSchema = z.object({
@@ -32,41 +34,72 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { snapshots } = healthSyncSchema.parse(body);
 
-    // Upsert health snapshots
+    // Process each snapshot
     for (const snapshot of snapshots) {
-      await db
-        .insert(healthSnapshots)
-        .values({
-          userId,
-          date: snapshot.date,
-          sleepDuration: snapshot.sleepDuration?.toString(),
-          sleepQuality: snapshot.sleepQuality,
-          hrv: snapshot.hrv?.toString(),
-          restingHr: snapshot.restingHr,
-          steps: snapshot.steps,
-          activeCalories: snapshot.activeCalories,
-        })
-        .onConflictDoUpdate({
-          target: [healthSnapshots.userId, healthSnapshots.date],
-          set: {
+      // Save to Postgres for historical data
+      try {
+        await db
+          .insert(healthSnapshots)
+          .values({
+            userId,
+            date: snapshot.date,
             sleepDuration: snapshot.sleepDuration?.toString(),
             sleepQuality: snapshot.sleepQuality,
             hrv: snapshot.hrv?.toString(),
             restingHr: snapshot.restingHr,
             steps: snapshot.steps,
             activeCalories: snapshot.activeCalories,
-          },
-        });
+          })
+          .onConflictDoUpdate({
+            target: [healthSnapshots.userId, healthSnapshots.date],
+            set: {
+              sleepDuration: snapshot.sleepDuration?.toString(),
+              sleepQuality: snapshot.sleepQuality,
+              hrv: snapshot.hrv?.toString(),
+              restingHr: snapshot.restingHr,
+              steps: snapshot.steps,
+              activeCalories: snapshot.activeCalories,
+            },
+          });
+      } catch (dbError) {
+        // Log but continue - KV will still work
+        console.warn('Postgres insert failed, continuing with KV:', dbError);
+      }
+
+      // Save to KV for fast access
+      await saveHealthSnapshot(userId, {
+        date: snapshot.date,
+        sleepDuration: snapshot.sleepDuration,
+        sleepQuality: snapshot.sleepQuality,
+        hrv: snapshot.hrv,
+        restingHr: snapshot.restingHr,
+        steps: snapshot.steps,
+        activeCalories: snapshot.activeCalories,
+      });
     }
 
-    // Calculate readiness for the latest snapshot
+    // Calculate and save readiness for the latest snapshot
     const latestSnapshot = snapshots[snapshots.length - 1];
-    const readiness = calculateReadiness(latestSnapshot);
+    const readinessInput: ReadinessInput = {
+      date: latestSnapshot.date,
+      sleepDuration: latestSnapshot.sleepDuration,
+      sleepQuality: latestSnapshot.sleepQuality,
+      hrv: latestSnapshot.hrv,
+      restingHr: latestSnapshot.restingHr,
+      steps: latestSnapshot.steps,
+      activeCalories: latestSnapshot.activeCalories,
+    };
+
+    const readiness = await saveUserReadiness(userId, readinessInput);
 
     return NextResponse.json({
       data: {
         synced: snapshots.length,
-        readiness,
+        readiness: {
+          score: readiness.score,
+          factors: readiness.factors,
+          recommendation: readiness.recommendation,
+        },
       },
       meta: {
         timestamp: new Date().toISOString(),
@@ -93,104 +126,46 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function calculateReadiness(snapshot: {
-  sleepDuration?: number;
-  sleepQuality?: number;
-  hrv?: number;
-  restingHr?: number;
-  steps?: number;
-  activeCalories?: number;
-}) {
-  // Factor scores (0-100 each)
-  const factors = {
-    sleep: calculateSleepFactor(snapshot.sleepDuration, snapshot.sleepQuality),
-    recovery: calculateRecoveryFactor(snapshot.hrv, snapshot.restingHr),
-    load: calculateLoadFactor(snapshot.steps, snapshot.activeCalories),
-    body: 100, // Default until injury data is integrated
-  };
+export async function GET(request: NextRequest) {
+  try {
+    // Authenticate user
+    const user = await requireAuth(request);
+    const userId = user.id;
 
-  // Weighted average: 30% sleep, 30% recovery, 25% load, 15% body
-  const score = Math.round(
-    factors.sleep * 0.30 +
-    factors.recovery * 0.30 +
-    factors.load * 0.25 +
-    factors.body * 0.15
-  );
+    // Get date from query params
+    const { searchParams } = new URL(request.url);
+    const date = searchParams.get('date');
 
-  let recommendation: string;
-  if (score >= 75) recommendation = 'full';
-  else if (score >= 55) recommendation = 'moderate';
-  else if (score >= 35) recommendation = 'light';
-  else recommendation = 'rest';
+    // Import dynamically to avoid circular dependency issues
+    const { getHealthSnapshot } = await import('@/lib/store');
+    const snapshot = await getHealthSnapshot(userId, date || new Date().toISOString().split('T')[0]);
 
-  return {
-    score,
-    factors,
-    recommendation,
-  };
-}
-
-function calculateSleepFactor(duration?: number, quality?: number): number {
-  let score = 70; // Base
-
-  if (duration !== undefined) {
-    if (duration >= 7 && duration <= 9) {
-      score += 20;
-    } else if (duration >= 6 && duration < 7) {
-      score += 5;
-    } else if (duration > 9) {
-      score += 10;
-    } else if (duration < 6) {
-      score -= 20;
+    if (!snapshot) {
+      return NextResponse.json({
+        data: null,
+        meta: {
+          timestamp: new Date().toISOString(),
+          message: 'No health data found for the specified date',
+        },
+      });
     }
+
+    return NextResponse.json({
+      data: snapshot,
+      meta: {
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('Health get error:', error);
+
+    if (error instanceof AuthError) {
+      return unauthorizedResponse(error.message);
+    }
+
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to get health data' } },
+      { status: 500 }
+    );
   }
-
-  if (quality !== undefined) {
-    // Quality is 0-100
-    score += (quality - 70) / 3;
-  }
-
-  return Math.max(0, Math.min(100, Math.round(score)));
-}
-
-function calculateRecoveryFactor(hrv?: number, restingHr?: number): number {
-  let score = 70; // Base
-
-  if (hrv !== undefined) {
-    // HRV baseline assumption: 50ms is average
-    if (hrv >= 60) score += 20;
-    else if (hrv >= 50) score += 10;
-    else if (hrv >= 40) score -= 5;
-    else score -= 15;
-  }
-
-  if (restingHr !== undefined) {
-    // Resting HR baseline assumption: 60 bpm is average
-    if (restingHr <= 55) score += 10;
-    else if (restingHr <= 65) score += 5;
-    else if (restingHr > 75) score -= 10;
-  }
-
-  return Math.max(0, Math.min(100, Math.round(score)));
-}
-
-function calculateLoadFactor(steps?: number, activeCalories?: number): number {
-  // Load factor: higher load = lower readiness (need recovery)
-  let score = 85; // Base - assume moderate activity
-
-  if (steps !== undefined) {
-    // 7500 steps is "moderate" baseline
-    if (steps > 15000) score -= 20;
-    else if (steps > 10000) score -= 10;
-    else if (steps < 3000) score += 5;
-  }
-
-  if (activeCalories !== undefined) {
-    // 400 cal is moderate baseline
-    if (activeCalories > 800) score -= 15;
-    else if (activeCalories > 500) score -= 5;
-    else if (activeCalories < 200) score += 5;
-  }
-
-  return Math.max(0, Math.min(100, Math.round(score)));
 }

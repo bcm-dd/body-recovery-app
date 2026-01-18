@@ -124,12 +124,18 @@ export default function ChatPage() {
       </header>
 
       {/* Messages */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '0 1rem',
-        paddingBottom: '100px',
-      }}>
+      <div
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+        aria-relevant="additions"
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '0 1rem',
+          paddingBottom: '100px',
+        }}
+      >
         {messages.map(message => (
           <div
             key={message.id}
@@ -140,6 +146,8 @@ export default function ChatPage() {
             }}
           >
             <div
+              role="article"
+              aria-label={`${message.role === 'user' ? 'You' : 'Coach'} said`}
               style={{
                 maxWidth: '80%',
                 padding: '0.75rem 1rem',
@@ -155,7 +163,7 @@ export default function ChatPage() {
               }}
             >
               {message.content || (
-                <span className="skeleton" style={{ display: 'inline-block', width: 60, height: 16 }} />
+                <span className="skeleton" style={{ display: 'inline-block', width: 60, height: 16 }} aria-label="Loading response" />
               )}
             </div>
           </div>
@@ -164,13 +172,17 @@ export default function ChatPage() {
       </div>
 
       {/* Quick suggestions */}
-      <div style={{
-        padding: '0.5rem 1rem',
-        display: 'flex',
-        gap: '0.5rem',
-        overflowX: 'auto',
-        background: 'var(--bg-primary)',
-      }}>
+      <div
+        role="group"
+        aria-label="Quick message suggestions"
+        style={{
+          padding: '0.5rem 1rem',
+          display: 'flex',
+          gap: '0.5rem',
+          overflowX: 'auto',
+          background: 'var(--bg-primary)',
+        }}
+      >
         {['My shoulder hurts', 'Modify this exercise', 'Is this weight ok?'].map(suggestion => (
           <button
             key={suggestion}
@@ -181,6 +193,7 @@ export default function ChatPage() {
               whiteSpace: 'nowrap',
             }}
             onClick={() => setInput(suggestion)}
+            aria-label={`Use suggestion: ${suggestion}`}
           >
             {suggestion}
           </button>
@@ -195,8 +208,17 @@ export default function ChatPage() {
         position: 'sticky',
         bottom: 80,
       }}>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <form
+          style={{ display: 'flex', gap: '0.5rem' }}
+          onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+          role="search"
+          aria-label="Send message to coach"
+        >
+          <label htmlFor="chat-input" className="sr-only">
+            Message to coach
+          </label>
           <input
+            id="chat-input"
             type="text"
             className="input"
             value={input}
@@ -204,16 +226,22 @@ export default function ChatPage() {
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="Ask your coach..."
             disabled={isLoading}
+            aria-describedby="chat-status"
           />
+          <span id="chat-status" className="sr-only" aria-live="polite">
+            {isLoading ? 'Sending message...' : ''}
+          </span>
           <button
+            type="submit"
             className="btn btn-primary"
             onClick={sendMessage}
             disabled={isLoading || !input.trim()}
             style={{ padding: '0.75rem 1rem' }}
+            aria-label={isLoading ? 'Sending message' : 'Send message'}
           >
             {isLoading ? '...' : '→'}
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
