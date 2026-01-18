@@ -5,10 +5,10 @@
  */
 
 import { NextRequest } from 'next/server';
-import { anthropic } from '@ai-sdk/anthropic';
 import { streamText } from 'ai';
 import { z } from 'zod';
 import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
+import { taskModels } from '@/lib/ai';
 
 // Request validation
 const chatRequestSchema = z.object({
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     const systemPrompt = buildSystemPrompt(context);
 
     const result = await streamText({
-      model: anthropic('claude-sonnet-4-20250514'),
+      model: taskModels.chat,
       system: systemPrompt,
       messages,
     });

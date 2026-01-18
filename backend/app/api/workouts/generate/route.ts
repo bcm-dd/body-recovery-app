@@ -5,12 +5,12 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { anthropic } from '@ai-sdk/anthropic';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { db, injuries, workouts } from '@/db';
-import { eq, desc, and, or, isNull, gte } from 'drizzle-orm';
+import { eq, desc, and, or } from 'drizzle-orm';
 import { requireAuth, AuthError, unauthorizedResponse } from '@/lib/auth';
+import { taskModels } from '@/lib/ai';
 
 // Request validation
 const generateRequestSchema = z.object({
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     );
 
     const result = await generateObject({
-      model: anthropic('claude-sonnet-4-20250514'),
+      model: taskModels.workoutGeneration,
       schema: workoutSchema,
       prompt: `Generate a workout for someone with the following preferences:
 - Duration: ${preferences?.duration || 45} minutes
