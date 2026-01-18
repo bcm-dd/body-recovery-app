@@ -44,8 +44,6 @@ export default function BodyPage() {
     }
   };
 
-  const injuredRegions = mockInjuries.map(i => i.region);
-
   return (
     <div className="animate-fade-in">
       <header className="screen-header">
