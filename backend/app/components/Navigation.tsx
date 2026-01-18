@@ -11,73 +11,69 @@ const navItems = [
   { href: '/profile', label: 'Profile', icon: '👤' },
 ];
 
+const styles = {
+  navBar: {
+    position: 'fixed' as const,
+    bottom: 0,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: '100%',
+    maxWidth: 430,
+    height: 80,
+    background: 'var(--bg-primary)',
+    borderTop: '1px solid var(--border-light)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+    zIndex: 100,
+  },
+  navItem: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    gap: '0.25rem',
+    padding: '0.5rem',
+    textDecoration: 'none',
+    color: 'var(--text-tertiary)',
+    transition: 'color 0.2s',
+    WebkitTapHighlightColor: 'transparent',
+  },
+  navItemActive: {
+    color: 'var(--brand-primary)',
+  },
+  navIcon: {
+    fontSize: '1.5rem',
+  },
+  navLabel: {
+    fontSize: '0.625rem',
+    fontWeight: 600,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.02em',
+  },
+};
+
 export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="nav-bar">
+    <nav style={styles.navBar}>
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`nav-item ${isActive ? 'nav-item-active' : ''}`}
+            style={{
+              ...styles.navItem,
+              ...(isActive ? styles.navItemActive : {}),
+            }}
           >
-            <span className="nav-icon">{item.icon}</span>
-            <span className="nav-label">{item.label}</span>
+            <span style={styles.navIcon}>{item.icon}</span>
+            <span style={styles.navLabel}>{item.label}</span>
           </Link>
         );
       })}
-      <style jsx>{`
-        .nav-bar {
-          position: fixed;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 100%;
-          max-width: 430px;
-          height: var(--nav-height);
-          background: var(--bg-primary);
-          border-top: 1px solid var(--border-light);
-          display: flex;
-          align-items: center;
-          justify-content: space-around;
-          padding-bottom: var(--safe-area-bottom);
-          z-index: 100;
-        }
-
-        .nav-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.25rem;
-          padding: 0.5rem;
-          text-decoration: none;
-          color: var(--text-tertiary);
-          transition: color 0.2s;
-          -webkit-tap-highlight-color: transparent;
-        }
-
-        .nav-item:hover {
-          color: var(--text-secondary);
-        }
-
-        .nav-item-active {
-          color: var(--brand-primary);
-        }
-
-        .nav-icon {
-          font-size: 1.5rem;
-        }
-
-        .nav-label {
-          font-size: 0.625rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.02em;
-        }
-      `}</style>
     </nav>
   );
 }
