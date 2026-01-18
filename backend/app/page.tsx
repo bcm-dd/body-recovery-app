@@ -1,217 +1,213 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ReadinessRing } from './components/ReadinessRing';
 
-export default function Home() {
-  const [chatInput, setChatInput] = useState('');
-  const [chatResponse, setChatResponse] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+// Mock data - would come from API in production
+const mockReadiness = {
+  score: 78,
+  factors: {
+    sleep: 85,
+    recovery: 72,
+    load: 80,
+    body: 75,
+  },
+  recommendation: 'full' as const,
+};
 
-  const testChat = async () => {
-    if (!chatInput.trim()) return;
+const mockWorkout = {
+  id: 'workout-1',
+  name: 'Upper Body Strength',
+  duration: 45,
+  exercises: 6,
+  focus: 'Chest, Shoulders, Triceps',
+};
 
-    setIsLoading(true);
-    setChatResponse('');
+export default function TodayPage() {
+  const [greeting, setGreeting] = useState('Good morning');
+  const [date, setDate] = useState('');
 
-    try {
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer demo-token', // Would be real token in production
-        },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: chatInput }],
-          context: {
-            currentWorkout: 'Upper Body',
-            readinessScore: 75,
-          },
-        }),
-      });
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good morning');
+    else if (hour < 17) setGreeting('Good afternoon');
+    else setGreeting('Good evening');
 
-      if (!response.ok) {
-        const error = await response.json();
-        setChatResponse(`Error: ${error.error?.message || 'Request failed'}`);
-        return;
-      }
-
-      // Handle streaming response
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let result = '';
-
-      while (reader) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        result += decoder.decode(value);
-        setChatResponse(result);
-      }
-    } catch (error) {
-      setChatResponse(`Error: ${error}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setDate(new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    }));
+  }, []);
 
   return (
-    <div className="container">
-      <header style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-          Movement & Recovery Companion
-        </h1>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          AI-driven movement coaching with clinical context
-        </p>
+    <div className="animate-fade-in">
+      {/* Header */}
+      <header className="screen-header">
+        <p className="text-secondary" style={{ fontSize: '0.875rem' }}>{date}</p>
+        <h1 className="screen-title">{greeting}</h1>
       </header>
 
-      {/* Status Section */}
+      {/* Readiness Card */}
       <div className="card">
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>
-          System Status
-        </h2>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div className="status-badge status-online">
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} />
-            API Online
-          </div>
-          <div className="status-badge status-online">
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} />
-            AI Gateway Connected
-          </div>
+        <div className="card-header">
+          <h2 className="card-title">Today's Readiness</h2>
+          <span className={`badge ${getReadinessBadge(mockReadiness.recommendation)}`}>
+            {getReadinessLabel(mockReadiness.recommendation)}
+          </span>
         </div>
-      </div>
-
-      {/* API Endpoints */}
-      <div className="card">
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>
-          API Endpoints
-        </h2>
-        <div style={{ display: 'grid', gap: '0.75rem' }}>
-          <EndpointRow
-            method="POST"
-            path="/api/health/sync"
-            description="Sync health data from mobile device"
-          />
-          <EndpointRow
-            method="POST"
-            path="/api/workouts/generate"
-            description="Generate AI-powered workout with constraints"
-          />
-          <EndpointRow
-            method="POST"
-            path="/api/ai/chat"
-            description="Streaming conversational AI for workout adjustments"
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem 0' }}>
+          <ReadinessRing
+            score={mockReadiness.score}
+            factors={mockReadiness.factors}
+            size={200}
           />
         </div>
-      </div>
-
-      {/* Chat Test */}
-      <div className="card">
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>
-          Test AI Chat
-        </h2>
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-          <input
-            type="text"
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && testChat()}
-            placeholder="Try: 'My shoulder hurts during bench press'"
-            style={{
-              flex: 1,
-              padding: '0.75rem 1rem',
-              borderRadius: '8px',
-              border: '1px solid var(--border)',
-              fontSize: '1rem',
-            }}
-          />
-          <button
-            className="btn btn-primary"
-            onClick={testChat}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Thinking...' : 'Send'}
-          </button>
-        </div>
-        {chatResponse && (
-          <div style={{
-            padding: '1rem',
-            background: 'var(--bg-secondary)',
-            borderRadius: '8px',
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'monospace',
-            fontSize: '0.875rem',
-          }}>
-            {chatResponse}
-          </div>
-        )}
-      </div>
-
-      {/* Mobile App */}
-      <div className="card">
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>
-          Mobile App
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-          The full experience is available on the React Native mobile app for iOS and Android.
+        <p className="text-secondary text-center" style={{ marginTop: '0.5rem' }}>
+          {getReadinessMessage(mockReadiness.recommendation)}
         </p>
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="btn btn-secondary">
-            📱 iOS App
-          </button>
-          <button className="btn btn-secondary">
-            🤖 Android App
-          </button>
+      </div>
+
+      {/* Today's Workout */}
+      <div className="section">
+        <h3 className="section-title">Today's Plan</h3>
+        <Link href="/workout" style={{ textDecoration: 'none' }}>
+          <div className="card" style={{ margin: 0, cursor: 'pointer' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{
+                width: 56,
+                height: 56,
+                borderRadius: 12,
+                background: 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.5rem',
+              }}>
+                💪
+              </div>
+              <div style={{ flex: 1 }}>
+                <h4 style={{ fontWeight: 600, marginBottom: '0.25rem' }}>
+                  {mockWorkout.name}
+                </h4>
+                <p className="text-secondary" style={{ fontSize: '0.875rem' }}>
+                  {mockWorkout.duration} min • {mockWorkout.exercises} exercises
+                </p>
+              </div>
+              <span style={{ fontSize: '1.5rem', color: 'var(--text-tertiary)' }}>→</span>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="section">
+        <h3 className="section-title">Quick Actions</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+          <Link href="/body" style={{ textDecoration: 'none' }}>
+            <QuickAction icon="🫀" label="Log Pain" color="#EF4444" />
+          </Link>
+          <Link href="/chat" style={{ textDecoration: 'none' }}>
+            <QuickAction icon="💬" label="Ask Coach" color="#3B82F6" />
+          </Link>
+          <Link href="/workout" style={{ textDecoration: 'none' }}>
+            <QuickAction icon="🔄" label="Change Plan" color="#8B5CF6" />
+          </Link>
+          <Link href="/profile" style={{ textDecoration: 'none' }}>
+            <QuickAction icon="📊" label="Progress" color="#10B981" />
+          </Link>
         </div>
       </div>
 
-      {/* Footer */}
-      <footer style={{
-        textAlign: 'center',
-        padding: '2rem',
-        color: 'var(--text-secondary)',
-        fontSize: '0.875rem',
-      }}>
-        Movement & Recovery Companion • Powered by Claude 4.5
-      </footer>
+      {/* Recent Activity */}
+      <div className="section">
+        <h3 className="section-title">This Week</h3>
+        <div className="card" style={{ margin: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
+              <div key={day + i} style={{ textAlign: 'center' }}>
+                <div className="text-tertiary" style={{ fontSize: '0.75rem', marginBottom: '0.5rem' }}>
+                  {day}
+                </div>
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: i < 4 ? 'var(--success)' : i === 4 ? 'var(--brand-primary)' : 'var(--bg-tertiary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: i <= 4 ? 'white' : 'var(--text-tertiary)',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                }}>
+                  {i < 4 ? '✓' : i === 4 ? '!' : ''}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-secondary text-center" style={{ fontSize: '0.875rem' }}>
+            4 workouts completed • 1 scheduled today
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function EndpointRow({ method, path, description }: {
-  method: string;
-  path: string;
-  description: string;
-}) {
+function QuickAction({ icon, label, color }: { icon: string; label: string; color: string }) {
   return (
     <div style={{
+      background: 'var(--bg-primary)',
+      border: '1px solid var(--border-light)',
+      borderRadius: 12,
+      padding: '1rem',
       display: 'flex',
       alignItems: 'center',
-      gap: '1rem',
-      padding: '0.5rem 0',
-      borderBottom: '1px solid var(--border)',
+      gap: '0.75rem',
+      cursor: 'pointer',
+      transition: 'background 0.2s',
     }}>
-      <span style={{
-        background: '#DBEAFE',
-        color: '#1E40AF',
-        padding: '0.25rem 0.5rem',
-        borderRadius: '4px',
-        fontSize: '0.75rem',
-        fontWeight: 600,
-        fontFamily: 'monospace',
+      <div style={{
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        background: `${color}15`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '1.25rem',
       }}>
-        {method}
-      </span>
-      <code style={{
-        flex: 1,
-        fontFamily: 'monospace',
-        fontSize: '0.875rem',
-      }}>
-        {path}
-      </code>
-      <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-        {description}
-      </span>
+        {icon}
+      </div>
+      <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{label}</span>
     </div>
   );
+}
+
+function getReadinessBadge(rec: string) {
+  switch (rec) {
+    case 'full': return 'badge-success';
+    case 'moderate': return 'badge-warning';
+    default: return 'badge-error';
+  }
+}
+
+function getReadinessLabel(rec: string) {
+  switch (rec) {
+    case 'full': return 'Ready to Train';
+    case 'moderate': return 'Moderate Day';
+    case 'light': return 'Take It Easy';
+    default: return 'Rest Day';
+  }
+}
+
+function getReadinessMessage(rec: string) {
+  switch (rec) {
+    case 'full': return 'Your body is well-recovered. Full intensity recommended.';
+    case 'moderate': return 'Good to train, but listen to your body.';
+    case 'light': return 'Consider lighter weights or mobility work today.';
+    default: return 'Your body needs rest. Take the day off.';
+  }
 }
