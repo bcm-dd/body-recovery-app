@@ -87,14 +87,18 @@ function LoginForm() {
       {/* Form */}
       <div style={{ padding: 'var(--spacing-lg)', flex: 1 }}>
         {(error || formError) && (
-          <div style={{
-            background: '#FEE2E2',
-            color: '#991B1B',
-            padding: 'var(--spacing-md)',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: 'var(--spacing-lg)',
-            fontSize: '0.875rem',
-          }}>
+          <div
+            role="alert"
+            aria-live="assertive"
+            style={{
+              background: '#FEE2E2',
+              color: '#991B1B',
+              padding: 'var(--spacing-md)',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: 'var(--spacing-lg)',
+              fontSize: '0.875rem',
+            }}
+          >
             {formError || 'Authentication failed. Please try again.'}
           </div>
         )}
@@ -153,6 +157,7 @@ function LoginForm() {
             type="submit"
             className="btn btn-primary btn-full btn-lg"
             disabled={isLoading}
+            aria-busy={isLoading}
             style={{ opacity: isLoading ? 0.7 : 1 }}
           >
             {isLoading ? 'Signing in...' : 'Sign In'}

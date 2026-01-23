@@ -6,17 +6,15 @@
  */
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type {
-  BodyModel,
   Injury,
   Surgery,
   ChronicCondition,
   Constraint,
   BodyRegion,
   Severity,
-  InjuryStatus,
   MovementPattern,
   PainLog,
 } from '@/types';
@@ -166,7 +164,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       updateInjury: (id, updates) => {
         set((state) => {
-          const index = state.injuries.findIndex((i) => i.id === id);
+          const index = state.injuries.findIndex((i: Injury) => i.id === id);
           if (index !== -1) {
             state.injuries[index] = {
               ...state.injuries[index],
@@ -181,7 +179,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       resolveInjury: (id) => {
         set((state) => {
-          const index = state.injuries.findIndex((i) => i.id === id);
+          const index = state.injuries.findIndex((i: Injury) => i.id === id);
           if (index !== -1) {
             state.injuries[index].status = 'resolved';
             state.injuries[index].resolvedDate = new Date();
@@ -194,7 +192,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       deleteInjury: (id) => {
         set((state) => {
-          state.injuries = state.injuries.filter((i) => i.id !== id);
+          state.injuries = state.injuries.filter((i: Injury) => i.id !== id);
           state.activeConstraints = collectConstraints(state);
         });
       },
@@ -213,7 +211,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       updateSurgery: (id, updates) => {
         set((state) => {
-          const index = state.surgeries.findIndex((s) => s.id === id);
+          const index = state.surgeries.findIndex((s: Surgery) => s.id === id);
           if (index !== -1) {
             state.surgeries[index] = { ...state.surgeries[index], ...updates };
           }
@@ -222,7 +220,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       deleteSurgery: (id) => {
         set((state) => {
-          state.surgeries = state.surgeries.filter((s) => s.id !== id);
+          state.surgeries = state.surgeries.filter((s: Surgery) => s.id !== id);
         });
       },
 
@@ -241,7 +239,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       updateChronicCondition: (id, updates) => {
         set((state) => {
-          const index = state.chronicConditions.findIndex((c) => c.id === id);
+          const index = state.chronicConditions.findIndex((c: ChronicCondition) => c.id === id);
           if (index !== -1) {
             state.chronicConditions[index] = {
               ...state.chronicConditions[index],
@@ -254,7 +252,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       deleteChronicCondition: (id) => {
         set((state) => {
-          state.chronicConditions = state.chronicConditions.filter((c) => c.id !== id);
+          state.chronicConditions = state.chronicConditions.filter((c: ChronicCondition) => c.id !== id);
           state.activeConstraints = collectConstraints(state);
         });
       },
@@ -279,7 +277,7 @@ export const useBodyModelStore = create<BodyModelStore>()(
 
       removeConstraint: (id) => {
         set((state) => {
-          state.manualConstraints = state.manualConstraints.filter((c) => c.id !== id);
+          state.manualConstraints = state.manualConstraints.filter((c: Constraint) => c.id !== id);
           state.activeConstraints = collectConstraints(state);
         });
       },
@@ -385,8 +383,8 @@ export const useBodyModelStore = create<BodyModelStore>()(
       markSynced: () => {
         set((state) => {
           state.lastSyncedAt = new Date();
-          state.injuries.forEach((i) => (i.synced = true));
-          state.painLogs.forEach((p) => (p.synced = true));
+          state.injuries.forEach((i: Injury) => (i.synced = true));
+          state.painLogs.forEach((p: PainLog) => (p.synced = true));
         });
       },
 

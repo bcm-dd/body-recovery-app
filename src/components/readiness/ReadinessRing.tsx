@@ -34,6 +34,7 @@ interface ReadinessRingProps {
   recommendation: ReadinessRecommendation;
   size?: 'sm' | 'md' | 'lg';
   animated?: boolean;
+  accessibilityLabel?: string;
 }
 
 // ============================================================================
@@ -52,6 +53,7 @@ export function ReadinessRing({
   recommendation,
   size = 'md',
   animated = true,
+  accessibilityLabel,
 }: ReadinessRingProps) {
   const { theme } = useTheme();
   const { colors, components } = theme;
@@ -150,8 +152,28 @@ export function ReadinessRing({
     return (startAngle / 360) * innerCircumference;
   };
 
+  // Build accessibility description
+  const recommendationText = {
+    full: 'full workout',
+    moderate: 'moderate workout',
+    light: 'light activity',
+    rest: 'rest day',
+  }[recommendation];
+
+  const defaultAccessibilityLabel = `Readiness score: ${score} out of 100. Recommendation: ${recommendationText}.${
+    factors
+      ? ` Sleep: ${factors.sleep}%, Recovery: ${factors.recovery}%, Load: ${factors.load}%, Body: ${factors.body}%.`
+      : ''
+  }`;
+
   return (
-    <View style={[styles.container, { width: ringSize, height: ringSize }]}>
+    <View
+      style={[styles.container, { width: ringSize, height: ringSize }]}
+      accessible={true}
+      accessibilityRole="progressbar"
+      accessibilityLabel={accessibilityLabel || defaultAccessibilityLabel}
+      accessibilityValue={{ min: 0, max: 100, now: score }}
+    >
       <Svg width={ringSize} height={ringSize}>
         <Defs>
           <LinearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">

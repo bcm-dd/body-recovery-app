@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Movement &amp; Recovery</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+
+	<!-- HealthKit Permissions -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>Movement &amp; Recovery uses your health data to calculate your daily readiness score and personalize your workouts based on sleep quality, heart rate variability, and recovery metrics.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Movement &amp; Recovery records your workout data to track your progress and help optimize your training schedule.</string>
+
+	<!-- Camera Permission (for VisionCamera - document scanning) -->
+	<key>NSCameraUsageDescription</key>
+	<string>Movement &amp; Recovery uses your camera to scan medical documents, injury reports, and exercise form for AI analysis.</string>
+
+	<!-- Microphone Permission (for Voice Input) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Movement &amp; Recovery uses your microphone for voice commands during workouts and to dictate notes about injuries or pain.</string>
+
+	<!-- Speech Recognition (for Voice Commands) -->
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Movement &amp; Recovery uses speech recognition for hands-free workout control and voice logging during exercises.</string>
+
+	<!-- Photo Library (optional - for saving progress photos) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Movement &amp; Recovery can save workout progress photos and injury documentation to your photo library.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Movement &amp; Recovery can save workout progress photos and injury documentation to your photo library.</string>
+
+	<!-- Background Modes for HealthKit -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+		<string>fetch</string>
+	</array>
+
+	<!-- Required for HealthKit Clinical Records (if needed later) -->
+	<key>NSHealthClinicalHealthRecordsShareUsageDescription</key>
+	<string>Movement &amp; Recovery can import clinical health records to better understand your medical history and tailor recovery recommendations.</string>
+
+	<!-- App Category -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.healthcare-fitness</string>
+</dict>
+</plist>

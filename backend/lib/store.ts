@@ -13,7 +13,6 @@ import {
   ReadinessRecommendation,
   Workout,
   WorkoutSession,
-  ExerciseLog,
   Injury,
   InjuryInput,
   InjuryUpdate,

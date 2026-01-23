@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 
 interface WorkoutStats {
@@ -81,6 +81,8 @@ function Confetti() {
 
 export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutCompleteProps) {
   const [showConfetti, setShowConfetti] = useState(true);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const doneButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Hide confetti after animation completes
@@ -88,8 +90,29 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
     return () => clearTimeout(timer);
   }, []);
 
+  // Focus the done button when the dialog opens
+  useEffect(() => {
+    doneButtonRef.current?.focus();
+  }, []);
+
+  // Handle escape key to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="workout-complete-title"
+      aria-describedby="workout-complete-description"
       className="animate-fade-in"
       style={{
         position: 'fixed',
@@ -108,6 +131,7 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
 
       {/* Success checkmark with pulse animation */}
       <div
+        aria-hidden="true"
         style={{
           width: 120,
           height: 120,
@@ -142,6 +166,7 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
 
       {/* Title */}
       <h1
+        id="workout-complete-title"
         style={{
           fontSize: '1.75rem',
           fontWeight: 700,
@@ -155,6 +180,7 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
 
       {/* Subtitle */}
       <p
+        id="workout-complete-description"
         className="text-secondary"
         style={{
           fontSize: '1rem',
@@ -222,8 +248,10 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
       <div style={{ width: '100%', maxWidth: 320 }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
           <button
+            ref={doneButtonRef}
             className="btn btn-primary btn-full btn-lg"
             onClick={onClose}
+            aria-label="Done, return to dashboard"
           >
             Done
           </button>
@@ -232,6 +260,7 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
           <button
             className="btn btn-ghost btn-full"
             style={{ marginTop: 'var(--spacing-sm)' }}
+            aria-label="View your workout progress"
           >
             View Progress
           </button>
@@ -244,6 +273,8 @@ export function WorkoutComplete({ workoutName, stats, onClose }: WorkoutComplete
 function StatBox({ icon, value, label }: { icon: string; value: string; label: string }) {
   return (
     <div
+      role="group"
+      aria-label={`${label}: ${value}`}
       style={{
         background: 'var(--bg-secondary)',
         borderRadius: 'var(--radius-lg)',
@@ -252,7 +283,7 @@ function StatBox({ icon, value, label }: { icon: string; value: string; label: s
         border: '1px solid var(--border-light)',
       }}
     >
-      <div style={{ fontSize: '1.25rem', marginBottom: 'var(--spacing-xs)' }}>{icon}</div>
+      <div aria-hidden="true" style={{ fontSize: '1.25rem', marginBottom: 'var(--spacing-xs)' }}>{icon}</div>
       <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>
         {value}
       </div>
@@ -268,7 +299,7 @@ function getMotivationalEmoji(exercisesCompleted: number): string {
   return '👏';
 }
 
-function getMotivationalMessage(exercisesCompleted: number): string {
+function getMotivationalMessage(_exercisesCompleted: number): string {
   const messages = [
     "Every workout counts. You're building habits that last!",
     "Consistency is key. You showed up and crushed it!",

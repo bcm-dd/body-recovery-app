@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { colors } from '../theme/tokens';
+import { palette } from '../theme/tokens';
 
 interface Props {
   children: ReactNode;
@@ -95,7 +95,7 @@ interface ErrorFallbackProps {
   onRetry: () => void;
 }
 
-function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps): JSX.Element {
+function ErrorFallback({ error, level, onRetry }: ErrorFallbackProps): React.ReactElement {
   const isAppLevel = level === 'app';
   const isScreenLevel = level === 'screen';
 
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.gray[50],
+    backgroundColor: palette.gray[50],
     borderRadius: 12,
     margin: 8,
   },
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 0,
     borderRadius: 0,
-    backgroundColor: colors.white,
+    backgroundColor: palette.white,
   },
   screenContainer: {
     flex: 1,
@@ -168,32 +168,32 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: colors.red[500],
+    color: palette.error.light,
     marginBottom: 16,
     width: 80,
     height: 80,
     lineHeight: 80,
     textAlign: 'center',
-    backgroundColor: colors.red[50],
+    backgroundColor: '#FEE2E2', // red-50 equivalent
     borderRadius: 40,
     overflow: 'hidden',
   },
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.gray[900],
+    color: palette.gray[900],
     marginBottom: 8,
     textAlign: 'center',
   },
   message: {
     fontSize: 14,
-    color: colors.gray[600],
+    color: palette.gray[600],
     textAlign: 'center',
     marginBottom: 24,
     lineHeight: 20,
   },
   debugContainer: {
-    backgroundColor: colors.gray[100],
+    backgroundColor: palette.gray[100],
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
@@ -203,28 +203,28 @@ const styles = StyleSheet.create({
   debugTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.gray[700],
+    color: palette.gray[700],
     marginBottom: 4,
   },
   debugText: {
     fontSize: 11,
-    color: colors.red[600],
+    color: palette.error.light,
     fontFamily: 'monospace',
     marginBottom: 8,
   },
   debugStack: {
     fontSize: 10,
-    color: colors.gray[500],
+    color: palette.gray[500],
     fontFamily: 'monospace',
   },
   retryButton: {
-    backgroundColor: colors.brand.primary,
+    backgroundColor: palette.blue[500],
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   retryText: {
-    color: colors.white,
+    color: palette.white,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -239,11 +239,14 @@ export function withErrorBoundary<P extends object>(
 ): React.ComponentType<P> {
   const displayName = WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-  const WithErrorBoundary: React.FC<P> = (props) => (
-    <ErrorBoundary {...options}>
-      <WrappedComponent {...props} />
-    </ErrorBoundary>
-  );
+  const WithErrorBoundary: React.FC<P> = (props) => {
+    const { fallback, onError, level } = options || {};
+    return (
+      <ErrorBoundary fallback={fallback} onError={onError} level={level}>
+        <WrappedComponent {...props} />
+      </ErrorBoundary>
+    );
+  };
 
   WithErrorBoundary.displayName = `withErrorBoundary(${displayName})`;
 

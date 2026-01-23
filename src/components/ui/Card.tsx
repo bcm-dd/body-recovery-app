@@ -9,8 +9,8 @@ import React from 'react';
 import {
   View,
   Pressable,
-  StyleSheet,
   ViewStyle,
+  StyleProp,
   PressableProps,
 } from 'react-native';
 import Animated, {
@@ -35,8 +35,10 @@ export interface CardProps {
   onPress?: PressableProps['onPress'];
   onLongPress?: PressableProps['onLongPress'];
   haptic?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   testID?: string;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 // ============================================================================
@@ -54,6 +56,8 @@ export function Card({
   haptic = true,
   style,
   testID,
+  accessibilityLabel,
+  accessibilityHint,
 }: CardProps) {
   const { theme, isDark } = useTheme();
   const { trigger } = useHaptics();
@@ -154,6 +158,9 @@ export function Card({
         onPressOut={handlePressOut}
         style={[cardStyle, animatedStyle, style]}
         testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
       >
         {children}
       </AnimatedPressable>

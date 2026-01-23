@@ -88,7 +88,14 @@ export interface ThemeColors {
 // Theme Factories
 // ============================================================================
 
-function getAccentColors(accent: AccentColor) {
+interface AccentColors {
+  accent: string;
+  accentLight: string;
+  accentDark: string;
+  accentText: string;
+}
+
+function getAccentColors(accent: AccentColor): AccentColors {
   const accentPalette = palette[accent];
   return {
     accent: accentPalette[500],

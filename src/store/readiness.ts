@@ -347,10 +347,10 @@ export const useReadinessStore = create<ReadinessStore>()(
           const history = state.healthHistory.slice(0, 7);
           if (history.length === 0) return;
 
-          const hrvValues = history.map((h) => h.hrv).filter(Boolean) as number[];
-          const hrValues = history.map((h) => h.restingHR).filter(Boolean) as number[];
-          const sleepDurations = history.map((h) => h.sleepDuration).filter(Boolean) as number[];
-          const sleepQualities = history.map((h) => h.sleepQuality).filter(Boolean) as number[];
+          const hrvValues = history.map((h: HealthSnapshot) => h.hrv).filter(Boolean) as number[];
+          const hrValues = history.map((h: HealthSnapshot) => h.restingHR).filter(Boolean) as number[];
+          const sleepDurations = history.map((h: HealthSnapshot) => h.sleepDuration).filter(Boolean) as number[];
+          const sleepQualities = history.map((h: HealthSnapshot) => h.sleepQuality).filter(Boolean) as number[];
 
           state.baselines = {
             hrv: hrvValues.length > 0 ? average(hrvValues) : null,

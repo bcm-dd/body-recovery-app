@@ -19,6 +19,7 @@ interface RestTimerProps {
   totalSeconds?: number;
   onSkip?: () => void;
   onAdd30?: () => void;
+  accessibilityLabel?: string;
 }
 
 // ============================================================================
@@ -30,6 +31,7 @@ export function RestTimer({
   totalSeconds = 90,
   onSkip,
   onAdd30,
+  accessibilityLabel,
 }: RestTimerProps) {
   const { theme } = useTheme();
   const { colors, components, spacing } = theme;
@@ -53,8 +55,19 @@ export function RestTimer({
     return colors.accent;
   };
 
+  // Build accessibility description
+  const defaultAccessibilityLabel = `Rest timer: ${formatTime(seconds)} remaining. ${
+    seconds <= 10 ? 'Almost done!' : ''
+  }`;
+
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      accessible={true}
+      accessibilityRole="timer"
+      accessibilityLabel={accessibilityLabel || defaultAccessibilityLabel}
+      accessibilityValue={{ min: 0, max: totalSeconds, now: seconds }}
+    >
       <Text variant="h4" color="secondary" style={{ marginBottom: spacing[4] }}>
         Rest
       </Text>

@@ -147,64 +147,93 @@ export default function TodayPage() {
       </div>
 
       {/* Recent Activity */}
-      <div className="section">
-        <h3 className="section-title">This Week</h3>
+      <section className="section" aria-labelledby="this-week-title">
+        <h3 id="this-week-title" className="section-title">This Week</h3>
         <div className="card" style={{ margin: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-              <div key={day + i} style={{ textAlign: 'center' }}>
-                <div className="text-tertiary" style={{ fontSize: '0.75rem', marginBottom: '0.5rem' }}>
-                  {day}
+          <div
+            role="group"
+            aria-label="Weekly workout progress"
+            style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}
+          >
+            {[
+              { day: 'Monday', abbr: 'M', status: 'completed' },
+              { day: 'Tuesday', abbr: 'T', status: 'completed' },
+              { day: 'Wednesday', abbr: 'W', status: 'completed' },
+              { day: 'Thursday', abbr: 'T', status: 'completed' },
+              { day: 'Friday', abbr: 'F', status: 'scheduled' },
+              { day: 'Saturday', abbr: 'S', status: 'none' },
+              { day: 'Sunday', abbr: 'S', status: 'none' },
+            ].map((dayInfo) => (
+              <div
+                key={dayInfo.day}
+                style={{ textAlign: 'center' }}
+                role="listitem"
+                aria-label={`${dayInfo.day}: ${dayInfo.status === 'completed' ? 'Workout completed' : dayInfo.status === 'scheduled' ? 'Workout scheduled' : 'No workout'}`}
+              >
+                <div className="text-tertiary" style={{ fontSize: '0.75rem', marginBottom: '0.5rem' }} aria-hidden="true">
+                  {dayInfo.abbr}
                 </div>
-                <div style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  background: i < 4 ? 'var(--success)' : i === 4 ? 'var(--brand-primary)' : 'var(--bg-tertiary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: i <= 4 ? 'white' : 'var(--text-tertiary)',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                }}>
-                  {i < 4 ? '✓' : i === 4 ? '!' : ''}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    background: dayInfo.status === 'completed' ? 'var(--success)' : dayInfo.status === 'scheduled' ? 'var(--brand-primary)' : 'var(--bg-tertiary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: dayInfo.status !== 'none' ? 'white' : 'var(--text-tertiary)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  {dayInfo.status === 'completed' ? '\u2713' : dayInfo.status === 'scheduled' ? '!' : ''}
                 </div>
               </div>
             ))}
           </div>
           <div className="text-secondary text-center" style={{ fontSize: '0.875rem' }}>
-            4 workouts completed • 1 scheduled today
+            4 workouts completed, 1 scheduled today
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
 function QuickAction({ icon, label, color }: { icon: string; label: string; color: string }) {
   return (
-    <div style={{
-      background: 'var(--bg-primary)',
-      border: '1px solid var(--border-light)',
-      borderRadius: 12,
-      padding: '1rem',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      cursor: 'pointer',
-      transition: 'background 0.2s',
-    }}>
-      <div style={{
-        width: 40,
-        height: 40,
-        borderRadius: 10,
-        background: `${color}15`,
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={label}
+      style={{
+        background: 'var(--bg-primary)',
+        border: '1px solid var(--border-light)',
+        borderRadius: 12,
+        padding: '1rem',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.25rem',
-      }}>
+        gap: '0.75rem',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+      }}
+      className="quick-action"
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 10,
+          background: `${color}15`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.25rem',
+        }}
+      >
         {icon}
       </div>
       <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{label}</span>

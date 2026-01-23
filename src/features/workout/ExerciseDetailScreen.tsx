@@ -4,9 +4,9 @@
 
 import React from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@/theme';
-import { Text, Button, Card } from '@/components/ui';
+import { Text, Button } from '@/components/ui';
 
 export function ExerciseDetailScreen() {
   const navigation = useNavigation();

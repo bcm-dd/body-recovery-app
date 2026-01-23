@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Authenticate user
-    const user = await requireAuth(request);
+    // Authenticate user (required but we don't need user data for chat)
+    await requireAuth(request);
 
     const body = await request.json();
     const { messages, context } = chatRequestSchema.parse(body);

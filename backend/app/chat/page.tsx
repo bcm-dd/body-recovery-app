@@ -103,7 +103,7 @@ export default function ChatPage() {
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Fallback response for demo
       const fallbackMessage: Message = {
         id: (Date.now() + 1).toString(),

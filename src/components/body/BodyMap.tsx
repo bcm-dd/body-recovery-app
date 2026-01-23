@@ -6,13 +6,8 @@
  */
 
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Circle, G } from 'react-native-svg';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  useSharedValue,
-} from 'react-native-reanimated';
 import { useTheme } from '@/theme';
 import { Text } from '@/components/ui';
 import { useHaptics } from '@/hooks';
@@ -29,6 +24,7 @@ interface BodyMapProps {
   view?: 'front' | 'back';
   size?: 'sm' | 'md' | 'lg';
   interactive?: boolean;
+  accessibilityLabel?: string;
 }
 
 interface RegionData {
@@ -215,6 +211,7 @@ export function BodyMap({
   view = 'front',
   size = 'md',
   interactive = true,
+  accessibilityLabel,
 }: BodyMapProps) {
   const { theme } = useTheme();
   const { colors } = theme;
@@ -262,8 +259,21 @@ export function BodyMap({
     setTimeout(() => setActiveRegion(null), 200);
   };
 
+  // Build accessibility description
+  const highlightedCount = highlightedRegions.size;
+  const defaultAccessibilityLabel = `Body map, ${view} view. ${
+    highlightedCount > 0
+      ? `${highlightedCount} highlighted region${highlightedCount > 1 ? 's' : ''}`
+      : 'No highlighted regions'
+  }. ${interactive ? 'Tap body regions to select them.' : ''}`;
+
   return (
-    <View style={[styles.container, { width: containerSize, height: containerSize * 1.4 }]}>
+    <View
+      style={[styles.container, { width: containerSize, height: containerSize * 1.4 }]}
+      accessible={true}
+      accessibilityRole="image"
+      accessibilityLabel={accessibilityLabel || defaultAccessibilityLabel}
+    >
       <Svg
         width="100%"
         height="100%"

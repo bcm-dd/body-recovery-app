@@ -10,7 +10,6 @@ import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type {
   WorkoutSession,
-  WorkoutStatus,
   ExerciseLog,
   SetLog,
   ExerciseDifficulty,
@@ -89,14 +88,6 @@ interface WorkoutActions {
 }
 
 type WorkoutStore = WorkoutState & WorkoutActions;
-
-// ============================================================================
-// Helpers
-// ============================================================================
-
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
 
 // ============================================================================
 // Initial State
@@ -269,7 +260,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
         set((state) => {
           if (!state.activeWorkout) return;
           const index = state.activeWorkout.exercises.findIndex(
-            (e) => e.id === exerciseLogId
+            (e: ExerciseLog) => e.id === exerciseLogId
           );
           if (index !== -1) {
             const exercise = state.activeWorkout.exercises[index];
@@ -334,7 +325,7 @@ export const useWorkoutStore = create<WorkoutStore>()(
           if (exercise) {
             exercise.completedSets.splice(setIndex, 1);
             // Renumber remaining sets
-            exercise.completedSets.forEach((s, i) => {
+            exercise.completedSets.forEach((s: SetLog, i: number) => {
               s.setNumber = i + 1;
             });
             state.currentSetIndex = Math.max(0, exercise.completedSets.length - 1);

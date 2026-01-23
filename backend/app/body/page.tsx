@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { LoadingSpinner, LoadingListItem } from '../components/LoadingSpinner';
+import { LoadingListItem } from '../components/LoadingSpinner';
 import { NoInjuriesTracked } from '../components/EmptyState';
 
 const bodyRegions = [

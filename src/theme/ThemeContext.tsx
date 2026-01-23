@@ -5,10 +5,9 @@
  * theme switching between light, dark, and system modes.
  */
 
-import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
-import { useColorScheme, ColorSchemeName } from 'react-native';
+import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import { useColorScheme } from 'react-native';
 import { Theme, ThemeMode, AccentColor, getTheme } from './theme';
-import { darkTheme } from './theme';
 
 // ============================================================================
 // Context Types
@@ -122,7 +121,7 @@ export function useTypography() {
  * Returns a styled component helper
  */
 export function useStyled() {
-  const { theme, isDark } = useTheme();
+  const { isDark } = useTheme();
 
   return useCallback(
     <T extends Record<string, unknown>>(

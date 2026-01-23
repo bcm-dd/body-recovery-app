@@ -17,7 +17,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  interpolateColor,
 } from 'react-native-reanimated';
 import { useTheme } from '@/theme';
 import { Text } from './Text';
@@ -60,11 +59,11 @@ export const Input = forwardRef<TextInput, InputProps>(
     },
     ref
   ) => {
-    const { theme, isDark } = useTheme();
+    const { theme } = useTheme();
     const [isFocused, setIsFocused] = useState(false);
     const focusAnim = useSharedValue(0);
 
-    const { colors, components, borderRadius, spacing, typography } = theme;
+    const { colors, components, spacing, typography } = theme;
 
     const handleFocus = useCallback(
       (e: any) => {

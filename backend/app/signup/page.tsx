@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
 
   const [name, setName] = useState('');
@@ -92,14 +92,18 @@ export default function SignUpPage() {
       {/* Form */}
       <div style={{ padding: 'var(--spacing-lg)', flex: 1 }}>
         {error && (
-          <div style={{
-            background: '#FEE2E2',
-            color: '#991B1B',
-            padding: 'var(--spacing-md)',
-            borderRadius: 'var(--radius-md)',
-            marginBottom: 'var(--spacing-lg)',
-            fontSize: '0.875rem',
-          }}>
+          <div
+            role="alert"
+            aria-live="assertive"
+            style={{
+              background: '#FEE2E2',
+              color: '#991B1B',
+              padding: 'var(--spacing-md)',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: 'var(--spacing-lg)',
+              fontSize: '0.875rem',
+            }}
+          >
             {error}
           </div>
         )}
@@ -207,6 +211,7 @@ export default function SignUpPage() {
             type="submit"
             className="btn btn-primary btn-full btn-lg"
             disabled={isLoading}
+            aria-busy={isLoading}
             style={{ opacity: isLoading ? 0.7 : 1 }}
           >
             {isLoading ? 'Creating Account...' : 'Create Account'}
@@ -240,5 +245,17 @@ export default function SignUpPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="animate-fade-in" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="skeleton" style={{ width: 200, height: 200, borderRadius: 20 }} />
+      </div>
+    }>
+      <SignUpForm />
+    </Suspense>
   );
 }

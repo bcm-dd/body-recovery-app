@@ -37,7 +37,7 @@ export type RootStackParamList = {
   // Body flow (modal)
   InjuryDetail: { injuryId: string };
   InjuryAdd: { bodyRegion?: string };
-  PainLog: { workoutId?: string; exerciseLogId?: string };
+  PainLog: { workoutId?: string; exerciseLogId?: string; bodyRegion?: string };
   DocumentUpload: undefined;
   DocumentDetail: { documentId: string };
 
@@ -48,6 +48,9 @@ export type RootStackParamList = {
   EquipmentSettings: undefined;
   PrivacySettings: undefined;
   AccountSettings: undefined;
+
+  // AI Chat
+  Chat: { workoutId?: string; exerciseLogId?: string } | undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- HealthKit Capability -->
+	<key>com.apple.developer.healthkit</key>
+	<true/>
+	<key>com.apple.developer.healthkit.access</key>
+	<array>
+		<!-- Read/write workout data -->
+		<string>health-records</string>
+	</array>
+	<key>com.apple.developer.healthkit.background-delivery</key>
+	<true/>
+
+	<!-- App Groups (for sharing data with widgets if needed) -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.movementrecovery.companion</string>
+	</array>
+
+	<!-- Keychain Sharing (for secure credential storage) -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.movementrecovery.companion</string>
+	</array>
+</dict>
+</plist>

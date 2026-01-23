@@ -96,6 +96,8 @@ export function SetLogger({
             <Pressable
               style={[styles.adjusterButton, { borderColor: colors.border }]}
               onPress={() => handleWeightChange(-2.5)}
+              accessibilityRole="button"
+              accessibilityLabel="Decrease weight by 2.5 kg"
             >
               <Text variant="h4" color="accent">
                 -
@@ -110,6 +112,8 @@ export function SetLogger({
             <Pressable
               style={[styles.adjusterButton, { borderColor: colors.border }]}
               onPress={() => handleWeightChange(2.5)}
+              accessibilityRole="button"
+              accessibilityLabel="Increase weight by 2.5 kg"
             >
               <Text variant="h4" color="accent">
                 +
@@ -130,6 +134,8 @@ export function SetLogger({
             <Pressable
               style={[styles.adjusterButton, { borderColor: colors.border }]}
               onPress={() => handleRepsChange(-1)}
+              accessibilityRole="button"
+              accessibilityLabel="Decrease reps by 1"
             >
               <Text variant="h4" color="accent">
                 -
@@ -144,6 +150,8 @@ export function SetLogger({
             <Pressable
               style={[styles.adjusterButton, { borderColor: colors.border }]}
               onPress={() => handleRepsChange(1)}
+              accessibilityRole="button"
+              accessibilityLabel="Increase reps by 1"
             >
               <Text variant="h4" color="accent">
                 +
@@ -162,6 +170,8 @@ export function SetLogger({
             setReps(suggestedReps);
             trigger('tap');
           }}
+          accessibilityRole="button"
+          accessibilityLabel="Reset to suggested weight and reps"
         >
           <Text variant="caption" color="secondary">
             Reset
@@ -173,6 +183,8 @@ export function SetLogger({
             setReps(suggestedReps - 2);
             trigger('tap');
           }}
+          accessibilityRole="button"
+          accessibilityLabel="Reduce reps by 2"
         >
           <Text variant="caption" color="secondary">
             Fewer reps
@@ -183,6 +195,8 @@ export function SetLogger({
           onPress={() => {
             handleWeightChange(-5);
           }}
+          accessibilityRole="button"
+          accessibilityLabel="Reduce weight by 5 kg for drop set"
         >
           <Text variant="caption" color="secondary">
             Drop set

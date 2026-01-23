@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { LoadingSpinner, Skeleton, LoadingListItem, StatCardSkeleton } from '../components/LoadingSpinner';
+import { LoadingSpinner, LoadingListItem, StatCardSkeleton } from '../components/LoadingSpinner';
 
 const mockStats = {
   workoutsThisMonth: 12,
@@ -115,15 +115,30 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div style={{
-        display: 'flex',
-        margin: '0 1.5rem',
-        borderBottom: '1px solid var(--border-light)',
-      }}>
+      <div
+        role="tablist"
+        aria-label="Profile sections"
+        style={{
+          display: 'flex',
+          margin: '0 1.5rem',
+          borderBottom: '1px solid var(--border-light)',
+        }}
+      >
         {(['progress', 'settings'] as const).map(tab => (
           <button
             key={tab}
+            role="tab"
+            id={`tab-${tab}`}
+            aria-selected={activeTab === tab}
+            aria-controls={`tabpanel-${tab}`}
+            tabIndex={activeTab === tab ? 0 : -1}
             onClick={() => setActiveTab(tab)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                setActiveTab(activeTab === 'progress' ? 'settings' : 'progress');
+              }
+            }}
             style={{
               flex: 1,
               padding: '1rem',
@@ -141,9 +156,15 @@ export default function ProfilePage() {
         ))}
       </div>
 
-      {activeTab === 'progress' ? (
-        <>
-          {/* Stats grid */}
+      <div
+        role="tabpanel"
+        id="tabpanel-progress"
+        aria-labelledby="tab-progress"
+        hidden={activeTab !== 'progress'}
+      >
+        {activeTab === 'progress' && (
+          <>
+            {/* Stats grid */}
           <div className="section">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               {isLoadingStats ? (
@@ -241,10 +262,19 @@ export default function ProfilePage() {
               </>
             )}
           </div>
-        </>
-      ) : (
-        <>
-          {/* Settings */}
+          </>
+        )}
+      </div>
+
+      <div
+        role="tabpanel"
+        id="tabpanel-settings"
+        aria-labelledby="tab-settings"
+        hidden={activeTab !== 'settings'}
+      >
+        {activeTab === 'settings' && (
+          <>
+            {/* Settings */}
           <div className="section">
             <h3 className="section-title">Account</h3>
             <SettingsItem icon="👤" label="Edit Profile" />
@@ -273,12 +303,14 @@ export default function ProfilePage() {
               style={{ color: 'var(--error)', opacity: isSigningOut ? 0.7 : 1 }}
               onClick={handleSignOut}
               disabled={isSigningOut}
+              aria-busy={isSigningOut}
             >
               {isSigningOut ? 'Signing Out...' : 'Sign Out'}
             </button>
           </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -300,11 +332,21 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
 
 function SettingsItem({ icon, label, badge }: { icon: string; label: string; badge?: string }) {
   return (
-    <div className="list-item">
-      <span style={{ fontSize: '1.25rem' }}>{icon}</span>
+    <button
+      type="button"
+      className="list-item"
+      style={{
+        width: '100%',
+        textAlign: 'left',
+        background: 'var(--bg-primary)',
+        border: '1px solid transparent',
+      }}
+      aria-label={badge ? `${label}: ${badge}` : label}
+    >
+      <span style={{ fontSize: '1.25rem' }} aria-hidden="true">{icon}</span>
       <div style={{ flex: 1, fontWeight: 500 }}>{label}</div>
       {badge && <span className="text-secondary" style={{ fontSize: '0.875rem' }}>{badge}</span>}
-      <span style={{ color: 'var(--text-tertiary)' }}>→</span>
-    </div>
+      <span style={{ color: 'var(--text-tertiary)' }} aria-hidden="true">\u2192</span>
+    </button>
   );
 }

@@ -29,7 +29,6 @@ export function BodyScreen() {
   const [bodyView, setBodyView] = useState<'front' | 'back'>('front');
 
   // Store state
-  const injuries = useBodyModelStore((state) => state.injuries);
   const getActiveInjuries = useBodyModelStore((state) => state.getActiveInjuries);
   const getBodyRegionStatus = useBodyModelStore((state) => state.getBodyRegionStatus);
 

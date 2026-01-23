@@ -13,27 +13,17 @@ import {
   SafeAreaView,
   Pressable,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  interpolate,
-} from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@/theme';
-import { Text, Card, Button } from '@/components/ui';
+import { Text, Button } from '@/components/ui';
 import { ExerciseCard } from '@/components/workout/ExerciseCard';
 import { RestTimer } from '@/components/workout/RestTimer';
 import { SetLogger } from '@/components/workout/SetLogger';
 import { useWorkoutStore } from '@/store';
 import { useHaptics } from '@/hooks';
-import type { RootStackScreenProps } from '@/navigation/types';
-
-type Props = RootStackScreenProps<'WorkoutExecution'>;
 
 export function WorkoutExecutionScreen() {
   const navigation = useNavigation();
-  const route = useRoute<Props['route']>();
   const { theme } = useTheme();
   const { colors, spacing } = theme;
   const { trigger } = useHaptics();

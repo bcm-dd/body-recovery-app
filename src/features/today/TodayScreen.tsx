@@ -20,10 +20,8 @@ import { useReadinessStore, useWorkoutStore, useBodyModelStore } from '@/store';
 import { useHaptics } from '@/hooks';
 import type { MainTabScreenProps } from '@/navigation/types';
 
-type Props = MainTabScreenProps<'Today'>;
-
 export function TodayScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<MainTabScreenProps<'Today'>['navigation']>();
   const { theme } = useTheme();
   const { colors, spacing } = theme;
   const { trigger } = useHaptics();

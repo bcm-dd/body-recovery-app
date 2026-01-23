@@ -1,0 +1,93 @@
+# Require a minimum iOS version for the project
+# React Native 0.74 requires iOS 13.4+
+platform :ios, min_ios_version_supported
+
+# Prepare React Native project
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+prepare_react_native_project!
+
+# Flipper configuration - disabled by default for production builds
+flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'MovementRecoveryCompanion' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :flipper_configuration => flipper_config,
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  # ============================================================================
+  # Required Pods for Dependencies
+  # ============================================================================
+
+  # react-native-health (HealthKit integration)
+  pod 'react-native-health', :path => '../node_modules/react-native-health'
+
+  # react-native-reanimated (animations)
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+
+  # react-native-gesture-handler (gestures)
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+
+  # react-native-screens (native navigation)
+  pod 'RNScreens', :path => '../node_modules/react-native-screens'
+
+  # react-native-safe-area-context (safe area insets)
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+
+  # react-native-svg (SVG rendering for body map)
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
+  # react-native-mmkv (fast key-value storage)
+  pod 'react-native-mmkv', :path => '../node_modules/react-native-mmkv'
+
+  # react-native-haptic-feedback (haptic feedback)
+  pod 'react-native-haptic-feedback', :path => '../node_modules/react-native-haptic-feedback'
+
+  # react-native-vector-icons (icon fonts)
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+  # react-native-vision-camera (camera for document scanning)
+  pod 'VisionCamera', :path => '../node_modules/react-native-vision-camera'
+
+  # react-native-voice (voice input)
+  pod 'react-native-voice', :path => '../node_modules/react-native-voice'
+
+  target 'MovementRecoveryCompanionTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  post_install do |installer|
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # Ensure minimum deployment target
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
+
+        # Required for VisionCamera
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+
+        # Enable module stability
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      end
+    end
+  end
+end

@@ -32,6 +32,9 @@ export function LoadingSpinner({
 
   const spinnerContent = (
     <div
+      role="status"
+      aria-live="polite"
+      aria-label={label || 'Loading'}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -41,6 +44,7 @@ export function LoadingSpinner({
       }}
     >
       <div
+        aria-hidden="true"
         style={{
           width: dimension,
           height: dimension,
@@ -92,6 +96,8 @@ export function LoadingSpinner({
           {label}
         </span>
       )}
+      {/* Screen reader only text */}
+      <span className="sr-only">{label || 'Loading, please wait...'}</span>
       <style jsx>{`
         @keyframes spin {
           from {
@@ -108,6 +114,9 @@ export function LoadingSpinner({
   if (fullScreen) {
     return (
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={label || 'Loading'}
         style={{
           position: 'fixed',
           inset: 0,

@@ -41,8 +41,18 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
+          {/* Skip link for keyboard navigation - accessibility */}
+          <a href="#main-content" className="skip-to-content">
+            Skip to main content
+          </a>
           <div className="app-container">
-            <main className="main-content">
+            <main
+              id="main-content"
+              className="main-content"
+              role="main"
+              aria-label="Main content"
+              tabIndex={-1}
+            >
               {children}
             </main>
             <Navigation />

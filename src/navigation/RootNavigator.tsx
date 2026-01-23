@@ -26,6 +26,9 @@ import { PainLogScreen } from '@/features/body/PainLogScreen';
 // Screens - Settings
 import { SettingsScreen } from '@/features/settings/SettingsScreen';
 
+// Screens - AI Chat
+import { ChatScreen } from '@/features/chat/ChatScreen';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
@@ -95,6 +98,16 @@ export function RootNavigator() {
           component={SettingsScreen}
           options={{
             animation: 'slide_from_right',
+          }}
+        />
+
+        {/* AI Chat - presented as modal from bottom */}
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
           }}
         />
       </Stack.Navigator>

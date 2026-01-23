@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary colors -->
+    <color name="primary">#6366F1</color>
+    <color name="primaryDark">#4F46E5</color>
+    <color name="accent">#22C55E</color>
+
+    <!-- Background colors -->
+    <color name="background">#0A0A0B</color>
+    <color name="surface">#18181B</color>
+
+    <!-- Text colors -->
+    <color name="textPrimary">#FAFAFA</color>
+    <color name="textSecondary">#A1A1AA</color>
+
+    <!-- Status colors -->
+    <color name="success">#22C55E</color>
+    <color name="warning">#F59E0B</color>
+    <color name="error">#EF4444</color>
+
+    <!-- React Native colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>
