@@ -97,7 +97,7 @@ module.exports = (env, argv) => {
         ? path.resolve(appDirectory, 'backend/public/app')
         : path.resolve(appDirectory, 'dist'),
       publicPath: isProduction ? '/app/' : '/',
-      filename: isProduction ? 'js/[name].[contenthash].js' : 'static/js/bundle.js',
+      filename: isProduction ? 'js/[name].[contenthash].js' : 'static/js/[name].bundle.js',
       chunkFilename: isProduction ? 'js/[name].[contenthash].chunk.js' : 'static/js/[name].chunk.js',
       clean: true,
     },
