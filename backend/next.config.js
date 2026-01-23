@@ -12,6 +12,21 @@ const nextConfig = {
     domains: [],
     unoptimized: false,
   },
+
+  // Rewrites for React Native Web app
+  async rewrites() {
+    return [
+      {
+        // Serve /app/ and /app (with or without trailing slash)
+        source: '/app',
+        destination: '/app/index.html',
+      },
+      {
+        source: '/app/',
+        destination: '/app/index.html',
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

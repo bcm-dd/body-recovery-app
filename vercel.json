@@ -9,6 +9,16 @@
   "outputDirectory": "backend/.next",
   "installCommand": "npm install && cd backend && npm install",
   "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/app",
+      "destination": "/app/index.html"
+    },
+    {
+      "source": "/app/",
+      "destination": "/app/index.html"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/daily-readiness",
