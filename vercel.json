@@ -1,9 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "installCommand": "npm run web:install",
-  "buildCommand": "npm run vercel-build",
-  "outputDirectory": "backend/.next",
+  "git": {
+    "deploymentEnabled": {
+      "claude/setup-dev-team-framework-mt9bO": true
+    }
+  },
   "crons": [
     {
       "path": "/api/cron/daily-readiness",
