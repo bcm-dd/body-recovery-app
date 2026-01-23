@@ -9,6 +9,7 @@ dist/
 *.tsbuildinfo
 .next/
 out/
+backend/public/app/
 
 # React Native
 android/app/build/
