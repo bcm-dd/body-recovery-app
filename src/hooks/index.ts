@@ -6,3 +6,5 @@
 
 export * from './useHaptics';
 export * from './useHealth';
+export * from './useReducedMotion';
+export * from './useResponsive';
