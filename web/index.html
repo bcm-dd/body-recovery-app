@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Movement & Recovery Companion - AI-driven movement and recovery coaching" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Movement & Recovery" />
+  <title>Movement & Recovery Companion</title>
+  <style>
+    /* Critical CSS for initial load */
+    html, body, #root {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #0a0a0a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow: hidden;
+    }
+
+    /* Disable text selection and callout on mobile */
+    * {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Allow text selection in inputs */
+    input, textarea {
+      -webkit-user-select: auto;
+      user-select: auto;
+    }
+
+    /* Loading spinner */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #ffffff;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #333333;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-text {
+      margin-top: 16px;
+      font-size: 16px;
+      opacity: 0.7;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Hide loading when app is ready */
+    #root:not(:empty) + .loading-container,
+    #root:not(:empty) .loading-container {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root">
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading...</div>
+    </div>
+  </div>
+</body>
+</html>
