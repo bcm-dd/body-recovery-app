@@ -56,11 +56,13 @@ export function ReadinessRing({
   accessibilityLabel,
 }: ReadinessRingProps) {
   const { theme } = useTheme();
-  const { colors, components } = theme;
+  const { colors, components, animation } = theme;
 
-  // Get size values
+  // Get size values from theme
   const ringSize = components.readinessRing.size[size];
   const strokeWidth = components.readinessRing.strokeWidth[size];
+  const segmentGapDegrees = components.readinessRing.segmentGap;
+  const ringAnimationDuration = animation.duration.ring;
   const radius = (ringSize - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const center = ringSize / 2;
@@ -72,7 +74,7 @@ export function ReadinessRing({
   const loadAnim = useSharedValue(0);
   const bodyAnim = useSharedValue(0);
 
-  // Get recommendation color
+  // Get recommendation color from theme
   const getScoreColor = () => {
     switch (recommendation) {
       case 'full':
@@ -80,7 +82,7 @@ export function ReadinessRing({
       case 'moderate':
         return colors.warning;
       case 'light':
-        return '#F97316'; // Orange
+        return colors.bodyMapModerate; // Orange for light activity
       case 'rest':
         return colors.error;
       default:
@@ -88,13 +90,15 @@ export function ReadinessRing({
     }
   };
 
-  // Animate on mount
+  // Animate on mount using theme animation duration
   useEffect(() => {
+    const factorDuration = ringAnimationDuration * 0.75; // Factors animate slightly faster
+
     if (animated) {
       progressAnim.value = withDelay(
         100,
         withTiming(score / 100, {
-          duration: 800,
+          duration: ringAnimationDuration,
           easing: Easing.out(Easing.cubic),
         })
       );
@@ -102,19 +106,19 @@ export function ReadinessRing({
       if (factors) {
         sleepAnim.value = withDelay(
           200,
-          withTiming(factors.sleep / 100, { duration: 600, easing: Easing.out(Easing.cubic) })
+          withTiming(factors.sleep / 100, { duration: factorDuration, easing: Easing.out(Easing.cubic) })
         );
         recoveryAnim.value = withDelay(
           300,
-          withTiming(factors.recovery / 100, { duration: 600, easing: Easing.out(Easing.cubic) })
+          withTiming(factors.recovery / 100, { duration: factorDuration, easing: Easing.out(Easing.cubic) })
         );
         loadAnim.value = withDelay(
           400,
-          withTiming(factors.load / 100, { duration: 600, easing: Easing.out(Easing.cubic) })
+          withTiming(factors.load / 100, { duration: factorDuration, easing: Easing.out(Easing.cubic) })
         );
         bodyAnim.value = withDelay(
           500,
-          withTiming(factors.body / 100, { duration: 600, easing: Easing.out(Easing.cubic) })
+          withTiming(factors.body / 100, { duration: factorDuration, easing: Easing.out(Easing.cubic) })
         );
       }
     } else {
@@ -126,7 +130,7 @@ export function ReadinessRing({
         bodyAnim.value = factors.body / 100;
       }
     }
-  }, [score, factors, animated]);
+  }, [score, factors, animated, ringAnimationDuration]);
 
   // Animated props for main progress ring
   const mainRingProps = useAnimatedProps(() => {
@@ -136,9 +140,8 @@ export function ReadinessRing({
     };
   });
 
-  // Factor segment calculations
-  const segmentGap = 8; // degrees
-  const totalGap = segmentGap * 4;
+  // Factor segment calculations using theme values
+  const totalGap = segmentGapDegrees * 4;
   const availableDegrees = 360 - totalGap;
   const segmentDegrees = availableDegrees / 4;
 
@@ -148,7 +151,7 @@ export function ReadinessRing({
   const segmentLength = (segmentDegrees / 360) * innerCircumference;
 
   const getSegmentOffset = (index: number) => {
-    const startAngle = -90 + index * (segmentDegrees + segmentGap);
+    const startAngle = -90 + index * (segmentDegrees + segmentGapDegrees);
     return (startAngle / 360) * innerCircumference;
   };
 
