@@ -2,12 +2,14 @@
  * Exercise Card Component (Web) - Movement & Recovery Companion
  *
  * Web-specific version without react-native-reanimated animations.
+ * Respects user's reduced motion preference for WCAG 2.1 Level AAA compliance.
  */
 
 import React, { useState } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme, spacing, borderRadius } from '@/theme';
 import { Text, Card } from '@/components/ui';
+import { useReducedMotion, getTransitionStyle } from '@/hooks/useReducedMotion';
 
 // ============================================================================
 // Types
@@ -75,6 +77,7 @@ export function ExerciseCard({
   style,
 }: ExerciseCardProps) {
   const { theme } = useTheme();
+  const { prefersReducedMotion } = useReducedMotion();
   const { colors, spacing, components } = theme;
 
   const [expanded, setExpanded] = useState(initialExpanded);
@@ -119,7 +122,8 @@ export function ExerciseCard({
                 backgroundColor: colors.accent,
                 width: `${progress * 100}%`,
                 // @ts-ignore - web style
-                transition: 'width 0.3s ease',
+                // Disable width transition when reduced motion is preferred
+                transition: getTransitionStyle(prefersReducedMotion, 'width 0.25s ease'),
               },
             ]}
           />
@@ -133,7 +137,7 @@ export function ExerciseCard({
             <Text variant="body" weight="semibold">
               {exercise.name}
             </Text>
-            <Text variant="caption" color="secondary" style={{ marginTop: 2 }}>
+            <Text variant="caption" color="secondary" style={{ marginTop: spacing[0.5] }}>
               {exercise.muscles.join(' • ')}
             </Text>
           </View>
@@ -168,7 +172,7 @@ export function ExerciseCard({
               ]}
             />
           ))}
-          <Text variant="caption" color="secondary" style={{ marginLeft: 8 }}>
+          <Text variant="caption" color="secondary" style={{ marginLeft: spacing[2] }}>
             {completedSets}/{prescription.sets} sets
           </Text>
         </View>
@@ -180,8 +184,8 @@ export function ExerciseCard({
             {
               maxHeight: expanded ? 200 : 0,
               opacity: expanded ? 1 : 0,
-              // @ts-ignore - web style
-              transition: 'max-height 0.3s ease, opacity 0.3s ease',
+              // @ts-ignore - web style (uses animation.duration.normal = 250ms)
+              transition: 'max-height 0.25s ease, opacity 0.25s ease',
             }
           ]}
         >
@@ -195,7 +199,7 @@ export function ExerciseCard({
               key={index}
               variant="bodySmall"
               color="secondary"
-              style={{ marginBottom: 4 }}
+              style={{ marginBottom: spacing[1] }}
             >
               • {cue}
             </Text>
@@ -223,8 +227,8 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 3,
     width: '100%',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: borderRadius.xl,
+    borderTopRightRadius: borderRadius.xl,
     overflow: 'hidden',
   },
   progressFill: {
@@ -245,29 +249,29 @@ const styles = StyleSheet.create({
   setIndicators: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: spacing[3],
   },
   setDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: spacing[3],
+    height: spacing[3],
+    borderRadius: spacing[1.5],
     borderWidth: 1.5,
-    marginRight: 6,
+    marginRight: spacing[1.5],
   },
   expandedContent: {
     overflow: 'hidden',
   },
   divider: {
     height: StyleSheet.hairlineWidth,
-    marginVertical: 12,
+    marginVertical: spacing[3],
   },
   completeOverlay: {
     position: 'absolute',
     top: 0,
     right: 0,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderTopRightRadius: 16,
-    borderBottomLeftRadius: 12,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1.5],
+    borderTopRightRadius: borderRadius.xl,
+    borderBottomLeftRadius: borderRadius.lg,
   },
 });

@@ -2,9 +2,10 @@
  * Card Component (Web) - Movement & Recovery Companion
  *
  * Web-specific version without react-native-reanimated animations.
+ * Respects user's reduced motion preference for WCAG 2.1 Level AAA compliance.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Pressable,
@@ -13,6 +14,7 @@ import {
   PressableProps,
 } from 'react-native';
 import { useTheme } from '@/theme';
+import { useReducedMotion, getAccessibleTransition } from '@/hooks/useReducedMotion';
 
 // ============================================================================
 // Types
@@ -49,10 +51,37 @@ export function Card({
   accessibilityLabel,
   accessibilityHint,
 }: CardProps) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
+  const { prefersReducedMotion } = useReducedMotion();
   const [isPressed, setIsPressed] = useState(false);
+  const [isFocusVisible, setIsFocusVisible] = useState(false);
+  const wasKeyboardFocusRef = useRef(false);
 
   const isInteractive = Boolean(onPress || onLongPress);
+
+  // Track if focus came from keyboard (Tab key)
+  useEffect(() => {
+    if (!isInteractive) return undefined;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        wasKeyboardFocusRef.current = true;
+      }
+    };
+    const handleMouseDown = () => {
+      wasKeyboardFocusRef.current = false;
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('mousedown', handleMouseDown);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('mousedown', handleMouseDown);
+      };
+    }
+    return undefined;
+  }, [isInteractive]);
 
   // Get padding value
   const getPadding = () => {
@@ -69,7 +98,7 @@ export function Card({
     }
   };
 
-  // Get variant styles
+  // Get variant styles (shadows are now theme-aware)
   const getVariantStyles = (): ViewStyle => {
     const { colors, shadows } = theme;
 
@@ -77,7 +106,7 @@ export function Card({
       case 'elevated':
         return {
           backgroundColor: colors.elevated,
-          ...(isDark ? {} : shadows.md),
+          ...shadows.md,
         };
       case 'outlined':
         return {
@@ -113,21 +142,48 @@ export function Card({
     onLongPress?.(event);
   };
 
+  // Handle focus for keyboard navigation (focus-visible behavior)
+  const handleFocus = useCallback(() => {
+    if (wasKeyboardFocusRef.current) {
+      setIsFocusVisible(true);
+    }
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setIsFocusVisible(false);
+  }, []);
+
   const cardStyle: ViewStyle = {
     borderRadius: theme.components.card.borderRadius,
     padding: getPadding(),
     ...getVariantStyles(),
   };
 
+  // When reduced motion is preferred, skip scale transform and use opacity-only feedback
   const pressedStyle: ViewStyle = isInteractive && isPressed ? {
-    transform: [{ scale: 0.98 }],
+    transform: prefersReducedMotion ? undefined : [{ scale: 0.98 }],
     opacity: 0.95,
   } : {};
 
+  // Focus ring style for keyboard navigation
+  const focusRingStyle = isFocusVisible ? {
+    // @ts-ignore - web-specific style
+    outline: `${theme.focusRing.width}px solid ${theme.focusRing.color}`,
+    outlineOffset: theme.focusRing.offset,
+  } : {
+    // @ts-ignore - web-specific style
+    outline: 'none',
+  };
+
+  // Uses accessible transition that respects reduced motion preference
   const webStyle = {
-    transition: 'transform 0.1s ease, opacity 0.1s ease',
+    transition: getAccessibleTransition(
+      prefersReducedMotion,
+      'transform 0.15s ease, opacity 0.15s ease, outline 0.1s ease'
+    ),
     cursor: isInteractive ? 'pointer' : 'default',
-  } as ViewStyle;
+    ...focusRingStyle,
+  } as unknown as ViewStyle;
 
   if (isInteractive) {
     return (
@@ -136,6 +192,9 @@ export function Card({
         onLongPress={handleLongPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        // @ts-ignore - web-specific handlers
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         style={[cardStyle, pressedStyle, webStyle, style]}
         testID={testID}
         accessibilityRole="button"

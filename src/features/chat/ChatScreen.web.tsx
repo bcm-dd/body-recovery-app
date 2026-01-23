@@ -18,9 +18,10 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '@/theme';
+import { useTheme, spacing, borderRadius } from '@/theme';
 import { Text, Card } from '@/components/ui';
 import { useWorkoutStore, useBodyModelStore, useReadinessStore } from '@/store';
+import { useResponsive } from '@/hooks/useResponsive';
 
 // ============================================================================
 // Types
@@ -48,12 +49,24 @@ interface ChatContext {
 interface MessageBubbleProps {
   message: Message;
   isStreaming?: boolean;
+  /** Whether the screen is desktop size */
+  isDesktop?: boolean;
+  /** Whether the screen is tablet size */
+  isTablet?: boolean;
 }
 
-function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
+function MessageBubble({ message, isStreaming = false, isDesktop = false, isTablet = false }: MessageBubbleProps) {
   const { theme } = useTheme();
   const { colors } = theme;
   const isUser = message.role === 'user';
+
+  // Adjust max-width based on screen size
+  // On desktop/tablet, messages can be wider since we have more space
+  const getMaxWidth = () => {
+    if (isDesktop) return '70%';
+    if (isTablet) return '75%';
+    return '85%';
+  };
 
   return (
     <View
@@ -62,7 +75,7 @@ function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
         {
           backgroundColor: isUser ? colors.accent : colors.card,
           alignSelf: isUser ? 'flex-end' : 'flex-start',
-          maxWidth: '85%',
+          maxWidth: getMaxWidth(),
           // @ts-ignore - web style
           animation: 'fadeIn 0.2s ease',
         },
@@ -86,7 +99,7 @@ function MessageBubble({ message, isStreaming = false }: MessageBubbleProps) {
         variant="caption"
         style={{
           color: isUser ? `${colors.accentText}99` : colors.textTertiary,
-          marginTop: 4,
+          marginTop: spacing[1],
           alignSelf: 'flex-end',
         }}
       >
@@ -107,19 +120,65 @@ interface SuggestionChipProps {
 
 function SuggestionChip({ text, onPress }: SuggestionChipProps) {
   const { theme } = useTheme();
-  const { colors } = theme;
+  const { colors, focusRing } = theme;
+  const [isFocusVisible, setIsFocusVisible] = useState(false);
+  const wasKeyboardFocusRef = useRef(false);
+
+  // Track if focus came from keyboard (Tab key)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        wasKeyboardFocusRef.current = true;
+      }
+    };
+    const handleMouseDown = () => {
+      wasKeyboardFocusRef.current = false;
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('mousedown', handleMouseDown);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('mousedown', handleMouseDown);
+      };
+    }
+    return undefined;
+  }, []);
+
+  const handleFocus = useCallback(() => {
+    if (wasKeyboardFocusRef.current) {
+      setIsFocusVisible(true);
+    }
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setIsFocusVisible(false);
+  }, []);
+
+  // Focus ring style for keyboard navigation
+  const focusRingStyle = isFocusVisible ? {
+    outline: `${focusRing.width}px solid ${focusRing.color}`,
+    outlineOffset: focusRing.offset,
+  } : {
+    outline: 'none',
+  };
 
   return (
     <Pressable
       onPress={onPress}
+      // @ts-ignore - web-specific handlers
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       style={[
         styles.suggestionChip,
         {
           backgroundColor: colors.surface,
           borderColor: colors.border,
-          // @ts-ignore - web style
           cursor: 'pointer',
-        },
+          transition: 'outline 0.1s ease',
+          ...focusRingStyle,
+        } as unknown as ViewStyle,
       ]}
       accessibilityRole="button"
       accessibilityLabel={text}
@@ -138,7 +197,8 @@ function SuggestionChip({ text, onPress }: SuggestionChipProps) {
 export function ChatScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
-  const { colors, spacing } = theme;
+  const { colors, spacing, focusRing } = theme;
+  const { isTablet, isDesktop } = useResponsive();
 
   const flatListRef = useRef<FlatList<Message>>(null);
   const inputRef = useRef<TextInput>(null);
@@ -148,6 +208,65 @@ export function ChatScreen() {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [_streamingMessage, setStreamingMessage] = useState<string>('');
+
+  // Focus state for send button and close button
+  const [isSendFocusVisible, setIsSendFocusVisible] = useState(false);
+  const [isCloseFocusVisible, setIsCloseFocusVisible] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const wasKeyboardFocusRef = useRef(false);
+
+  // Track if focus came from keyboard (Tab key)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        wasKeyboardFocusRef.current = true;
+      }
+    };
+    const handleMouseDown = () => {
+      wasKeyboardFocusRef.current = false;
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('mousedown', handleMouseDown);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('mousedown', handleMouseDown);
+      };
+    }
+    return undefined;
+  }, []);
+
+  // Focus handlers for send button
+  const handleSendFocus = useCallback(() => {
+    if (wasKeyboardFocusRef.current) {
+      setIsSendFocusVisible(true);
+    }
+  }, []);
+
+  const handleSendBlur = useCallback(() => {
+    setIsSendFocusVisible(false);
+  }, []);
+
+  // Focus handlers for close button
+  const handleCloseFocus = useCallback(() => {
+    if (wasKeyboardFocusRef.current) {
+      setIsCloseFocusVisible(true);
+    }
+  }, []);
+
+  const handleCloseBlur = useCallback(() => {
+    setIsCloseFocusVisible(false);
+  }, []);
+
+  // Focus handlers for text input
+  const handleInputFocus = useCallback(() => {
+    setIsInputFocused(true);
+  }, []);
+
+  const handleInputBlur = useCallback(() => {
+    setIsInputFocused(false);
+  }, []);
 
   // Store state for context
   const activeWorkout = useWorkoutStore((state) => state.activeWorkout);
@@ -251,12 +370,14 @@ export function ChatScreen() {
 
   const renderMessage = ({ item, index }: { item: Message; index: number }) => {
     const isLastMessage = index === messages.length - 1;
-    const isStreaming = isLastMessage && isLoading && item.role === 'assistant';
+    const isStreamingMsg = isLastMessage && isLoading && item.role === 'assistant';
 
     return (
       <MessageBubble
         message={item}
-        isStreaming={isStreaming}
+        isStreaming={isStreamingMsg}
+        isDesktop={isDesktop}
+        isTablet={isTablet}
       />
     );
   };
@@ -305,11 +426,19 @@ export function ChatScreen() {
       <View style={styles.header}>
         <Pressable
           onPress={handleClose}
-          hitSlop={16}
+          hitSlop={spacing[4]}
           accessibilityRole="button"
           accessibilityLabel="Close chat"
-          // @ts-ignore - web style
-          style={{ cursor: 'pointer' }}
+          // @ts-ignore - web-specific handlers
+          onFocus={handleCloseFocus}
+          onBlur={handleCloseBlur}
+          style={{
+            cursor: 'pointer',
+            transition: 'outline 0.1s ease',
+            outline: isCloseFocusVisible ? `${focusRing.width}px solid ${focusRing.color}` : 'none',
+            outlineOffset: focusRing.offset,
+            borderRadius: 4,
+          } as unknown as ViewStyle}
         >
           <Text variant="body" color="accent">
             Close
@@ -374,15 +503,19 @@ export function ChatScreen() {
               {
                 backgroundColor: colors.background,
                 color: colors.textPrimary,
-                borderColor: colors.border,
-                // @ts-ignore - web style
-                outlineStyle: 'none',
-              },
+                borderColor: isInputFocused ? colors.borderFocused : colors.border,
+                borderWidth: isInputFocused ? 2 : 1,
+                outline: isInputFocused ? `${focusRing.width}px solid ${focusRing.color}` : 'none',
+                outlineOffset: focusRing.offset,
+                transition: 'border-color 0.1s ease, outline 0.1s ease',
+              } as unknown as ViewStyle,
             ]}
             placeholder="Ask me anything..."
             placeholderTextColor={colors.textTertiary}
             value={inputText}
             onChangeText={setInputText}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
             multiline
             maxLength={500}
             editable={!isLoading}
@@ -392,12 +525,20 @@ export function ChatScreen() {
           <Pressable
             onPress={() => sendMessage(inputText)}
             disabled={!inputText.trim() || isLoading}
+            // @ts-ignore - web-specific handlers
+            onFocus={handleSendFocus}
+            onBlur={handleSendBlur}
             style={[
               styles.sendButton,
               {
                 backgroundColor: inputText.trim() && !isLoading ? colors.accent : colors.disabledBackground,
                 cursor: inputText.trim() && !isLoading ? 'pointer' : 'not-allowed',
-              } as ViewStyle,
+                outline: isSendFocusVisible && inputText.trim() && !isLoading
+                  ? `${focusRing.width}px solid ${focusRing.color}`
+                  : 'none',
+                outlineOffset: focusRing.offset,
+                transition: 'outline 0.1s ease',
+              } as unknown as ViewStyle,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Send message"
@@ -486,79 +627,79 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: spacing[5],
+    paddingVertical: spacing[3],
   },
   keyboardAvoid: {
     flex: 1,
   },
   messagesList: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: spacing[4],
+    paddingBottom: spacing[4],
   },
   messagesListEmpty: {
     flex: 1,
     justifyContent: 'center',
   },
   messageBubble: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    marginBottom: 8,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
+    borderRadius: borderRadius.xl,
+    marginBottom: spacing[2],
   },
   emptyState: {
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing[5],
   },
   contextCard: {
-    marginTop: 16,
+    marginTop: spacing[4],
     width: '100%',
     maxWidth: 280,
   },
   suggestions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    gap: 8,
+    paddingHorizontal: spacing[4],
+    paddingBottom: spacing[2],
+    gap: spacing[2],
   },
   suggestionChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: spacing[3.5],
+    paddingVertical: spacing[2],
+    borderRadius: borderRadius['2xl'],
     borderWidth: 1,
   },
   streamingIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 12,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[2],
+    marginHorizontal: spacing[4],
+    borderRadius: borderRadius.lg,
     alignSelf: 'flex-start',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   textInput: {
     flex: 1,
-    minHeight: 40,
+    minHeight: spacing[10],
     maxHeight: 120,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[2.5],
+    borderRadius: borderRadius['2xl'],
     borderWidth: 1,
     fontSize: 16,
-    marginRight: 12,
+    marginRight: spacing[3],
   },
   sendButton: {
-    height: 40,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    height: spacing[10],
+    paddingHorizontal: spacing[5],
+    borderRadius: borderRadius['2xl'],
     alignItems: 'center',
     justifyContent: 'center',
   },

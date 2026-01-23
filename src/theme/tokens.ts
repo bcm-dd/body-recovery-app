@@ -242,7 +242,7 @@ export const borderRadius = {
 } as const;
 
 // ============================================================================
-// Shadows (for light mode)
+// Shadows (Light Mode)
 // ============================================================================
 
 export const shadows = {
@@ -284,16 +284,73 @@ export const shadows = {
 } as const;
 
 // ============================================================================
+// Shadows (Dark Mode)
+// Uses deeper shadows with higher opacity for visible depth on dark backgrounds
+// ============================================================================
+
+export const shadowsDark = {
+  none: {
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+  },
+  sm: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  lg: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  xl: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+} as const;
+
+// ============================================================================
 // Animation
 // ============================================================================
 
+/**
+ * Animation Duration Tokens
+ *
+ * Use these tokens for consistent animation timing across all components:
+ *
+ * - instant (0ms): No animation, immediate state changes
+ * - fast (150ms): Quick micro-interactions (button press, hover states, input focus)
+ * - normal (250ms): Standard transitions (expand/collapse, progress updates)
+ * - slow (400ms): Deliberate animations (modal enter/exit, page transitions)
+ * - ring (800ms): Extended animations (readiness ring progress, score reveals)
+ *
+ * CSS usage: `${animation.duration.fast}ms` or `${animation.duration.fast / 1000}s`
+ * Reanimated usage: `withTiming(value, { duration: animation.duration.normal })`
+ */
 export const animation = {
   duration: {
     instant: 0,
     fast: 150,
     normal: 250,
     slow: 400,
-    ring: 500,
+    ring: 800,
   },
   easing: {
     linear: 'linear',
@@ -330,6 +387,28 @@ export const breakpoints = {
   phone: 0,
   tablet: 768,
   desktop: 1024,
+} as const;
+
+// ============================================================================
+// Focus Ring (Web Accessibility)
+// ============================================================================
+
+export const focusRing = {
+  width: 2,
+  offset: 2,
+  color: 'blue', // Will be mapped to accent color in theme
+} as const;
+
+// ============================================================================
+// Icon Sizes
+// ============================================================================
+
+export const iconSizes = {
+  xs: 12,
+  sm: 16,
+  md: 20,
+  lg: 24,
+  xl: 32,
 } as const;
 
 // ============================================================================
@@ -412,7 +491,10 @@ export type Typography = typeof typography;
 export type Spacing = typeof spacing;
 export type BorderRadius = typeof borderRadius;
 export type Shadows = typeof shadows;
+export type ShadowsDark = typeof shadowsDark;
 export type Animation = typeof animation;
 export type ZIndex = typeof zIndex;
 export type Breakpoints = typeof breakpoints;
 export type Components = typeof components;
+export type FocusRing = typeof focusRing;
+export type IconSizes = typeof iconSizes;

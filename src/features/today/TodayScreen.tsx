@@ -4,7 +4,7 @@
  * Main dashboard showing readiness, today's plan, and quick actions.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@/theme';
-import { Text, Card, Button } from '@/components/ui';
+import { Text, Card, Button, LoadingState, EmptyState, Skeleton, SkeletonText } from '@/components/ui';
 import { ReadinessRing } from '@/components/readiness/ReadinessRing';
 import { useReadinessStore, useWorkoutStore, useBodyModelStore } from '@/store';
 import { useHaptics } from '@/hooks';
@@ -28,11 +28,15 @@ export function TodayScreen() {
 
   // Store state
   const readiness = useReadinessStore((state) => state.currentReadiness);
+  const readinessLoading = useReadinessStore((state) => state.isLoading);
   const calculateReadiness = useReadinessStore((state) => state.calculateReadiness);
   const activeInjuries = useBodyModelStore((state) => state.getActiveInjuries());
   const activeWorkout = useWorkoutStore((state) => state.activeWorkout);
+  const workoutLoading = useWorkoutStore((state) => state.isLoading);
 
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  // Simulate whether user has a workout scheduled for today
+  const [hasScheduledWorkout, _setHasScheduledWorkout] = useState(true);
 
   // Calculate readiness on mount
   useEffect(() => {
@@ -99,19 +103,28 @@ export function TodayScreen() {
 
         {/* Readiness Ring */}
         <View style={styles.readinessContainer}>
-          <ReadinessRing
-            score={readiness?.score ?? 0}
-            factors={readiness?.factors}
-            recommendation={readiness?.recommendation ?? 'moderate'}
-          />
-          <Text
-            variant="body"
-            color="secondary"
-            align="center"
-            style={{ marginTop: spacing[4] }}
-          >
-            {getReadinessMessage()}
-          </Text>
+          {readinessLoading ? (
+            <LoadingState
+              size="lg"
+              message="Calculating your readiness..."
+            />
+          ) : (
+            <>
+              <ReadinessRing
+                score={readiness?.score ?? 0}
+                factors={readiness?.factors}
+                recommendation={readiness?.recommendation ?? 'moderate'}
+              />
+              <Text
+                variant="body"
+                color="secondary"
+                align="center"
+                style={{ marginTop: spacing[4] }}
+              >
+                {getReadinessMessage()}
+              </Text>
+            </>
+          )}
         </View>
 
         {/* Active Injuries Alert */}
@@ -138,50 +151,97 @@ export function TodayScreen() {
             Today's Session
           </Text>
 
-          <Card variant="elevated" padding="lg">
-            <View style={styles.workoutHeader}>
-              <Text variant="h4">Upper Body Strength</Text>
-              <Text variant="caption" color="secondary">
-                ~45 min
-              </Text>
-            </View>
+          {workoutLoading ? (
+            // Skeleton loading state
+            <Card variant="elevated" padding="lg">
+              <View style={styles.workoutHeader}>
+                <SkeletonText width={160} height={24} />
+                <SkeletonText width={50} height={14} />
+              </View>
 
-            <View style={styles.workoutMeta}>
-              <View style={styles.metaItem}>
-                <Text variant="h3" color="accent">
-                  7
-                </Text>
-                <Text variant="caption" color="secondary">
-                  exercises
-                </Text>
+              <View style={[styles.workoutMeta, { marginTop: spacing[4] }]}>
+                <View style={styles.metaItem}>
+                  <Skeleton width={40} height={30} variant="text" />
+                  <SkeletonText width={60} height={12} style={{ marginTop: spacing[1] }} />
+                </View>
+                <View style={[styles.metaItem, { borderLeftWidth: 1, borderLeftColor: colors.border }]}>
+                  <Skeleton width={40} height={30} variant="text" />
+                  <SkeletonText width={30} height={12} style={{ marginTop: spacing[1] }} />
+                </View>
+                <View style={[styles.metaItem, { borderLeftWidth: 1, borderLeftColor: colors.border }]}>
+                  <Skeleton width={60} height={30} variant="text" />
+                  <SkeletonText width={50} height={12} style={{ marginTop: spacing[1] }} />
+                </View>
               </View>
-              <View style={[styles.metaItem, { borderLeftWidth: 1, borderLeftColor: colors.border }]}>
-                <Text variant="h3" color="accent">
-                  24
-                </Text>
-                <Text variant="caption" color="secondary">
-                  sets
-                </Text>
-              </View>
-              <View style={[styles.metaItem, { borderLeftWidth: 1, borderLeftColor: colors.border }]}>
-                <Text variant="h3" color="accent">
-                  {readiness?.recommendation === 'full' ? 'Full' : 'Modified'}
-                </Text>
-                <Text variant="caption" color="secondary">
-                  intensity
-                </Text>
-              </View>
-            </View>
 
-            <Button
-              title={activeWorkout ? 'Resume Workout' : 'Start Workout'}
-              variant="primary"
-              size="lg"
-              fullWidth
-              style={{ marginTop: spacing[4] }}
-              onPress={handleStartWorkout}
-            />
-          </Card>
+              <Skeleton
+                width="100%"
+                height={52}
+                variant="rect"
+                borderRadius={12}
+                style={{ marginTop: spacing[4] }}
+              />
+            </Card>
+          ) : !hasScheduledWorkout ? (
+            // Empty state when no workout is scheduled
+            <Card variant="elevated" padding="lg">
+              <EmptyState
+                title="No workout scheduled"
+                message="Your rest day or no session planned. Generate a workout or adjust your plan."
+                action={{
+                  title: 'Generate Workout',
+                  onPress: () => navigation.navigate('Plan'),
+                  variant: 'primary',
+                }}
+              />
+            </Card>
+          ) : (
+            // Actual workout content
+            <Card variant="elevated" padding="lg">
+              <View style={styles.workoutHeader}>
+                <Text variant="h4">Upper Body Strength</Text>
+                <Text variant="caption" color="secondary">
+                  ~45 min
+                </Text>
+              </View>
+
+              <View style={styles.workoutMeta}>
+                <View style={styles.metaItem}>
+                  <Text variant="h3" color="accent">
+                    7
+                  </Text>
+                  <Text variant="caption" color="secondary">
+                    exercises
+                  </Text>
+                </View>
+                <View style={[styles.metaItem, { borderLeftWidth: 1, borderLeftColor: colors.border }]}>
+                  <Text variant="h3" color="accent">
+                    24
+                  </Text>
+                  <Text variant="caption" color="secondary">
+                    sets
+                  </Text>
+                </View>
+                <View style={[styles.metaItem, { borderLeftWidth: 1, borderLeftColor: colors.border }]}>
+                  <Text variant="h3" color="accent">
+                    {readiness?.recommendation === 'full' ? 'Full' : 'Modified'}
+                  </Text>
+                  <Text variant="caption" color="secondary">
+                    intensity
+                  </Text>
+                </View>
+              </View>
+
+              <Button
+                title={activeWorkout ? 'Resume Workout' : 'Start Workout'}
+                variant="primary"
+                size="lg"
+                fullWidth
+                style={{ marginTop: spacing[4] }}
+                onPress={handleStartWorkout}
+              />
+            </Card>
+          )}
         </View>
 
         {/* Quick Actions */}

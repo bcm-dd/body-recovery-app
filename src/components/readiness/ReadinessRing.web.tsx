@@ -3,6 +3,7 @@
  *
  * Web-specific version without react-native-reanimated.
  * Uses CSS transitions for animations.
+ * Respects user's reduced motion preference for WCAG 2.1 Level AAA compliance.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -10,6 +11,7 @@ import { View, StyleSheet } from 'react-native';
 import Svg, { Circle, G, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useTheme } from '@/theme';
 import { Text } from '@/components/ui';
+import { useReducedMotion, getTransitionStyle } from '@/hooks/useReducedMotion';
 import type { ReadinessRecommendation } from '@/types';
 
 // ============================================================================
@@ -43,8 +45,12 @@ export function ReadinessRing({
   accessibilityLabel,
 }: ReadinessRingProps) {
   const { theme } = useTheme();
+  const { prefersReducedMotion } = useReducedMotion();
   const { colors, components } = theme;
-  const [displayedScore, setDisplayedScore] = useState(animated ? 0 : score);
+
+  // When reduced motion is preferred, skip the score animation
+  const shouldAnimate = animated && !prefersReducedMotion;
+  const [displayedScore, setDisplayedScore] = useState(shouldAnimate ? 0 : score);
 
   // Get size values
   const ringSize = components.readinessRing.size[size];
@@ -61,7 +67,7 @@ export function ReadinessRing({
       case 'moderate':
         return colors.warning;
       case 'light':
-        return '#F97316'; // Orange
+        return colors.bodyMapModerate; // Orange for light activity
       case 'rest':
         return colors.error;
       default:
@@ -69,17 +75,18 @@ export function ReadinessRing({
     }
   };
 
-  // Animate score on mount
+  // Animate score on mount (respects reduced motion preference)
   useEffect(() => {
-    if (animated) {
+    if (shouldAnimate) {
       const timer = setTimeout(() => {
         setDisplayedScore(score);
       }, 100);
       return () => clearTimeout(timer);
     }
+    // When reduced motion is preferred, show final score immediately
     setDisplayedScore(score);
     return undefined;
-  }, [score, animated]);
+  }, [score, shouldAnimate]);
 
   // Calculate stroke dash offset
   const strokeDashoffset = circumference * (1 - displayedScore / 100);
@@ -152,7 +159,13 @@ export function ReadinessRing({
           rotation={-90}
           origin={`${center}, ${center}`}
           // @ts-ignore - web style
-          style={{ transition: 'stroke-dashoffset 0.8s ease-out' }}
+          // Disable stroke animation when reduced motion is preferred
+          style={{
+            transition: getTransitionStyle(
+              prefersReducedMotion,
+              'stroke-dashoffset 0.8s ease-out'
+            ),
+          }}
         />
 
         {/* Factor segments (inner ring) */}

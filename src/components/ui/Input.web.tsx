@@ -13,7 +13,7 @@ import {
   ViewStyle,
   Pressable,
 } from 'react-native';
-import { useTheme } from '@/theme';
+import { useTheme, spacing } from '@/theme';
 import { Text } from './Text';
 
 // ============================================================================
@@ -55,7 +55,7 @@ export const Input = forwardRef<TextInput, InputProps>(
     const { theme } = useTheme();
     const [isFocused, setIsFocused] = useState(false);
 
-    const { colors, components, spacing, typography } = theme;
+    const { colors, components, spacing, typography, focusRing } = theme;
 
     const handleFocus = useCallback(
       (e: any) => {
@@ -102,8 +102,12 @@ export const Input = forwardRef<TextInput, InputProps>(
               height: components.input.height,
               borderColor: getBorderColor(),
               borderWidth: isFocused ? 2 : components.input.borderWidth,
+              // @ts-ignore - web-specific style (uses animation.duration.fast = 150ms)
+              transition: 'border-color 0.15s ease, border-width 0.15s ease, outline 0.1s ease',
+              // Focus ring for keyboard navigation
               // @ts-ignore - web-specific style
-              transition: 'border-color 0.15s ease, border-width 0.15s ease',
+              outline: isFocused && !disabled ? `${focusRing.width}px solid ${focusRing.color}` : 'none',
+              outlineOffset: focusRing.offset,
             },
           ]}
         >
@@ -134,7 +138,7 @@ export const Input = forwardRef<TextInput, InputProps>(
             <Pressable
               onPress={onRightIconPress}
               style={styles.rightIcon}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={{ top: spacing[2.5], bottom: spacing[2.5], left: spacing[2.5], right: spacing[2.5] }}
             >
               {rightIcon}
             </Pressable>
@@ -166,7 +170,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    marginBottom: 6,
+    marginBottom: spacing[1.5],
   },
   inputContainer: {
     flexDirection: 'row',
@@ -178,12 +182,12 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   leftIcon: {
-    paddingLeft: 12,
+    paddingLeft: spacing[3],
   },
   rightIcon: {
-    paddingRight: 12,
+    paddingRight: spacing[3],
   },
   helperText: {
-    marginTop: 4,
+    marginTop: spacing[1],
   },
 });

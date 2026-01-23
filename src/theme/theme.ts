@@ -5,7 +5,7 @@
  * Supports light, dark, and system themes.
  */
 
-import { palette, typography, spacing, borderRadius, shadows, animation, components } from './tokens';
+import { palette, typography, spacing, borderRadius, shadows, shadowsDark, animation, components, focusRing } from './tokens';
 
 // ============================================================================
 // Theme Types
@@ -14,15 +14,22 @@ import { palette, typography, spacing, borderRadius, shadows, animation, compone
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type AccentColor = 'blue' | 'green' | 'purple' | 'orange' | 'pink';
 
+export interface ThemeFocusRing {
+  width: number;
+  offset: number;
+  color: string;
+}
+
 export interface Theme {
   mode: 'light' | 'dark';
   colors: ThemeColors;
   typography: typeof typography;
   spacing: typeof spacing;
   borderRadius: typeof borderRadius;
-  shadows: typeof shadows;
+  shadows: typeof shadows | typeof shadowsDark;
   animation: typeof animation;
   components: typeof components;
+  focusRing: ThemeFocusRing;
 }
 
 export interface ThemeColors {
@@ -168,9 +175,14 @@ export function createDarkTheme(accent: AccentColor = 'blue'): Theme {
     typography,
     spacing,
     borderRadius,
-    shadows,
+    shadows: shadowsDark,
     animation,
     components,
+    focusRing: {
+      width: focusRing.width,
+      offset: focusRing.offset,
+      color: accentColors.accent,
+    },
   };
 }
 
@@ -244,6 +256,11 @@ export function createLightTheme(accent: AccentColor = 'blue'): Theme {
     shadows,
     animation,
     components,
+    focusRing: {
+      width: focusRing.width,
+      offset: focusRing.offset,
+      color: accentColors.accent,
+    },
   };
 }
 

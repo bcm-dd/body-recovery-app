@@ -18,6 +18,7 @@ const babelLoaderConfiguration = {
   include: [
     path.resolve(appDirectory, 'index.web.js'),
     path.resolve(appDirectory, 'App.tsx'),
+    path.resolve(appDirectory, 'App.web.tsx'),
     path.resolve(appDirectory, 'src'),
     // Include react-native packages that need transpilation
     path.resolve(appDirectory, 'node_modules/react-native-reanimated'),

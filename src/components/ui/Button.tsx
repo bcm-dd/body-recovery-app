@@ -23,6 +23,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '@/theme';
 import { useHaptics } from '@/hooks/useHaptics';
+import type { IconFamily } from './Icon';
 
 // ============================================================================
 // Types
@@ -38,8 +39,16 @@ export interface ButtonProps extends Omit<PressableProps, 'style'> {
   loading?: boolean;
   disabled?: boolean;
   fullWidth?: boolean;
+  /** Custom left icon element (takes precedence over leftIconName) */
   leftIcon?: React.ReactNode;
+  /** Custom right icon element (takes precedence over rightIconName) */
   rightIcon?: React.ReactNode;
+  /** Icon name for left icon (uses Icon component internally) */
+  leftIconName?: string;
+  /** Icon name for right icon (uses Icon component internally) */
+  rightIconName?: string;
+  /** Icon family for both left and right icons */
+  iconFamily?: IconFamily;
   haptic?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
@@ -61,6 +70,9 @@ export function Button({
   fullWidth = false,
   leftIcon,
   rightIcon,
+  leftIconName,
+  rightIconName,
+  iconFamily = 'material',
   haptic = true,
   style,
   textStyle,

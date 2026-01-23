@@ -3,9 +3,10 @@
  *
  * Web-specific version without react-native-reanimated animations.
  * Uses CSS transitions for press feedback.
+ * Respects user's reduced motion preference for WCAG 2.1 Level AAA compliance.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import {
   Pressable,
   Text,
@@ -16,6 +17,7 @@ import {
   PressableProps,
 } from 'react-native';
 import { useTheme } from '@/theme';
+import { useReducedMotion, getAccessibleTransition } from '@/hooks/useReducedMotion';
 
 // ============================================================================
 // Types
@@ -60,9 +62,34 @@ export function Button({
   ...pressableProps
 }: ButtonProps) {
   const { theme } = useTheme();
+  const { prefersReducedMotion } = useReducedMotion();
   const [isPressed, setIsPressed] = useState(false);
+  const [isFocusVisible, setIsFocusVisible] = useState(false);
+  const wasKeyboardFocusRef = useRef(false);
 
   const isDisabled = disabled || loading;
+
+  // Track if focus came from keyboard (Tab key)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        wasKeyboardFocusRef.current = true;
+      }
+    };
+    const handleMouseDown = () => {
+      wasKeyboardFocusRef.current = false;
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('mousedown', handleMouseDown);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('mousedown', handleMouseDown);
+      };
+    }
+    return undefined;
+  }, []);
 
   // Get variant styles
   const getVariantStyles = useCallback(() => {
@@ -141,6 +168,17 @@ export function Button({
     setIsPressed(false);
   }, []);
 
+  // Handle focus for keyboard navigation (focus-visible behavior)
+  const handleFocus = useCallback(() => {
+    if (wasKeyboardFocusRef.current) {
+      setIsFocusVisible(true);
+    }
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setIsFocusVisible(false);
+  }, []);
+
   // Handle press
   const handlePress = useCallback(
     (event: any) => {
@@ -149,11 +187,24 @@ export function Button({
     [onPress]
   );
 
+  // Focus ring style for keyboard navigation
+  const focusRingStyle = isFocusVisible && !isDisabled ? {
+    // @ts-ignore - web-specific style
+    outline: `${theme.focusRing.width}px solid ${theme.focusRing.color}`,
+    outlineOffset: theme.focusRing.offset,
+  } : {
+    // @ts-ignore - web-specific style
+    outline: 'none',
+  };
+
   return (
     <Pressable
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      // @ts-ignore - web-specific handlers
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       disabled={isDisabled}
       accessibilityRole="button"
       accessibilityLabel={loading ? `${title}, loading` : title}
@@ -171,12 +222,19 @@ export function Button({
           paddingHorizontal: sizeStyles.paddingHorizontal,
           borderRadius: theme.components.button.borderRadius,
           borderWidth: variant === 'secondary' ? 1.5 : 0,
-          transform: [{ scale: isPressed ? 0.97 : 1 }],
+          // When reduced motion is preferred, skip scale transform entirely
+          // and use opacity-only feedback for a more accessible experience
+          transform: prefersReducedMotion ? undefined : [{ scale: isPressed ? 0.97 : 1 }],
           opacity: isPressed ? 0.9 : 1,
           // @ts-ignore - web-specific style
-          transition: 'transform 0.1s ease, opacity 0.1s ease',
+          // Use accessible transition that respects reduced motion preference
+          transition: getAccessibleTransition(
+            prefersReducedMotion,
+            'transform 0.15s ease, opacity 0.15s ease, outline 0.1s ease'
+          ),
           cursor: isDisabled ? 'not-allowed' : 'pointer',
-        },
+          ...focusRingStyle,
+        } as ViewStyle,
         fullWidth && styles.fullWidth,
         style,
       ]}
@@ -193,8 +251,8 @@ export function Button({
               {
                 color: variantStyles.textColor,
                 fontSize: sizeStyles.fontSize,
-                marginLeft: leftIcon ? 8 : 0,
-                marginRight: rightIcon ? 8 : 0,
+                marginLeft: leftIcon ? theme.spacing[2] : 0,
+                marginRight: rightIcon ? theme.spacing[2] : 0,
               },
               textStyle,
             ]}

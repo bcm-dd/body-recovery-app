@@ -59,7 +59,7 @@ export function Card({
   accessibilityLabel,
   accessibilityHint,
 }: CardProps) {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const { trigger } = useHaptics();
   const pressed = useSharedValue(0);
 
@@ -80,7 +80,7 @@ export function Card({
     }
   };
 
-  // Get variant styles
+  // Get variant styles (shadows are now theme-aware)
   const getVariantStyles = (): ViewStyle => {
     const { colors, shadows } = theme;
 
@@ -88,7 +88,7 @@ export function Card({
       case 'elevated':
         return {
           backgroundColor: colors.elevated,
-          ...(isDark ? {} : shadows.md),
+          ...shadows.md,
         };
       case 'outlined':
         return {
