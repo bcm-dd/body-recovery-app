@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { ThemeProvider } from '@/theme';
 import { RootNavigator } from '@/navigation';
+import { ErrorBoundary } from '@/components/ui';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -25,13 +26,17 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <View style={styles.container}>
-      <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider initialThemeMode="dark" initialAccentColor="blue">
-            <RootNavigator />
-          </ThemeProvider>
-        </QueryClientProvider>
-      </SafeAreaProvider>
+      <ErrorBoundary>
+        <SafeAreaProvider>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider initialThemeMode="dark" initialAccentColor="blue">
+              <ErrorBoundary>
+                <RootNavigator />
+              </ErrorBoundary>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </SafeAreaProvider>
+      </ErrorBoundary>
     </View>
   );
 }

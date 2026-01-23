@@ -12,3 +12,4 @@ export * from './Icon';
 export * from './LoadingState';
 export * from './EmptyState';
 export * from './Skeleton';
+export * from './ErrorBoundary';
