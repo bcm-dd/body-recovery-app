@@ -24,6 +24,8 @@ const babelLoaderConfiguration = {
     path.resolve(appDirectory, 'node_modules/react-native-svg'),
     path.resolve(appDirectory, 'node_modules/react-native-vector-icons'),
     path.resolve(appDirectory, 'node_modules/@react-navigation'),
+    path.resolve(appDirectory, 'node_modules/@react-native'),
+    path.resolve(appDirectory, 'node_modules/react-native-health-connect'),
   ],
   use: {
     loader: 'babel-loader',
