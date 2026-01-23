@@ -1,60 +1,87 @@
 /**
  * Design Tokens - Movement & Recovery Companion
  *
- * Core design values that drive the entire visual system.
- * These tokens are the single source of truth for colors, typography,
- * spacing, and other visual properties.
+ * Premium design system based on "Calm Confidence" philosophy.
+ * Every element should feel inevitable, considered, and deeply satisfying.
+ *
+ * Core principles:
+ * - Timeless over trendy
+ * - Purposeful color
+ * - Restrained motion
+ * - OLED-optimized dark mode
  */
 
 // ============================================================================
-// Colors
+// Colors - Premium Palette
 // ============================================================================
 
 export const palette = {
-  // Neutrals
+  // Pure values
   white: '#FFFFFF',
   black: '#000000',
+  void: '#000000', // True black for OLED optimization
 
-  // Dark mode backgrounds
+  // Dark mode backgrounds (OLED-optimized)
   dark: {
-    background: '#0A0A0A',
-    surface: '#1A1A1A',
-    card: '#242424',
-    elevated: '#2E2E2E',
-    border: '#3A3A3A',
+    void: '#000000',      // True black - OLED optimization, maximum contrast
+    base: '#0A0A0B',      // Primary background - almost black, slight warmth
+    surface: '#141416',   // Cards, elevated elements
+    elevated: '#1C1C1F',  // Modals, popovers, focused states
+    border: '#2A2A2E',    // Subtle dividers, card edges
   },
 
-  // Light mode backgrounds
+  // Light mode backgrounds (warm, paper-like)
   light: {
-    background: '#F9FAFB',
-    surface: '#FFFFFF',
-    card: '#FFFFFF',
-    elevated: '#FFFFFF',
-    border: '#E5E7EB',
+    base: '#FAFAFA',      // Primary background - warm white
+    surface: '#FFFFFF',   // Cards, elevated elements
+    elevated: '#FFFFFF',  // With shadow for elevation
+    border: '#E5E5E7',    // Subtle dividers
   },
 
-  // Primary accent (Blue)
+  // Text hierarchy - Dark mode
+  textDark: {
+    primary: '#FFFFFF',   // Headlines, primary content
+    secondary: '#A1A1A6', // Supporting text, labels
+    tertiary: '#636366',  // Timestamps, hints, disabled
+    inverse: '#000000',   // Text on light backgrounds
+  },
+
+  // Text hierarchy - Light mode
+  textLight: {
+    primary: '#000000',   // Headlines, primary content
+    secondary: '#6B6B6B', // Supporting text, labels
+    tertiary: '#8E8E93',  // Timestamps, hints, disabled
+    inverse: '#FFFFFF',   // Text on dark backgrounds
+  },
+
+  // Primary accent - iOS System Blue
+  accent: {
+    default: '#0A84FF',   // The signature blue - familiar, accessible, trusted
+    hover: '#409CFF',     // Lighter on hover/press
+    muted: '#0A84FF20',   // Backgrounds, subtle highlights (20% opacity)
+  },
+
+  // Alternative accent palettes
   blue: {
     50: '#EFF6FF',
     100: '#DBEAFE',
     200: '#BFDBFE',
     300: '#93C5FD',
     400: '#60A5FA',
-    500: '#3B82F6',
+    500: '#0A84FF',   // iOS System Blue
     600: '#2563EB',
     700: '#1D4ED8',
     800: '#1E40AF',
     900: '#1E3A8A',
   },
 
-  // Alternative accents
   green: {
     50: '#F0FDF4',
     100: '#DCFCE7',
     200: '#BBF7D0',
     300: '#86EFAC',
     400: '#4ADE80',
-    500: '#22C55E',
+    500: '#30D158',   // iOS System Green
     600: '#16A34A',
     700: '#15803D',
     800: '#166534',
@@ -67,7 +94,7 @@ export const palette = {
     200: '#E9D5FF',
     300: '#D8B4FE',
     400: '#C084FC',
-    500: '#A855F7',
+    500: '#BF5AF2',   // iOS System Purple
     600: '#9333EA',
     700: '#7E22CE',
     800: '#6B21A8',
@@ -80,27 +107,14 @@ export const palette = {
     200: '#FED7AA',
     300: '#FDBA74',
     400: '#FB923C',
-    500: '#F97316',
+    500: '#FF9F0A',   // iOS System Orange
     600: '#EA580C',
     700: '#C2410C',
     800: '#9A3412',
     900: '#7C2D12',
   },
 
-  pink: {
-    50: '#FDF2F8',
-    100: '#FCE7F3',
-    200: '#FBCFE8',
-    300: '#F9A8D4',
-    400: '#F472B6',
-    500: '#EC4899',
-    600: '#DB2777',
-    700: '#BE185D',
-    800: '#9D174D',
-    900: '#831843',
-  },
-
-  // Semantic colors
+  // Neutral grays
   gray: {
     50: '#F9FAFB',
     100: '#F3F4F6',
@@ -114,82 +128,105 @@ export const palette = {
     900: '#111827',
   },
 
-  // Status colors
-  success: {
-    light: '#22C55E',
-    dark: '#22C55E',
-  },
-  warning: {
-    light: '#F59E0B',
-    dark: '#F59E0B',
-  },
-  error: {
-    light: '#EF4444',
-    dark: '#EF4444',
-  },
-  info: {
-    light: '#3B82F6',
-    dark: '#60A5FA',
-  },
+  // Semantic colors - iOS System Colors
+  success: '#30D158',   // Completions, positive trends
+  warning: '#FFD60A',   // Cautions, attention needed
+  error: '#FF453A',     // Errors, pain, stop signals
+  info: '#64D2FF',      // Informational, neutral highlights
 
   // Readiness ring colors
   readiness: {
-    sleep: '#8B5CF6', // Purple for sleep
-    recovery: '#10B981', // Emerald for HRV/recovery
-    load: '#F59E0B', // Amber for training load
-    body: '#EF4444', // Red for injury/body flags
+    sleep: '#BF5AF2',     // Purple - night, rest
+    recovery: '#64D2FF',  // Cyan - freshness
+    load: '#FF9F0A',      // Orange - effort, work
+    body: '#30D158',      // Green - physical state
+    background: '#2A2A2E', // Ring background track
   },
 
   // Body map colors
   bodyMap: {
-    good: '#22C55E',
-    mild: '#F59E0B',
-    moderate: '#F97316',
-    severe: '#EF4444',
-    neutral: '#6B7280',
+    severe: '#FF453A',    // Red - severe pain
+    moderate: '#FF9F0A',  // Orange - moderate pain
+    mild: '#FFD60A',      // Yellow - mild pain
+    good: '#30D158',      // Green - good
+    neutral: '#636366',   // Gray - neutral/unselected
   },
 } as const;
 
 // ============================================================================
-// Typography
+// Typography - iOS-inspired Scale
 // ============================================================================
 
 export const typography = {
-  // Font families
+  // Font families - System fonts for native feel
   fontFamily: {
-    sans: 'System',
+    sans: 'System',   // SF Pro on iOS, Roboto on Android
     mono: 'Menlo',
   },
 
-  // Font sizes (in pixels, will be converted to scaled units)
+  // Font sizes following iOS HIG
   fontSize: {
-    xs: 12,
-    sm: 14,
-    base: 16,
-    lg: 18,
-    xl: 20,
-    '2xl': 24,
-    '3xl': 30,
-    '4xl': 36,
-    '5xl': 48,
+    caption2: 11,     // Minimum legible size
+    caption1: 12,     // Labels, small UI
+    footnote: 13,     // Timestamps, hints
+    subhead: 15,      // Supporting text
+    callout: 16,      // Secondary content
+    body: 17,         // Primary reading text
+    headline: 17,     // Emphasized body (semibold)
+    title3: 20,       // Card titles, exercise names
+    title2: 22,       // Section headers
+    title1: 28,       // Screen titles
+    hero: 34,         // App title, major celebrations
+
+    // Legacy aliases for backward compatibility
+    xs: 11,
+    sm: 13,
+    base: 17,
+    lg: 20,
+    xl: 22,
+    '2xl': 28,
+    '3xl': 34,
+    '4xl': 40,
+  },
+
+  // Line heights (absolute values)
+  lineHeight: {
+    caption2: 13,
+    caption1: 16,
+    footnote: 18,
+    subhead: 20,
+    callout: 21,
+    body: 22,
+    headline: 22,
+    title3: 25,
+    title2: 28,
+    title1: 34,
+    hero: 41,
+
+    // Legacy aliases for backward compatibility
+    tight: 20,
+    normal: 22,
+    xs: 13,
+    sm: 18,
+    base: 22,
+    lg: 25,
+    xl: 28,
+    '2xl': 34,
+    '3xl': 41,
+    '4xl': 48,
   },
 
   // Font weights
   fontWeight: {
-    normal: '400' as const,
+    regular: '400' as const,
     medium: '500' as const,
     semibold: '600' as const,
     bold: '700' as const,
+    // Legacy alias
+    normal: '400' as const,
   },
 
-  // Line heights (multipliers)
-  lineHeight: {
-    tight: 1.2,
-    normal: 1.5,
-    relaxed: 1.75,
-  },
-
-  // Letter spacing
+  // Letter spacing - mostly untouched, system fonts are optimized
   letterSpacing: {
     tight: -0.5,
     normal: 0,
@@ -198,33 +235,36 @@ export const typography = {
 } as const;
 
 // ============================================================================
-// Spacing
+// Spacing - 4px Base Unit
 // ============================================================================
 
 export const spacing = {
   0: 0,
-  0.5: 2,
-  1: 4,
-  1.5: 6,
-  2: 8,
-  2.5: 10,
-  3: 12,
-  3.5: 14,
-  4: 16,
-  5: 20,
-  6: 24,
-  7: 28,
-  8: 32,
-  9: 36,
-  10: 40,
-  11: 44,
-  12: 48,
-  14: 56,
-  16: 64,
-  20: 80,
-  24: 96,
-  28: 112,
-  32: 128,
+  0.5: 2,    // Extra small - fine adjustments
+  1: 4,      // xs - Inline spacing, icon gaps
+  1.5: 6,    // Between xs and sm
+  2: 8,      // sm - Related elements
+  2.5: 10,   // Between sm and md
+  3: 12,     // md - Component internal padding
+  3.5: 14,   // Between md and base
+  4: 16,     // base - Standard gaps between elements
+  5: 20,     // lg - Section gaps (used sparingly)
+  6: 24,     // xl - Major section separation
+  8: 32,     // 2xl - Screen edge margins (mobile)
+  10: 40,    // Between 2xl and 3xl
+  12: 48,    // 3xl - Large feature spacing
+  16: 64,    // 4xl - Hero spacing
+
+  // Named aliases for clarity
+  xs: 4,
+  sm: 8,
+  md: 12,
+  base: 16,
+  lg: 20,
+  xl: 24,
+  '2xl': 32,
+  '3xl': 48,
+  '4xl': 64,
 } as const;
 
 // ============================================================================
@@ -232,17 +272,18 @@ export const spacing = {
 // ============================================================================
 
 export const borderRadius = {
-  none: 0,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  '2xl': 24,
-  full: 9999,
+  none: 0,       // Sharp edges (dividers, full-bleed)
+  sm: 8,         // Small buttons, tags, chips
+  md: 12,        // Cards, inputs, standard buttons
+  lg: 16,        // Large cards, modals
+  xl: 20,        // Feature cards, hero elements
+  '2xl': 24,     // Larger rounded elements
+  full: 9999,    // Pills, circular buttons, avatars
 } as const;
 
 // ============================================================================
-// Shadows (Light Mode)
+// Shadows - Light Mode
+// Uses subtle shadows for elegant depth
 // ============================================================================
 
 export const shadows = {
@@ -262,30 +303,31 @@ export const shadows = {
   },
   md: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 3,
   },
   lg: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
     elevation: 5,
   },
   xl: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.16,
+    shadowRadius: 48,
     elevation: 8,
   },
 } as const;
 
 // ============================================================================
-// Shadows (Dark Mode)
-// Uses deeper shadows with higher opacity for visible depth on dark backgrounds
+// Shadows - Dark Mode
+// In dark mode, shadows disappear into darkness
+// Use background color stepping and borders instead
 // ============================================================================
 
 export const shadowsDark = {
@@ -297,70 +339,62 @@ export const shadowsDark = {
     elevation: 0,
   },
   sm: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 5,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   xl: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
 } as const;
 
 // ============================================================================
-// Animation
+// Animation - Physics-Based Motion
 // ============================================================================
 
-/**
- * Animation Duration Tokens
- *
- * Use these tokens for consistent animation timing across all components:
- *
- * - instant (0ms): No animation, immediate state changes
- * - fast (150ms): Quick micro-interactions (button press, hover states, input focus)
- * - normal (250ms): Standard transitions (expand/collapse, progress updates)
- * - slow (400ms): Deliberate animations (modal enter/exit, page transitions)
- * - ring (800ms): Extended animations (readiness ring progress, score reveals)
- *
- * CSS usage: `${animation.duration.fast}ms` or `${animation.duration.fast / 1000}s`
- * Reanimated usage: `withTiming(value, { duration: animation.duration.normal })`
- */
 export const animation = {
   duration: {
-    instant: 0,
-    fast: 150,
-    normal: 250,
-    slow: 400,
-    ring: 800,
+    instant: 0,       // No animation, immediate state changes
+    fast: 100,        // Quick micro-interactions (80-150ms)
+    normal: 200,      // Standard transitions
+    slow: 300,        // Deliberate animations
+    slower: 400,      // Page transitions
+    ring: 800,        // Extended animations (readiness ring)
   },
+
+  // Spring configurations for physics-based motion
+  spring: {
+    button: { damping: 15, stiffness: 300 },      // Quick, snappy feedback
+    transition: { damping: 20, stiffness: 200 },  // Smooth transitions
+    bounce: { damping: 10, stiffness: 150 },      // Bouncy, playful
+    gentle: { damping: 25, stiffness: 120 },      // Gentle, subtle
+  },
+
   easing: {
     linear: 'linear',
     easeIn: 'ease-in',
     easeOut: 'ease-out',
     easeInOut: 'ease-in-out',
-    spring: {
-      damping: 15,
-      stiffness: 150,
-    },
   },
 } as const;
 
@@ -380,7 +414,7 @@ export const zIndex = {
 } as const;
 
 // ============================================================================
-// Breakpoints (for tablet responsiveness)
+// Breakpoints (for responsive design)
 // ============================================================================
 
 export const breakpoints = {
@@ -396,7 +430,7 @@ export const breakpoints = {
 export const focusRing = {
   width: 2,
   offset: 2,
-  color: 'blue', // Will be mapped to accent color in theme
+  color: 'accent',
 } as const;
 
 // ============================================================================
@@ -416,32 +450,37 @@ export const iconSizes = {
 // ============================================================================
 
 export const components = {
-  // Button
+  // Button - 44pt minimum touch target
   button: {
     height: {
       sm: 36,
-      md: 44,
+      md: 44,    // Minimum accessible touch target
       lg: 52,
     },
     paddingHorizontal: {
-      sm: spacing[3],
-      md: spacing[4],
-      lg: spacing[6],
+      sm: spacing[3],  // 12
+      md: spacing[4],  // 16
+      lg: spacing[6],  // 24
     },
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.md,  // 12px
   },
 
   // Card
   card: {
-    padding: spacing[4],
-    borderRadius: borderRadius.xl,
+    padding: {
+      sm: spacing[3],  // 12
+      md: spacing[4],  // 16
+      lg: spacing[5],  // 20
+    },
+    borderRadius: borderRadius.lg,  // 16px
+    borderWidth: 1,
   },
 
   // Input
   input: {
     height: 48,
-    paddingHorizontal: spacing[4],
-    borderRadius: borderRadius.lg,
+    paddingHorizontal: spacing[4],  // 16
+    borderRadius: borderRadius.md,  // 12px
     borderWidth: 1,
   },
 
@@ -449,23 +488,34 @@ export const components = {
   exerciseCard: {
     height: {
       collapsed: 80,
-      expanded: 'auto',
+      expanded: 'auto' as const,
     },
-    borderRadius: borderRadius.xl,
-    padding: spacing[4],
+    videoThumbnail: {
+      width: 80,
+      height: 80,
+      borderRadius: borderRadius.md,  // 12px
+    },
+    borderRadius: borderRadius.lg,  // 16px
+    padding: spacing[4],  // 16
   },
 
-  // Readiness ring
+  // Readiness ring - Signature visual element
   readinessRing: {
     size: {
       sm: 120,
-      md: 180,
-      lg: 240,
+      md: 200,   // Mobile default
+      lg: 240,   // Tablet
     },
     strokeWidth: {
       sm: 8,
       md: 12,
-      lg: 16,
+      lg: 12,
+    },
+    segmentGap: 4,  // Gap between segments in degrees
+    scoreSize: {
+      sm: 32,
+      md: 48,
+      lg: 48,
     },
   },
 
@@ -473,12 +523,20 @@ export const components = {
   tabBar: {
     height: 84,
     iconSize: 24,
+    labelSize: 11,
   },
 
   // Rest timer
   restTimer: {
     size: 200,
     strokeWidth: 8,
+    fontSize: 48,
+  },
+
+  // Set indicator dots
+  setIndicator: {
+    size: 8,
+    gap: 8,
   },
 } as const;
 

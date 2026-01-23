@@ -84,17 +84,17 @@ export function Card({
   }, [isInteractive]);
 
   // Get padding value
-  const getPadding = () => {
+  const getPadding = (): number => {
     switch (padding) {
       case 'none':
         return 0;
       case 'sm':
-        return theme.spacing[2];
+        return theme.components.card.padding.sm;
       case 'lg':
-        return theme.spacing[6];
+        return theme.components.card.padding.lg;
       case 'md':
       default:
-        return theme.components.card.padding;
+        return theme.components.card.padding.md;
     }
   };
 

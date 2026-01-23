@@ -224,8 +224,8 @@ export function Button({
           borderWidth: variant === 'secondary' ? 1.5 : 0,
           // When reduced motion is preferred, skip scale transform entirely
           // and use opacity-only feedback for a more accessible experience
-          transform: prefersReducedMotion ? undefined : [{ scale: isPressed ? 0.97 : 1 }],
-          opacity: isPressed ? 0.9 : 1,
+          // Premium 0.96 scale for a subtle, refined press feedback
+          transform: prefersReducedMotion ? undefined : [{ scale: isPressed ? 0.96 : 1 }],
           // @ts-ignore - web-specific style
           // Use accessible transition that respects reduced motion preference
           transition: getAccessibleTransition(

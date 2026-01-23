@@ -1,8 +1,9 @@
 /**
  * Theme System - Movement & Recovery Companion
  *
- * Creates themed color values and provides theme context.
- * Supports light, dark, and system themes.
+ * Premium theme system implementing "Calm Confidence" design philosophy.
+ * Dark mode as default - OLED-optimized for gyms, early mornings, late evenings.
+ * Light mode feels like a premium magazine - warm, not clinical.
  */
 
 import { palette, typography, spacing, borderRadius, shadows, shadowsDark, animation, components, focusRing } from './tokens';
@@ -12,7 +13,7 @@ import { palette, typography, spacing, borderRadius, shadows, shadowsDark, anima
 // ============================================================================
 
 export type ThemeMode = 'light' | 'dark' | 'system';
-export type AccentColor = 'blue' | 'green' | 'purple' | 'orange' | 'pink';
+export type AccentColor = 'blue' | 'green' | 'purple' | 'orange';
 
 export interface ThemeFocusRing {
   width: number;
@@ -33,13 +34,13 @@ export interface Theme {
 }
 
 export interface ThemeColors {
-  // Backgrounds
+  // Backgrounds - stepped for dark mode depth
   background: string;
   surface: string;
-  card: string;
   elevated: string;
+  card: string;  // Legacy alias for surface
 
-  // Text
+  // Text hierarchy
   textPrimary: string;
   textSecondary: string;
   textTertiary: string;
@@ -49,13 +50,13 @@ export interface ThemeColors {
   border: string;
   borderFocused: string;
 
-  // Accent (primary brand color)
+  // Accent (signature blue by default)
   accent: string;
-  accentLight: string;
-  accentDark: string;
+  accentHover: string;
+  accentMuted: string;
   accentText: string;
 
-  // Semantic
+  // Semantic colors
   success: string;
   successBackground: string;
   warning: string;
@@ -70,14 +71,14 @@ export interface ThemeColors {
   disabledBackground: string;
   disabledText: string;
 
-  // Readiness ring
+  // Readiness ring colors
   readinessSleep: string;
   readinessRecovery: string;
   readinessLoad: string;
   readinessBody: string;
   readinessBackground: string;
 
-  // Body map
+  // Body map colors
   bodyMapGood: string;
   bodyMapMild: string;
   bodyMapModerate: string;
@@ -97,80 +98,90 @@ export interface ThemeColors {
 
 interface AccentColors {
   accent: string;
-  accentLight: string;
-  accentDark: string;
+  accentHover: string;
+  accentMuted: string;
   accentText: string;
 }
 
-function getAccentColors(accent: AccentColor): AccentColors {
-  const accentPalette = palette[accent];
+function getAccentColors(accentKey: AccentColor, isDark: boolean): AccentColors {
+  // Default to iOS System Blue
+  if (accentKey === 'blue') {
+    return {
+      accent: palette.accent.default,
+      accentHover: palette.accent.hover,
+      accentMuted: palette.accent.muted,
+      accentText: palette.white,
+    };
+  }
+
+  const accentPalette = palette[accentKey];
   return {
     accent: accentPalette[500],
-    accentLight: accentPalette[400],
-    accentDark: accentPalette[600],
+    accentHover: isDark ? accentPalette[400] : accentPalette[600],
+    accentMuted: `${accentPalette[500]}20`,
     accentText: palette.white,
   };
 }
 
 export function createDarkTheme(accent: AccentColor = 'blue'): Theme {
-  const accentColors = getAccentColors(accent);
+  const accentColors = getAccentColors(accent, true);
 
   return {
     mode: 'dark',
     colors: {
-      // Backgrounds
-      background: palette.dark.background,
+      // Backgrounds - OLED-optimized stepped depth
+      background: palette.dark.base,
       surface: palette.dark.surface,
-      card: palette.dark.card,
       elevated: palette.dark.elevated,
+      card: palette.dark.surface,  // Legacy alias
 
-      // Text
-      textPrimary: palette.white,
-      textSecondary: palette.gray[400],
-      textTertiary: palette.gray[500],
-      textInverse: palette.gray[900],
+      // Text - proper contrast hierarchy
+      textPrimary: palette.textDark.primary,
+      textSecondary: palette.textDark.secondary,
+      textTertiary: palette.textDark.tertiary,
+      textInverse: palette.textDark.inverse,
 
-      // Borders
+      // Borders - subtle in dark mode
       border: palette.dark.border,
       borderFocused: accentColors.accent,
 
       // Accent
       ...accentColors,
 
-      // Semantic
-      success: palette.success.dark,
-      successBackground: `${palette.success.dark}20`,
-      warning: palette.warning.dark,
-      warningBackground: `${palette.warning.dark}20`,
-      error: palette.error.dark,
-      errorBackground: `${palette.error.dark}20`,
-      info: palette.info.dark,
-      infoBackground: `${palette.info.dark}20`,
+      // Semantic - iOS System Colors
+      success: palette.success,
+      successBackground: `${palette.success}20`,
+      warning: palette.warning,
+      warningBackground: `${palette.warning}20`,
+      error: palette.error,
+      errorBackground: `${palette.error}20`,
+      info: palette.info,
+      infoBackground: `${palette.info}20`,
 
       // Interactive
       pressedOverlay: 'rgba(255, 255, 255, 0.1)',
-      disabledBackground: palette.gray[800],
-      disabledText: palette.gray[600],
+      disabledBackground: palette.dark.surface,
+      disabledText: palette.textDark.tertiary,
 
       // Readiness ring
       readinessSleep: palette.readiness.sleep,
       readinessRecovery: palette.readiness.recovery,
       readinessLoad: palette.readiness.load,
       readinessBody: palette.readiness.body,
-      readinessBackground: palette.dark.surface,
+      readinessBackground: palette.readiness.background,
 
       // Body map
       bodyMapGood: palette.bodyMap.good,
       bodyMapMild: palette.bodyMap.mild,
       bodyMapModerate: palette.bodyMap.moderate,
       bodyMapSevere: palette.bodyMap.severe,
-      bodyMapNeutral: palette.gray[600],
+      bodyMapNeutral: palette.bodyMap.neutral,
 
       // Exercise card states
-      exerciseUpcoming: palette.dark.card,
+      exerciseUpcoming: palette.dark.surface,
       exerciseActive: accentColors.accent,
-      exerciseComplete: palette.success.dark,
-      exerciseSkipped: palette.gray[700],
+      exerciseComplete: palette.success,
+      exerciseSkipped: palette.dark.elevated,
     },
     typography,
     spacing,
@@ -187,26 +198,22 @@ export function createDarkTheme(accent: AccentColor = 'blue'): Theme {
 }
 
 export function createLightTheme(accent: AccentColor = 'blue'): Theme {
-  const accentColors = getAccentColors(accent);
-  // Adjust accent for light mode readability
-  accentColors.accent = palette[accent][600];
-  accentColors.accentLight = palette[accent][500];
-  accentColors.accentDark = palette[accent][700];
+  const accentColors = getAccentColors(accent, false);
 
   return {
     mode: 'light',
     colors: {
-      // Backgrounds
-      background: palette.light.background,
+      // Backgrounds - warm, paper-like
+      background: palette.light.base,
       surface: palette.light.surface,
-      card: palette.light.card,
       elevated: palette.light.elevated,
+      card: palette.light.surface,  // Legacy alias
 
       // Text
-      textPrimary: palette.gray[900],
-      textSecondary: palette.gray[600],
-      textTertiary: palette.gray[500],
-      textInverse: palette.white,
+      textPrimary: palette.textLight.primary,
+      textSecondary: palette.textLight.secondary,
+      textTertiary: palette.textLight.tertiary,
+      textInverse: palette.textLight.inverse,
 
       // Borders
       border: palette.light.border,
@@ -220,8 +227,8 @@ export function createLightTheme(accent: AccentColor = 'blue'): Theme {
       successBackground: palette.green[50],
       warning: palette.orange[600],
       warningBackground: palette.orange[50],
-      error: palette.error.light,
-      errorBackground: `${palette.error.light}15`,
+      error: palette.error,
+      errorBackground: `${palette.error}15`,
       info: palette.blue[600],
       infoBackground: palette.blue[50],
 
@@ -235,7 +242,7 @@ export function createLightTheme(accent: AccentColor = 'blue'): Theme {
       readinessRecovery: palette.readiness.recovery,
       readinessLoad: palette.readiness.load,
       readinessBody: palette.readiness.body,
-      readinessBackground: palette.gray[100],
+      readinessBackground: palette.gray[200],
 
       // Body map
       bodyMapGood: palette.bodyMap.good,

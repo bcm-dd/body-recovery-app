@@ -46,15 +46,17 @@ export function ReadinessRing({
 }: ReadinessRingProps) {
   const { theme } = useTheme();
   const { prefersReducedMotion } = useReducedMotion();
-  const { colors, components } = theme;
+  const { colors, components, animation } = theme;
 
   // When reduced motion is preferred, skip the score animation
   const shouldAnimate = animated && !prefersReducedMotion;
   const [displayedScore, setDisplayedScore] = useState(shouldAnimate ? 0 : score);
 
-  // Get size values
+  // Get size values from theme
   const ringSize = components.readinessRing.size[size];
   const strokeWidth = components.readinessRing.strokeWidth[size];
+  const segmentGapDegrees = components.readinessRing.segmentGap;
+  const ringAnimationDuration = animation.duration.ring;
   const radius = (ringSize - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const center = ringSize / 2;
@@ -91,17 +93,16 @@ export function ReadinessRing({
   // Calculate stroke dash offset
   const strokeDashoffset = circumference * (1 - displayedScore / 100);
 
-  // Factor segment calculations
+  // Factor segment calculations using theme values
   const innerRadius = radius - strokeWidth - 4;
   const innerCircumference = innerRadius * 2 * Math.PI;
-  const segmentGap = 8; // degrees
-  const totalGap = segmentGap * 4;
+  const totalGap = segmentGapDegrees * 4;
   const availableDegrees = 360 - totalGap;
   const segmentDegrees = availableDegrees / 4;
   const segmentLength = (segmentDegrees / 360) * innerCircumference;
 
   const getSegmentOffset = (index: number) => {
-    const startAngle = -90 + index * (segmentDegrees + segmentGap);
+    const startAngle = -90 + index * (segmentDegrees + segmentGapDegrees);
     return (startAngle / 360) * innerCircumference;
   };
 
@@ -160,10 +161,11 @@ export function ReadinessRing({
           origin={`${center}, ${center}`}
           // @ts-ignore - web style
           // Disable stroke animation when reduced motion is preferred
+          // Uses theme animation duration for premium feel
           style={{
             transition: getTransitionStyle(
               prefersReducedMotion,
-              'stroke-dashoffset 0.8s ease-out'
+              `stroke-dashoffset ${ringAnimationDuration}ms ease-out`
             ),
           }}
         />

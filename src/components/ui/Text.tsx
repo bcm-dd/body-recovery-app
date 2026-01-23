@@ -37,7 +37,7 @@ export type TextColor =
 export interface TextProps extends RNTextProps {
   variant?: TextVariant;
   color?: TextColor;
-  weight?: 'normal' | 'medium' | 'semibold' | 'bold';
+  weight?: 'regular' | 'medium' | 'semibold' | 'bold';
   align?: 'left' | 'center' | 'right';
   children: React.ReactNode;
 }
@@ -58,67 +58,76 @@ export function Text({
   const { theme } = useTheme();
   const { typography, colors } = theme;
 
-  // Get variant styles
+  // Get variant styles using iOS HIG typography scale
   const getVariantStyles = (): TextStyle => {
     switch (variant) {
       case 'h1':
+        // Hero text - 34px
         return {
-          fontSize: typography.fontSize['4xl'],
+          fontSize: typography.fontSize.hero,
           fontWeight: typography.fontWeight.bold,
-          lineHeight: typography.fontSize['4xl'] * typography.lineHeight.tight,
+          lineHeight: typography.lineHeight.hero,
           letterSpacing: typography.letterSpacing.tight,
         };
       case 'h2':
+        // Title 1 - 28px
         return {
-          fontSize: typography.fontSize['3xl'],
+          fontSize: typography.fontSize.title1,
           fontWeight: typography.fontWeight.bold,
-          lineHeight: typography.fontSize['3xl'] * typography.lineHeight.tight,
+          lineHeight: typography.lineHeight.title1,
           letterSpacing: typography.letterSpacing.tight,
         };
       case 'h3':
+        // Title 2 - 22px
         return {
-          fontSize: typography.fontSize['2xl'],
+          fontSize: typography.fontSize.title2,
           fontWeight: typography.fontWeight.semibold,
-          lineHeight: typography.fontSize['2xl'] * typography.lineHeight.tight,
+          lineHeight: typography.lineHeight.title2,
         };
       case 'h4':
+        // Title 3 - 20px
         return {
-          fontSize: typography.fontSize.xl,
+          fontSize: typography.fontSize.title3,
           fontWeight: typography.fontWeight.semibold,
-          lineHeight: typography.fontSize.xl * typography.lineHeight.tight,
+          lineHeight: typography.lineHeight.title3,
         };
       case 'bodySmall':
+        // Subhead - 15px
         return {
-          fontSize: typography.fontSize.sm,
-          fontWeight: typography.fontWeight.normal,
-          lineHeight: typography.fontSize.sm * typography.lineHeight.normal,
+          fontSize: typography.fontSize.subhead,
+          fontWeight: typography.fontWeight.regular,
+          lineHeight: typography.lineHeight.subhead,
         };
       case 'caption':
+        // Footnote - 13px
         return {
-          fontSize: typography.fontSize.xs,
-          fontWeight: typography.fontWeight.normal,
-          lineHeight: typography.fontSize.xs * typography.lineHeight.normal,
+          fontSize: typography.fontSize.footnote,
+          fontWeight: typography.fontWeight.regular,
+          lineHeight: typography.lineHeight.footnote,
         };
       case 'label':
+        // Caption 1 - 12px
         return {
-          fontSize: typography.fontSize.sm,
+          fontSize: typography.fontSize.caption1,
           fontWeight: typography.fontWeight.medium,
-          lineHeight: typography.fontSize.sm * typography.lineHeight.tight,
+          lineHeight: typography.lineHeight.caption1,
           textTransform: 'uppercase',
           letterSpacing: typography.letterSpacing.wide,
         };
       case 'button':
+        // Headline - 17px semibold
         return {
-          fontSize: typography.fontSize.base,
+          fontSize: typography.fontSize.headline,
           fontWeight: typography.fontWeight.semibold,
-          lineHeight: typography.fontSize.base * typography.lineHeight.tight,
+          lineHeight: typography.lineHeight.headline,
         };
       case 'body':
       default:
+        // Body - 17px
         return {
-          fontSize: typography.fontSize.base,
-          fontWeight: typography.fontWeight.normal,
-          lineHeight: typography.fontSize.base * typography.lineHeight.normal,
+          fontSize: typography.fontSize.body,
+          fontWeight: typography.fontWeight.regular,
+          lineHeight: typography.lineHeight.body,
         };
     }
   };

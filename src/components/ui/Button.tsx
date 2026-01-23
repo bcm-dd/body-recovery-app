@@ -154,25 +154,26 @@ export function Button({
   const variantStyles = getVariantStyles();
   const sizeStyles = getSizeStyles();
 
-  // Animated style for press feedback
+  // Get spring config from theme
+  const springConfig = theme.animation.spring.button;
+
+  // Animated style for press feedback - premium 0.96 scale
   const animatedStyle = useAnimatedStyle(() => {
-    const scale = interpolate(pressed.value, [0, 1], [1, 0.97]);
-    const opacity = interpolate(pressed.value, [0, 1], [1, 0.9]);
+    const scale = interpolate(pressed.value, [0, 1], [1, 0.96]);
 
     return {
       transform: [{ scale }],
-      opacity,
     };
   });
 
-  // Handle press in/out
+  // Handle press in/out with theme spring config
   const handlePressIn = useCallback(() => {
-    pressed.value = withSpring(1, { damping: 15, stiffness: 300 });
-  }, [pressed]);
+    pressed.value = withSpring(1, springConfig);
+  }, [pressed, springConfig]);
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withSpring(0, { damping: 15, stiffness: 300 });
-  }, [pressed]);
+    pressed.value = withSpring(0, springConfig);
+  }, [pressed, springConfig]);
 
   // Handle press with haptic
   const handlePress = useCallback(

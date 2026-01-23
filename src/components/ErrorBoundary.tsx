@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: palette.error.light,
+    color: palette.error,
     marginBottom: 16,
     width: 80,
     height: 80,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
   debugText: {
     fontSize: 11,
-    color: palette.error.light,
+    color: palette.error,
     fontFamily: 'monospace',
     marginBottom: 8,
   },
