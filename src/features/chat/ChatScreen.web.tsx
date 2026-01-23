@@ -15,6 +15,7 @@ import {
   TextInput,
   ActivityIndicator,
   FlatList,
+  ViewStyle,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@/theme';
@@ -146,7 +147,7 @@ export function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [streamingMessage, setStreamingMessage] = useState<string>('');
+  const [_streamingMessage, setStreamingMessage] = useState<string>('');
 
   // Store state for context
   const activeWorkout = useWorkoutStore((state) => state.activeWorkout);
@@ -395,9 +396,8 @@ export function ChatScreen() {
               styles.sendButton,
               {
                 backgroundColor: inputText.trim() && !isLoading ? colors.accent : colors.disabledBackground,
-                // @ts-ignore - web style
                 cursor: inputText.trim() && !isLoading ? 'pointer' : 'not-allowed',
-              },
+              } as ViewStyle,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Send message"

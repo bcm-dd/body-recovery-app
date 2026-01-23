@@ -76,9 +76,9 @@ export function ReadinessRing({
         setDisplayedScore(score);
       }, 100);
       return () => clearTimeout(timer);
-    } else {
-      setDisplayedScore(score);
     }
+    setDisplayedScore(score);
+    return undefined;
   }, [score, animated]);
 
   // Calculate stroke dash offset

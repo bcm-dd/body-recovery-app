@@ -43,7 +43,7 @@ export function Card({
   padding = 'md',
   onPress,
   onLongPress,
-  haptic = true,
+  haptic: _haptic = true,
   style,
   testID,
   accessibilityLabel,
@@ -125,10 +125,9 @@ export function Card({
   } : {};
 
   const webStyle = {
-    // @ts-ignore - web-specific style
     transition: 'transform 0.1s ease, opacity 0.1s ease',
     cursor: isInteractive ? 'pointer' : 'default',
-  };
+  } as ViewStyle;
 
   if (isInteractive) {
     return (
