@@ -5,6 +5,10 @@
       "claude/setup-dev-team-framework-mt9bO": true
     }
   },
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "backend/.next",
+  "installCommand": "npm install && cd backend && npm install",
+  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/cron/daily-readiness",
