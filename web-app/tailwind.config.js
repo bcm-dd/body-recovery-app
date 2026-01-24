@@ -149,6 +149,10 @@ export default {
         'scale-in': 'scale-in 0.2s ease-out',
         'ring-progress': 'ring-progress 0.8s ease-out forwards',
       },
+
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      },
     },
   },
   plugins: [],
