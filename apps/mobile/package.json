@@ -24,7 +24,6 @@
     "@app/domain": "workspace:*",
     "@app/ui": "workspace:*",
     "@app/copy": "workspace:*",
-    "@app/types": "workspace:*",
     "@tamagui/config": "^1.118.0",
     "@tamagui/core": "^1.118.0",
     "@tamagui/font-inter": "^1.118.0",

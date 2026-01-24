@@ -419,13 +419,15 @@ function generateRationaleSummary(planType: PlanType, rationale: PlanRationale):
     r.impact === 'drove_plan_type'
   );
 
-  if (highImpactReasons.length > 0) {
-    parts.push(highImpactReasons[0].explanation);
+  const firstHighImpact = highImpactReasons[0];
+  if (firstHighImpact) {
+    parts.push(firstHighImpact.explanation);
   }
 
   // Add any warnings
-  if (rationale.warnings.length > 0) {
-    parts.push(rationale.warnings[0]);
+  const firstWarning = rationale.warnings[0];
+  if (firstWarning) {
+    parts.push(firstWarning);
   }
 
   return parts.join(' ');

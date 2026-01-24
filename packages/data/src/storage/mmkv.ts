@@ -131,7 +131,7 @@ export class MMKVStorageAdapter implements StorageAdapter {
   setObject<T>(key: string, value: T): void {
     const json = JSON.stringify(value);
     this.mmkv.set(key, json);
-    this.notifyListeners(key, value);
+    this.notifyListeners(key, value as StorageValue);
   }
 
   delete(key: string): void {

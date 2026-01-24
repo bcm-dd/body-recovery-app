@@ -1956,7 +1956,7 @@ export function getAlternativesForContraindication(
 
   return contraindication.alternativeExerciseIds
     .map((id) => EXERCISES_BY_ID[id])
-    .filter(Boolean);
+    .filter((e): e is Exercise => e !== undefined);
 }
 
 // ============================================================================

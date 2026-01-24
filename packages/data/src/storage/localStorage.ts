@@ -25,8 +25,8 @@ import {
 export class LocalStorageAdapter implements StorageAdapter {
   private prefix: string;
   private listeners: Set<StorageListener> = new Set();
-  private originalSetItem: typeof localStorage.setItem;
-  private originalRemoveItem: typeof localStorage.removeItem;
+  private originalSetItem?: typeof localStorage.setItem;
+  private originalRemoveItem?: typeof localStorage.removeItem;
 
   constructor(options: StorageOptions = {}) {
     this.prefix = options.id ? `${options.id}:` : 'body-recovery:';
@@ -182,10 +182,10 @@ export class LocalStorageAdapter implements StorageAdapter {
   setObject<T>(key: string, value: T): void {
     if (typeof localStorage === 'undefined') return;
 
-    const encoded = this.encodeValue(value, 'object');
+    const encoded = this.encodeValue(value as StorageValue, 'object');
 
     localStorage.setItem(this.getFullKey(key), encoded);
-    this.notifyListeners(key, value);
+    this.notifyListeners(key, value as StorageValue);
   }
 
   delete(key: string): void {
@@ -361,8 +361,8 @@ export class InMemoryStorageAdapter implements StorageAdapter {
   }
 
   setObject<T>(key: string, value: T): void {
-    this.data.set(key, value);
-    this.notifyListeners(key, value);
+    this.data.set(key, value as StorageValue);
+    this.notifyListeners(key, value as StorageValue);
   }
 
   delete(key: string): void {

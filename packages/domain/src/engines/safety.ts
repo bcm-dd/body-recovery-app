@@ -230,13 +230,15 @@ function determineAction(triggers: SafetyTrigger[]): SafetyAction {
   }
 
   const highTriggers = triggers.filter(t => t.severity === 'high');
-  if (highTriggers.length > 0) {
-    return highTriggers[0].action;
+  const firstHigh = highTriggers[0];
+  if (firstHigh) {
+    return firstHigh.action;
   }
 
   const mediumTriggers = triggers.filter(t => t.severity === 'medium');
-  if (mediumTriggers.length > 0) {
-    return mediumTriggers[0].action;
+  const firstMedium = mediumTriggers[0];
+  if (firstMedium) {
+    return firstMedium.action;
   }
 
   const lowTriggers = triggers.filter(t => t.severity === 'low');
@@ -261,7 +263,8 @@ function generateUserMessage(triggers: SafetyTrigger[]): string {
     return severityOrder.indexOf(a.severity) - severityOrder.indexOf(b.severity);
   });
 
-  return sortedTriggers[0].message;
+  const mostSevere = sortedTriggers[0];
+  return mostSevere ? mostSevere.message : '';
 }
 
 /**

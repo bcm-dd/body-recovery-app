@@ -73,10 +73,6 @@ export {
 // Convenience Re-exports for Common Use Cases
 // ============================================================================
 
-/**
- * Quick access to exercise count by category
- */
-export { EXERCISES } from './exercises';
 import { EXERCISES } from './exercises';
 
 export const EXERCISE_COUNTS = {
