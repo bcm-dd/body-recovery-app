@@ -1,31 +1,45 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Remove standalone for standard Vercel deployment
   reactStrictMode: true,
   poweredByHeader: false,
-
-  // Ensure trailing slashes are handled consistently
   trailingSlash: false,
 
   // Image optimization
   images: {
     domains: [],
-    unoptimized: false,
+    unoptimized: true, // Static export compatibility
   },
 
-  // Rewrites for React Native Web app
+  // Rewrites to serve the Vite SPA for all non-API routes
   async rewrites() {
-    return [
-      {
-        // Serve /app/ and /app (with or without trailing slash)
-        source: '/app',
-        destination: '/app/index.html',
-      },
-      {
-        source: '/app/',
-        destination: '/app/index.html',
-      },
-    ];
+    return {
+      beforeFiles: [
+        // Serve static assets from /assets
+        {
+          source: '/assets/:path*',
+          destination: '/assets/:path*',
+        },
+      ],
+      afterFiles: [
+        // All non-API routes serve the SPA
+        {
+          source: '/:path((?!api|_next|assets|favicon).*)',
+          destination: '/index.html',
+        },
+      ],
+      fallback: [
+        // Catch-all fallback to SPA
+        {
+          source: '/:path*',
+          destination: '/index.html',
+        },
+      ],
+    };
+  },
+
+  // Skip the default page
+  async redirects() {
+    return [];
   },
 };
 

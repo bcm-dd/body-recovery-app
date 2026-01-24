@@ -5,18 +5,36 @@
       "claude/setup-dev-team-framework-mt9bO": true
     }
   },
-  "buildCommand": "cd backend && npm run build",
+  "buildCommand": "cd web-app && npm install && npm run build && cp -r dist/* ../backend/public/ && cd ../backend && npm install && npm run build",
   "outputDirectory": "backend/.next",
-  "installCommand": "npm install && npm run web:build && cd backend && npm install",
+  "installCommand": "npm install",
   "framework": "nextjs",
-  "rewrites": [
+  "headers": [
     {
-      "source": "/app",
-      "destination": "/app/index.html"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
     },
     {
-      "source": "/app/",
-      "destination": "/app/index.html"
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ],
   "crons": [

@@ -1,15 +1,14 @@
 /**
- * Root Layout - Movement & Recovery Companion (API Backend)
+ * Root Layout - Body Recovery API
  *
- * Minimal layout for API-only Next.js backend.
- * The main web UI is served via React Native Web.
+ * Minimal layout for API-only backend.
  */
 
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Movement & Recovery API',
-  description: 'API backend for Movement & Recovery Companion',
+  title: 'Body Recovery',
+  description: 'An AI that knows your body and helps you take care of it.',
 };
 
 export default function RootLayout({
