@@ -5,7 +5,7 @@
       "claude/setup-dev-team-framework-mt9bO": true
     }
   },
-  "buildCommand": "cd web-app && npm ci --include=dev && npm run build && cp -r dist/* ../backend/public/ && cd ../backend && npm ci && npm run build",
+  "buildCommand": "cd web-app && npm ci --include=dev && npm run build && cp -r dist/* ../backend/public/ && cd ../backend && npm ci --include=dev && npm run build",
   "outputDirectory": "backend/.next",
   "installCommand": "npm install",
   "framework": "nextjs",
