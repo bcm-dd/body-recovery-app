@@ -1,5 +1,5 @@
 /**
- * Core types for the Body Recovery Web App
+ * Core types for the Tend Web App
  */
 
 // ============================================================================

@@ -23,17 +23,17 @@ const sizes = {
 }
 
 const factorColors = {
-  sleep: '#BF5AF2',    // Purple
-  recovery: '#64D2FF', // Cyan
-  load: '#FF9F0A',     // Orange
-  body: '#30D158',     // Green
+  sleep: '#9BB5C9',    // Calm blue (healing)
+  recovery: '#7CB98B', // Soft green (good)
+  load: '#D4A84B',     // Warm amber (caution)
+  body: '#C4A484',     // Warm sand (accent)
 }
 
 const recommendationColors = {
-  rest: '#FF453A',     // Red
-  light: '#FFD60A',    // Yellow
-  moderate: '#FF9F0A', // Orange
-  full: '#30D158',     // Green
+  rest: '#C97B7B',     // Soft red (concern)
+  light: '#D4A84B',    // Warm amber (caution)
+  moderate: '#C4A484', // Warm sand (accent)
+  full: '#7CB98B',     // Soft green (good)
 }
 
 export function ReadinessRing({

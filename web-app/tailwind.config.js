@@ -14,18 +14,31 @@ export default {
         surface: '#141416',
         elevated: '#1C1C1F',
 
-        // Primary accent - iOS System Blue
+        // Primary accent - Warm earth tones for Tend brand
         accent: {
-          DEFAULT: '#0A84FF',
-          hover: '#409CFF',
-          muted: 'rgba(10, 132, 255, 0.12)',
+          DEFAULT: '#C4A484',  // Warm sand
+          hover: '#D4B494',
+          muted: 'rgba(196, 164, 132, 0.12)',
         },
 
-        // Semantic colors - iOS System Colors
-        success: '#30D158',
-        warning: '#FFD60A',
-        error: '#FF453A',
-        info: '#64D2FF',
+        // Secondary accent - Deeper earth
+        secondary: {
+          DEFAULT: '#8B7355',
+          hover: '#9B8365',
+          muted: 'rgba(139, 115, 85, 0.12)',
+        },
+
+        // Semantic colors - Warm, softer palette
+        good: '#7CB98B',      // Soft green (replaces success)
+        caution: '#D4A84B',   // Warm amber (replaces warning)
+        concern: '#C97B7B',   // Soft red (replaces error)
+        healing: '#9BB5C9',   // Calm blue
+
+        // Legacy aliases for compatibility
+        success: '#7CB98B',
+        warning: '#D4A84B',
+        error: '#C97B7B',
+        info: '#9BB5C9',
 
         // Text hierarchy
         'text-primary': '#FFFFFF',
@@ -35,20 +48,20 @@ export default {
         // Borders
         border: '#2A2A2E',
 
-        // Readiness colors
+        // Readiness colors - Updated for Tend brand
         readiness: {
-          sleep: '#BF5AF2',
-          recovery: '#64D2FF',
-          load: '#FF9F0A',
-          body: '#30D158',
+          sleep: '#9BB5C9',   // Calm blue (healing)
+          recovery: '#7CB98B', // Soft green (good)
+          load: '#D4A84B',    // Warm amber (caution)
+          body: '#C4A484',    // Warm sand (accent)
         },
 
-        // Body map colors
+        // Body map colors - Updated for Tend brand
         body: {
-          severe: '#FF453A',
-          moderate: '#FF9F0A',
-          mild: '#FFD60A',
-          good: '#30D158',
+          severe: '#C97B7B',   // Soft red (concern)
+          moderate: '#D4A84B', // Warm amber (caution)
+          mild: '#C4A484',     // Warm sand (accent)
+          good: '#7CB98B',     // Soft green (good)
           neutral: '#636366',
         },
       },

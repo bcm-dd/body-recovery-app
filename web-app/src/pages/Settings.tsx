@@ -4,26 +4,26 @@ import { cn } from '@/lib/cn'
 
 const settingsSections = [
   {
-    title: 'Account',
+    title: 'Your account',
     items: [
-      { label: 'Profile', value: 'Edit' },
+      { label: 'Your profile', value: 'Edit' },
       { label: 'Email', value: 'user@example.com' },
-      { label: 'Password', value: 'Change' },
+      { label: 'Password', value: 'Update' },
     ],
   },
   {
-    title: 'Preferences',
+    title: 'Training preferences',
     items: [
       { label: 'Units', value: 'Metric' },
-      { label: 'Week Starts', value: 'Monday' },
-      { label: 'Notifications', value: 'On' },
+      { label: 'Week begins', value: 'Monday' },
+      { label: 'Gentle reminders', value: 'On' },
     ],
   },
   {
-    title: 'Health Data',
+    title: 'How we connect',
     items: [
       { label: 'Apple Health', value: 'Connected' },
-      { label: 'Export Data', value: '' },
+      { label: 'Export your data', value: '' },
     ],
   },
 ]
@@ -38,6 +38,9 @@ export function SettingsPage() {
           transition={{ duration: 0.3 }}
         >
           <Text variant="title1">Settings</Text>
+          <Text variant="footnote" color="tertiary" className="mt-1">
+            Move with wisdom
+          </Text>
         </motion.div>
       </header>
 
@@ -91,11 +94,40 @@ export function SettingsPage() {
           </motion.section>
         ))}
 
+        {/* About Tend */}
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+        >
+          <Text
+            variant="footnote"
+            color="secondary"
+            className="uppercase tracking-wider mb-2 px-1"
+          >
+            About Tend
+          </Text>
+          <Card variant="default" padding="md">
+            <div className="space-y-3">
+              <div
+                className="w-10 h-1 rounded-full"
+                style={{ backgroundColor: '#C4A484' }}
+              />
+              <Text variant="body" color="secondary" className="leading-relaxed">
+                Tend helps you listen to your body. We don't optimize you — we help you understand yourself.
+              </Text>
+              <Text variant="caption1" color="tertiary">
+                Built with care for those who move through life mindfully.
+              </Text>
+            </div>
+          </Card>
+        </motion.section>
+
         {/* Sign Out */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.4 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
         >
           <Button variant="danger" fullWidth>
             Sign Out
@@ -106,11 +138,11 @@ export function SettingsPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.5 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
           className="text-center pt-4"
         >
           <Text variant="caption2" color="tertiary">
-            Body Recovery v1.0.0
+            Tend v1.0.0
           </Text>
         </motion.div>
       </div>

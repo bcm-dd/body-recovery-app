@@ -1,5 +1,5 @@
 /**
- * API Client - Body Recovery Web App
+ * API Client - Tend Web App
  *
  * Handles all communication with the backend API.
  */

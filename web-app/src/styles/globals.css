@@ -53,9 +53,9 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  /* Subtle glow effect */
+  /* Subtle glow effect - Warm sand for Tend brand */
   .glow-accent {
-    box-shadow: 0 0 40px rgba(10, 132, 255, 0.15);
+    box-shadow: 0 0 40px rgba(196, 164, 132, 0.15);
   }
 
   /* Button press animation */
