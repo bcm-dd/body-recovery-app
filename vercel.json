@@ -5,7 +5,6 @@
   "framework": "nextjs",
   "outputDirectory": "apps/web/.next",
   "regions": ["syd1"],
-  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- . ':(exclude)apps/mobile' ':(exclude)*.md'",
   "git": {
     "deploymentEnabled": {
       "main": true,
