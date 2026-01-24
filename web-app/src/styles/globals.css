@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* OLED-optimized dark mode defaults */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-void text-text-primary;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  }
+
+  /* Focus ring for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-void;
+  }
+
+  /* Remove default button styles */
+  button {
+    @apply focus-visible:outline-none;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-text-tertiary;
+  }
+}
+
+/* Premium component styles */
+@layer components {
+  /* Glass morphism card */
+  .glass {
+    @apply bg-surface/80 backdrop-blur-xl;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Subtle glow effect */
+  .glow-accent {
+    box-shadow: 0 0 40px rgba(10, 132, 255, 0.15);
+  }
+
+  /* Button press animation */
+  .press-scale {
+    @apply transition-transform duration-fast active:scale-[0.96];
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-normal;
+  }
+
+  .card-hover:hover {
+    @apply bg-elevated;
+    transform: translateY(-2px);
+  }
+
+  /* Smooth page transitions */
+  .page-enter {
+    @apply animate-fade-in;
+  }
+
+  /* Ring segment */
+  .ring-segment {
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s ease-out;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  /* Safe area padding for mobile */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Text balance for better headlines */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
