@@ -37,10 +37,30 @@ export function BodyWeather({
     onTap?.()
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleTap()
+    }
+  }
+
+  // Generate aria-label based on current state
+  const getAriaLabel = () => {
+    const stateDescription = showDetails
+      ? `Readiness score: ${score} out of 100. ${atmosphere.guidance}`
+      : `${atmosphere.message} ${atmosphere.subMessage}`
+    const actionHint = showDetails ? 'Press to return to overview' : 'Press to view details'
+    return `Body weather: ${stateDescription}. ${actionHint}`
+  }
+
   return (
     <motion.div
       className="relative w-full h-full min-h-[400px] overflow-hidden cursor-pointer select-none"
       onClick={handleTap}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={getAriaLabel()}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.5, ease: 'easeOut' }}

@@ -6,16 +6,67 @@
  * Responses are short, actionable, honest, warm.
  */
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Text } from '@/components/ui'
 import { cn } from '@/lib/cn'
+import { api } from '@/lib/api'
 
 interface Exchange {
   id: string
   thought: string
   response: string
   timestamp: Date
+}
+
+interface StreamingResponse {
+  thought: string
+  partialResponse: string
+}
+
+/**
+ * Parse streaming response chunks from Vercel AI SDK
+ * Handles both raw text and SSE format data
+ */
+function parseStreamChunk(chunk: string): string {
+  // Vercel AI SDK streams data in format: 0:"text" or just raw text
+  // Try to extract text from the format
+  const lines = chunk.split('\n').filter(Boolean)
+  let result = ''
+
+  for (const line of lines) {
+    // Handle Vercel AI SDK format: 0:"text content"
+    const match = line.match(/^\d+:"(.*)"/s)
+    if (match) {
+      // Unescape the JSON string
+      try {
+        result += JSON.parse(`"${match[1]}"`)
+      } catch {
+        result += match[1]
+      }
+    } else if (!line.startsWith('data:') && !line.startsWith('event:')) {
+      // Raw text chunk
+      result += line
+    } else if (line.startsWith('data:')) {
+      // SSE format
+      const data = line.slice(5).trim()
+      if (data && data !== '[DONE]') {
+        try {
+          const parsed = JSON.parse(data)
+          if (parsed.choices?.[0]?.delta?.content) {
+            result += parsed.choices[0].delta.content
+          } else if (typeof parsed === 'string') {
+            result += parsed
+          }
+        } catch {
+          // Not JSON, use as-is
+          result += data
+        }
+      }
+    }
+  }
+
+  return result
 }
 
 // Gentle invitations, not commands
@@ -32,6 +83,8 @@ export function ChatPage() {
   const [currentThought, setCurrentThought] = useState('')
   const [isPresent, setIsPresent] = useState(false)
   const [isResponding, setIsResponding] = useState(false)
+  const [streamingResponse, setStreamingResponse] = useState<StreamingResponse | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   // Auto-resize textarea
@@ -42,28 +95,69 @@ export function ChatPage() {
     }
   }, [currentThought])
 
-  const handleShare = async (thought: string) => {
+  const handleShare = useCallback(async (thought: string) => {
     if (!thought.trim() || isResponding) return
 
     const trimmedThought = thought.trim()
     setCurrentThought('')
     setIsResponding(true)
     setIsPresent(true)
+    setError(null)
+    setStreamingResponse({ thought: trimmedThought, partialResponse: '' })
 
-    // Simulate presence (will be replaced with API)
-    await new Promise((resolve) => setTimeout(resolve, 1200))
+    // Build message history for context
+    const messages: { role: 'user' | 'assistant'; content: string }[] = [
+      ...exchanges.flatMap((ex) => [
+        { role: 'user' as const, content: ex.thought },
+        { role: 'assistant' as const, content: ex.response },
+      ]),
+      { role: 'user' as const, content: trimmedThought },
+    ]
 
-    const response = getTendResponse(trimmedThought)
-    const exchange: Exchange = {
-      id: Date.now().toString(),
-      thought: trimmedThought,
-      response,
-      timestamp: new Date(),
+    // Context for AI - hardcoded for now as specified
+    const aiContext = {
+      readinessScore: 72,
+      activeInjuries: [] as string[],
     }
 
-    setExchanges((prev) => [...prev, exchange])
-    setIsResponding(false)
-  }
+    try {
+      let fullResponse = ''
+
+      await api.streamChat(
+        messages,
+        aiContext,
+        // onChunk - append streamed text
+        (chunk: string) => {
+          // Parse SSE data format if needed
+          const textChunk = parseStreamChunk(chunk)
+          if (textChunk) {
+            fullResponse += textChunk
+            setStreamingResponse((prev) =>
+              prev ? { ...prev, partialResponse: fullResponse } : null
+            )
+          }
+        },
+        // onComplete
+        () => {
+          // Create the final exchange
+          const exchange: Exchange = {
+            id: Date.now().toString(),
+            thought: trimmedThought,
+            response: fullResponse || "I'm here. What's on your mind?",
+            timestamp: new Date(),
+          }
+          setExchanges((prev) => [...prev, exchange])
+          setStreamingResponse(null)
+          setIsResponding(false)
+        }
+      )
+    } catch (err) {
+      console.error('Chat error:', err)
+      setError("I'm having trouble connecting right now. Try again in a moment.")
+      setStreamingResponse(null)
+      setIsResponding(false)
+    }
+  }, [exchanges, isResponding])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -196,22 +290,87 @@ export function ChatPage() {
                   </motion.div>
                 ))}
 
-                {/* Responding state */}
-                {isResponding && (
+                {/* Responding state with streaming */}
+                {isResponding && streamingResponse && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.4 }}
                     className="text-center space-y-6"
                   >
+                    {/* User's thought being responded to */}
                     <Text
                       variant="footnote"
                       color="tertiary"
                       className="italic"
                     >
-                      {currentThought || exchanges[exchanges.length - 1]?.thought || '...'}
+                      {streamingResponse.thought}
                     </Text>
-                    <PresenceIndicator />
+
+                    {/* Streaming response or thinking indicator */}
+                    {streamingResponse.partialResponse ? (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <Text
+                          variant="title3"
+                          color="primary"
+                          className="font-normal leading-relaxed"
+                        >
+                          {streamingResponse.partialResponse}
+                          <motion.span
+                            animate={{ opacity: [1, 0] }}
+                            transition={{ duration: 0.5, repeat: Infinity }}
+                            className="inline-block w-0.5 h-5 bg-text-primary ml-0.5 align-middle"
+                          />
+                        </Text>
+                      </motion.div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Text
+                          variant="caption1"
+                          color="tertiary"
+                          className="animate-pulse"
+                        >
+                          Thinking...
+                        </Text>
+                        <PresenceIndicator />
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* Error state */}
+                {error && !isResponding && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-center space-y-4"
+                  >
+                    <Text
+                      variant="body"
+                      color="secondary"
+                      className="leading-relaxed"
+                    >
+                      {error}
+                    </Text>
+                    <button
+                      onClick={() => setError(null)}
+                      className={cn(
+                        'px-4 py-2 rounded-full',
+                        'bg-surface/50 hover:bg-surface',
+                        'border border-border/50 hover:border-border',
+                        'text-text-secondary hover:text-text-primary',
+                        'text-footnote',
+                        'transition-all duration-normal'
+                      )}
+                    >
+                      Dismiss
+                    </button>
                   </motion.div>
                 )}
               </motion.div>
@@ -349,86 +508,6 @@ function PresenceIndicator() {
       ))}
     </motion.div>
   )
-}
-
-/**
- * Response generator following Tend voice principles:
- * - Validate before solving
- * - Admit uncertainty
- * - 1-2 sentences max
- * - Never use "I understand" (robotic)
- * - Warm, honest, actionable
- */
-function getTendResponse(thought: string): string {
-  const lower = thought.toLowerCase()
-
-  // Pain/hurt responses - validate first
-  if (lower.includes('pain') || lower.includes('hurt') || lower.includes('pushed through')) {
-    const responses = [
-      "That takes courage to admit. Where is it? Let's make sure tomorrow is gentler.",
-      "Bodies remember what we put them through. Worth noting where, so we can adapt.",
-      "Pain is information, not failure. Can you show me where?",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-
-  // Feeling off - validate the feeling
-  if (lower.includes('off') || lower.includes('not right') || lower.includes('weird')) {
-    const responses = [
-      "That's real. Some days are like that. Want to talk about what feels off?",
-      "Trusting that instinct matters. What's your body telling you?",
-      "I might be wrong, but maybe today isn't a pushing day. What do you think?",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-
-  // Stuck/uncertain - meet them where they are
-  if (lower.includes('stuck') || lower.includes('not sure') || lower.includes('uncertain')) {
-    const responses = [
-      "Stuck is okay. Sometimes the path forward isn't clear yet.",
-      "That's honest. What would feel right, even if it's small?",
-      "I don't always know either. What does your gut say?",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-
-  // Need to talk - create space
-  if (lower.includes('talk') || lower.includes('vent') || lower.includes('need to')) {
-    const responses = [
-      "I'm here. Take your time.",
-      "No rush. What's weighing on you?",
-      "Space for whatever you need to say.",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-
-  // Workout/training questions - practical but warm
-  if (lower.includes('workout') || lower.includes('train') || lower.includes('exercise')) {
-    const responses = [
-      "What kind of movement sounds good? Not what you should do, what you want.",
-      "I could suggest something, but what does your body actually feel like doing?",
-      "Before we plan anything: how are you actually feeling today?",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-
-  // Tired/exhausted - validate rest
-  if (lower.includes('tired') || lower.includes('exhausted') || lower.includes('drained')) {
-    const responses = [
-      "Then rest. That's not giving up, that's listening.",
-      "Exhaustion is real. What would help right now?",
-      "Your body is asking for something. Maybe it's permission to stop.",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
-  }
-
-  // Default - warm, open
-  const defaults = [
-    "Tell me more about that.",
-    "I'm listening. What else?",
-    "That's worth exploring. Go on.",
-  ]
-  return defaults[Math.floor(Math.random() * defaults.length)]
 }
 
 /**

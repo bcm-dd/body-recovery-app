@@ -5,10 +5,11 @@
  * Feeling tells you your state before numbers do.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { format } from 'date-fns'
-import { Card, Text, Button } from '@/components/ui'
+import { useNavigate } from 'react-router'
+import { Card, Text, Button, Toast, useToast, Loading } from '@/components/ui'
 import { BodyWeather } from '@/components/body-weather'
 
 // Mock data - will be replaced with API calls
@@ -40,10 +41,42 @@ type ViewState = 'weather' | 'day'
 
 export function TodayPage() {
   const [view, setView] = useState<ViewState>('weather')
+  const [isLoading, setIsLoading] = useState(true)
+  const { toast, showToast, hideToast } = useToast()
+  const navigate = useNavigate()
   const today = new Date()
+
+  // Simulate initial data fetch
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  const handleRestOption = (activityName: string) => {
+    showToast(`Coming soon - ${activityName} will be available in the next update`)
+  }
+
+  const handleSomethingHurts = () => {
+    navigate('/body')
+  }
+
+  const handleFeelingGood = () => {
+    showToast("Noted! We'll remember that.")
+  }
+
+  const handleBeginWorkout = () => {
+    showToast('Workout feature coming soon')
+  }
+
+  if (isLoading) {
+    return <Loading variant="fullPage" size="lg" label="Sensing your body..." />
+  }
 
   return (
     <div className="min-h-full bg-void">
+      <Toast message={toast.message} isVisible={toast.isVisible} onClose={hideToast} />
       <AnimatePresence mode="wait">
         {view === 'weather' ? (
           <motion.div
@@ -157,7 +190,7 @@ export function TodayPage() {
                       {mockWorkout.exercises} movements, adapted to how you're feeling
                     </Text>
 
-                    <Button fullWidth size="lg">
+                    <Button fullWidth size="lg" onClick={handleBeginWorkout}>
                       Begin when ready
                     </Button>
                   </Card>
@@ -181,9 +214,21 @@ export function TodayPage() {
                       Your body is asking for recovery. That's not weakness—it's wisdom.
                     </Text>
                     <div className="space-y-3">
-                      <RestOption title="5-minute breathing" subtitle="Calm your nervous system" />
-                      <RestOption title="Gentle stretching" subtitle="10 minutes of mobility" />
-                      <RestOption title="Just rest" subtitle="Do nothing, guilt-free" />
+                      <RestOption
+                        title="5-minute breathing"
+                        subtitle="Calm your nervous system"
+                        onClick={() => handleRestOption('5-minute breathing')}
+                      />
+                      <RestOption
+                        title="Gentle stretching"
+                        subtitle="10 minutes of mobility"
+                        onClick={() => handleRestOption('Gentle stretching')}
+                      />
+                      <RestOption
+                        title="Just rest"
+                        subtitle="Do nothing, guilt-free"
+                        onClick={() => handleRestOption('Just rest')}
+                      />
                     </div>
                   </Card>
                 </motion.div>
@@ -200,11 +245,13 @@ export function TodayPage() {
                   title="Something hurts"
                   subtitle="Let's track it"
                   delay={0.3}
+                  onClick={handleSomethingHurts}
                 />
                 <NoteCard
                   title="Feeling good"
                   subtitle="Worth noting too"
                   delay={0.35}
+                  onClick={handleFeelingGood}
                 />
               </div>
             </section>
@@ -263,9 +310,20 @@ function IntensityBadge({
   )
 }
 
-function RestOption({ title, subtitle }: { title: string; subtitle: string }) {
+function RestOption({
+  title,
+  subtitle,
+  onClick,
+}: {
+  title: string
+  subtitle: string
+  onClick?: () => void
+}) {
   return (
-    <button className="w-full text-left p-3 rounded-lg bg-surface hover:bg-elevated transition-colors">
+    <button
+      className="w-full text-left p-3 rounded-lg bg-surface hover:bg-elevated transition-colors"
+      onClick={onClick}
+    >
       <Text variant="body" weight="medium">
         {title}
       </Text>
@@ -280,10 +338,12 @@ function NoteCard({
   title,
   subtitle,
   delay,
+  onClick,
 }: {
   title: string
   subtitle: string
   delay: number
+  onClick?: () => void
 }) {
   return (
     <motion.div
@@ -291,7 +351,21 @@ function NoteCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay }}
     >
-      <Card variant="default" padding="md" interactive className="cursor-pointer">
+      <Card
+        variant="default"
+        padding="md"
+        interactive
+        className="cursor-pointer"
+        onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onClick?.()
+          }
+        }}
+      >
         <Text variant="body" weight="medium">
           {title}
         </Text>

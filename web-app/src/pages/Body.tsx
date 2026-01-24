@@ -74,17 +74,17 @@ const SENSATION_OPTIONS: Array<{
   color: string
   bgColor: string
 }> = [
-  { level: 'good', label: 'Feeling good', color: '#30D158', bgColor: 'rgba(48, 209, 88, 0.15)' },
-  { level: 'tight', label: 'A little tight', color: '#FFD60A', bgColor: 'rgba(255, 214, 10, 0.15)' },
-  { level: 'something', label: "Something's there", color: '#FF9F0A', bgColor: 'rgba(255, 159, 10, 0.15)' },
-  { level: 'pain', label: 'Definitely pain', color: '#FF453A', bgColor: 'rgba(255, 69, 58, 0.15)' },
+  { level: 'good', label: 'Feeling good', color: '#7CB98B', bgColor: 'rgba(124, 185, 139, 0.15)' },
+  { level: 'tight', label: 'A little tight', color: '#D4A84B', bgColor: 'rgba(212, 168, 75, 0.15)' },
+  { level: 'something', label: "Something's there", color: '#D4A84B', bgColor: 'rgba(212, 168, 75, 0.15)' },
+  { level: 'pain', label: 'Definitely pain', color: '#C97B7B', bgColor: 'rgba(201, 123, 123, 0.15)' },
 ]
 
 const STATUS_COLORS: Record<RegionStatus, { fill: string; glow: string }> = {
-  good: { fill: 'rgba(48, 209, 88, 0.3)', glow: 'rgba(48, 209, 88, 0.4)' },
-  trained: { fill: 'rgba(255, 159, 10, 0.35)', glow: 'rgba(255, 159, 10, 0.5)' },
-  healing: { fill: 'rgba(255, 214, 10, 0.3)', glow: 'rgba(255, 214, 10, 0.4)' },
-  attention: { fill: 'rgba(255, 69, 58, 0.35)', glow: 'rgba(255, 69, 58, 0.5)' },
+  good: { fill: 'rgba(124, 185, 139, 0.3)', glow: 'rgba(124, 185, 139, 0.4)' },
+  trained: { fill: 'rgba(212, 168, 75, 0.35)', glow: 'rgba(212, 168, 75, 0.5)' },
+  healing: { fill: 'rgba(155, 181, 201, 0.3)', glow: 'rgba(155, 181, 201, 0.4)' },
+  attention: { fill: 'rgba(201, 123, 123, 0.35)', glow: 'rgba(201, 123, 123, 0.5)' },
 }
 
 const FRONT_REGIONS: RegionData[] = [
@@ -166,7 +166,9 @@ interface BreathingBodyProps {
 }
 
 function BreathingBody({ view, regionStates, selectedRegion, onRegionSelect }: BreathingBodyProps) {
-  const regions = view === 'front' ? FRONT_REGIONS : [...FRONT_REGIONS.filter(r => !['chest', 'core', 'hip_left', 'hip_right'].includes(r.id)), ...BACK_REGIONS]
+  // Back view should show only back-specific regions plus shared limbs/head
+  const BACK_VIEW_SHARED_REGIONS = ['head', 'neck', 'shoulder_left', 'shoulder_right', 'upper_arm_left', 'upper_arm_right', 'elbow_left', 'elbow_right', 'forearm_left', 'forearm_right', 'thigh_left', 'thigh_right', 'knee_left', 'knee_right', 'calf_left', 'calf_right', 'ankle_left', 'ankle_right']
+  const regions = view === 'front' ? FRONT_REGIONS : [...FRONT_REGIONS.filter(r => BACK_VIEW_SHARED_REGIONS.includes(r.id)), ...BACK_REGIONS]
 
   return (
     <div className="relative flex items-center justify-center">
@@ -266,12 +268,12 @@ function BodyRegionPath({ region, status, colors, isSelected, onClick }: BodyReg
   }
 
   const getFillColor = () => {
-    if (isSelected) return 'rgba(10, 132, 255, 0.5)'
+    if (isSelected) return 'rgba(196, 164, 132, 0.5)'
     return colors.fill
   }
 
   const getStrokeColor = () => {
-    if (isSelected) return '#0A84FF'
+    if (isSelected) return '#C4A484'
     if (isHovered) return 'rgba(255, 255, 255, 0.4)'
     return 'rgba(255, 255, 255, 0.08)'
   }
@@ -291,7 +293,7 @@ function BodyRegionPath({ region, status, colors, isSelected, onClick }: BodyReg
       {(status !== 'good' || isSelected) && (
         <motion.path
           d={region.path}
-          fill={isSelected ? 'rgba(10, 132, 255, 0.3)' : colors.glow}
+          fill={isSelected ? 'rgba(196, 164, 132, 0.3)' : colors.glow}
           filter={getFilter()}
           animate={shouldPulse && !isSelected ? {
             opacity: [0.4, 0.7, 0.4],
@@ -324,7 +326,7 @@ function BodyRegionPath({ region, status, colors, isSelected, onClick }: BodyReg
           <motion.path
             d={region.path}
             fill="transparent"
-            stroke={isSelected ? '#0A84FF' : 'rgba(255, 255, 255, 0.2)'}
+            stroke={isSelected ? '#C4A484' : 'rgba(255, 255, 255, 0.2)'}
             strokeWidth={2}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1.02 }}
