@@ -106,23 +106,23 @@ export default function ProgressPage() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 md:space-y-8">
+      {/* Page Header - Responsive */}
+      <div className="flex flex-col gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Progress</h1>
-          <p className="mt-1 text-muted">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Progress</h1>
+          <p className="mt-1 text-sm text-muted">
             Track your recovery journey and pain trends over time.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Date Range Selector */}
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-surface p-1">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          {/* Date Range Selector - Scrollable on mobile */}
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-surface p-1 overflow-x-auto scrollbar-hide">
             {(['7d', '14d', '30d', '90d'] as DateRange[]).map((range) => (
               <button
                 key={range}
                 onClick={() => setDateRange(range)}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`rounded-md px-3 py-2 sm:py-1.5 text-sm font-medium transition-colors whitespace-nowrap touch-target ${
                   dateRange === range
                     ? 'bg-primary text-white'
                     : 'text-muted hover:text-foreground'
@@ -134,7 +134,7 @@ export default function ProgressPage() {
           </div>
           <button
             onClick={handleExportData}
-            className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-card transition-colors"
+            className="flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 sm:py-2 text-sm font-medium text-foreground hover:bg-card transition-colors touch-target"
           >
             <Download className="h-4 w-4" />
             Export Data
@@ -142,82 +142,86 @@ export default function ProgressPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <p className="text-sm font-medium text-muted">Average Pain Level</p>
-          <p className="mt-2 text-3xl font-bold text-foreground">
+      {/* Stats Cards - 2x2 grid on mobile */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+          <p className="text-xs sm:text-sm font-medium text-muted">Average Pain Level</p>
+          <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-foreground">
             {avgPain.toFixed(1)}
           </p>
-          <p className="mt-1 text-sm text-muted">out of 10</p>
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted">out of 10</p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <p className="text-sm font-medium text-muted">Pain Trend</p>
-          <div className="mt-2 flex items-baseline gap-2">
-            <p className="text-3xl font-bold text-foreground">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+          <p className="text-xs sm:text-sm font-medium text-muted">Pain Trend</p>
+          <div className="mt-1 sm:mt-2 flex items-baseline gap-1 sm:gap-2 flex-wrap">
+            <p className="text-2xl sm:text-3xl font-bold text-foreground">
               {Math.abs(painChange).toFixed(0)}%
             </p>
             {painChange < 0 ? (
-              <span className="flex items-center gap-1 text-sm text-success">
-                <TrendingDown className="h-4 w-4" />
-                decrease
+              <span className="flex items-center gap-0.5 sm:gap-1 text-xs sm:text-sm text-success">
+                <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">decrease</span>
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-sm text-warning">
-                <TrendingUp className="h-4 w-4" />
-                increase
+              <span className="flex items-center gap-0.5 sm:gap-1 text-xs sm:text-sm text-warning">
+                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden xs:inline">increase</span>
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-muted">vs start of period</p>
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted">vs start of period</p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <p className="text-sm font-medium text-muted">Sessions Completed</p>
-          <p className="mt-2 text-3xl font-bold text-foreground">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+          <p className="text-xs sm:text-sm font-medium text-muted">Sessions Completed</p>
+          <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-foreground">
             {totalSessions}
           </p>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted">
             of {trendData.length} days ({Math.round((totalSessions / trendData.length) * 100)}%)
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <p className="text-sm font-medium text-muted">Active Pain Areas</p>
-          <p className="mt-2 text-3xl font-bold text-foreground">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+          <p className="text-xs sm:text-sm font-medium text-muted">Active Pain Areas</p>
+          <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-foreground">
             {appState.bodyRegions.filter((r) => r.painLevel > 0).length}
           </p>
-          <p className="mt-1 text-sm text-muted">regions need attention</p>
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted">regions need attention</p>
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-8 lg:grid-cols-2">
+      {/* Charts - Stack on mobile */}
+      <div className="grid gap-4 sm:gap-6 md:gap-8 lg:grid-cols-2">
         {/* Pain Trend Chart */}
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <h2 className="text-lg font-semibold text-foreground">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">
             Pain Trend Over Time
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-xs sm:text-sm text-muted">
             Daily average pain level
           </p>
 
-          <div className="mt-6 h-64">
+          <div className="mt-4 sm:mt-6 h-48 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendData}>
+              <LineChart data={trendData} margin={{ left: -20, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   dataKey="date"
                   stroke="var(--text-muted)"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
+                  interval="preserveStartEnd"
+                  tick={{ fontSize: 10 }}
                 />
                 <YAxis
                   domain={[0, 10]}
                   stroke="var(--text-muted)"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
+                  width={30}
+                  tick={{ fontSize: 10 }}
                 />
                 <Tooltip
                   contentStyle={{
@@ -225,6 +229,7 @@ export default function ProgressPage() {
                     border: '1px solid var(--border)',
                     borderRadius: '8px',
                     color: 'var(--foreground)',
+                    fontSize: '12px',
                   }}
                 />
                 <Line
@@ -233,7 +238,7 @@ export default function ProgressPage() {
                   stroke="var(--primary)"
                   strokeWidth={2}
                   dot={false}
-                  activeDot={{ r: 6, fill: 'var(--primary)' }}
+                  activeDot={{ r: 4, fill: 'var(--primary)' }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -241,32 +246,34 @@ export default function ProgressPage() {
         </div>
 
         {/* Region Breakdown */}
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <h2 className="text-lg font-semibold text-foreground">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">
             Pain by Region
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-xs sm:text-sm text-muted">
             Current vs previous period
           </p>
 
-          <div className="mt-6 h-64">
+          <div className="mt-4 sm:mt-6 h-48 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={regionData} layout="vertical">
+              <BarChart data={regionData} layout="vertical" margin={{ left: 0, right: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis
                   type="number"
                   domain={[0, 10]}
                   stroke="var(--text-muted)"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
+                  tick={{ fontSize: 10 }}
                 />
                 <YAxis
                   type="category"
                   dataKey="name"
                   stroke="var(--text-muted)"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
-                  width={100}
+                  width={70}
+                  tick={{ fontSize: 10 }}
                 />
                 <Tooltip
                   contentStyle={{
@@ -274,9 +281,13 @@ export default function ProgressPage() {
                     border: '1px solid var(--border)',
                     borderRadius: '8px',
                     color: 'var(--foreground)',
+                    fontSize: '12px',
                   }}
                 />
-                <Legend />
+                <Legend
+                  wrapperStyle={{ fontSize: '12px' }}
+                  iconSize={10}
+                />
                 <Bar
                   dataKey="previous"
                   name="Previous"
@@ -295,34 +306,106 @@ export default function ProgressPage() {
         </div>
       </div>
 
-      {/* Region Details Table */}
-      <div className="rounded-xl border border-border bg-card card-shadow">
-        <div className="border-b border-border p-6">
-          <h2 className="text-lg font-semibold text-foreground">
+      {/* Region Details Table - Scrollable on mobile */}
+      <div className="rounded-xl border border-border bg-card card-shadow overflow-hidden">
+        <div className="border-b border-border p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">
             Region-by-Region Breakdown
           </h2>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-xs sm:text-sm text-muted">
             Detailed view of pain levels across all tracked body regions
           </p>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile card view */}
+        <div className="block sm:hidden divide-y divide-border">
+          {regionData.map((region) => (
+            <div key={region.name} className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-foreground">{region.name}</span>
+                <span
+                  className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    region.change > 0
+                      ? 'bg-success/10 text-success'
+                      : region.change < 0
+                      ? 'bg-error/10 text-error'
+                      : 'bg-muted/10 text-muted'
+                  }`}
+                >
+                  {region.change > 0
+                    ? 'Improving'
+                    : region.change < 0
+                    ? 'Worsening'
+                    : 'Stable'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between text-xs text-muted mb-1">
+                    <span>Current</span>
+                    <span>{region.current}/10</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-surface">
+                    <div
+                      className={`h-full rounded-full ${
+                        region.current >= 7
+                          ? 'bg-error'
+                          : region.current >= 4
+                          ? 'bg-warning'
+                          : 'bg-success'
+                      }`}
+                      style={{ width: `${region.current * 10}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted">Previous: {region.previous}</span>
+                <span
+                  className={`flex items-center gap-1 font-medium ${
+                    region.change > 0
+                      ? 'text-success'
+                      : region.change < 0
+                      ? 'text-error'
+                      : 'text-muted'
+                  }`}
+                >
+                  {region.change > 0 ? (
+                    <>
+                      <TrendingDown className="h-4 w-4" />-{region.change}
+                    </>
+                  ) : region.change < 0 ? (
+                    <>
+                      <TrendingUp className="h-4 w-4" />+
+                      {Math.abs(region.change)}
+                    </>
+                  ) : (
+                    'No change'
+                  )}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop table view */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full">
             <thead className="border-b border-border bg-surface">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-muted">
+                <th className="px-4 md:px-6 py-3 text-left text-xs sm:text-sm font-medium text-muted">
                   Region
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-muted">
+                <th className="px-4 md:px-6 py-3 text-left text-xs sm:text-sm font-medium text-muted">
                   Current Level
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-muted">
+                <th className="px-4 md:px-6 py-3 text-left text-xs sm:text-sm font-medium text-muted">
                   Previous Level
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-muted">
+                <th className="px-4 md:px-6 py-3 text-left text-xs sm:text-sm font-medium text-muted">
                   Change
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-muted">
+                <th className="px-4 md:px-6 py-3 text-left text-xs sm:text-sm font-medium text-muted">
                   Status
                 </th>
               </tr>
@@ -330,12 +413,12 @@ export default function ProgressPage() {
             <tbody className="divide-y divide-border">
               {regionData.map((region) => (
                 <tr key={region.name} className="hover:bg-surface transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-foreground">
+                  <td className="px-4 md:px-6 py-3 sm:py-4 text-sm font-medium text-foreground whitespace-nowrap">
                     {region.name}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 md:px-6 py-3 sm:py-4">
                     <div className="flex items-center gap-2">
-                      <div className="h-2 w-16 rounded-full bg-surface">
+                      <div className="h-2 w-12 sm:w-16 rounded-full bg-surface">
                         <div
                           className={`h-full rounded-full ${
                             region.current >= 7
@@ -352,10 +435,10 @@ export default function ProgressPage() {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-muted">
+                  <td className="px-4 md:px-6 py-3 sm:py-4 text-sm text-muted">
                     {region.previous}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 md:px-6 py-3 sm:py-4">
                     <span
                       className={`flex items-center gap-1 text-sm font-medium ${
                         region.change > 0
@@ -379,7 +462,7 @@ export default function ProgressPage() {
                       )}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 md:px-6 py-3 sm:py-4">
                     <span
                       className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
                         region.change > 0

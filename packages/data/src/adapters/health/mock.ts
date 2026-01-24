@@ -628,6 +628,9 @@ export class MockHealthAdapter implements HealthAdapter {
   private mockDataSeed: number;
   private updateCallbacks: Set<(snapshot: DailyHealthSnapshot) => void> =
     new Set();
+  /** Map of callbacks to their interval IDs for proper cleanup */
+  private activeIntervals: Map<(snapshot: DailyHealthSnapshot) => void, ReturnType<typeof setInterval>> =
+    new Map();
 
   constructor(seed?: number) {
     // Seed for reproducible data (useful for testing)
@@ -829,10 +832,30 @@ export class MockHealthAdapter implements HealthAdapter {
       }
     }, 5 * 60 * 1000);
 
+    // Store interval ID for proper cleanup
+    this.activeIntervals.set(callback, interval);
+
     return () => {
       this.updateCallbacks.delete(callback);
-      clearInterval(interval);
+      const storedInterval = this.activeIntervals.get(callback);
+      if (storedInterval) {
+        clearInterval(storedInterval);
+        this.activeIntervals.delete(callback);
+      }
     };
+  }
+
+  /**
+   * Cleanup all active intervals and subscriptions.
+   * Call this when disposing of the adapter to prevent memory leaks.
+   */
+  dispose(): void {
+    // Clear all active intervals
+    for (const interval of this.activeIntervals.values()) {
+      clearInterval(interval);
+    }
+    this.activeIntervals.clear();
+    this.updateCallbacks.clear();
   }
 
   async initializeBackgroundSync(): Promise<void> {

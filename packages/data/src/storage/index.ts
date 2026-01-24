@@ -108,7 +108,10 @@ export function getSecureStorage(): StorageAdapter {
       try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { createSecureMMKVStorage } = require('./mmkv');
-        // In production, use a device-specific key from secure enclave
+        // WARNING: DEMO ONLY - Hardcoded encryption key for development/demo purposes.
+        // In production, this key MUST come from secure storage (e.g., iOS Keychain,
+        // Android Keystore) or be derived from device-specific secure enclave.
+        // Using a hardcoded key provides NO real security.
         const encryptionKey = 'TODO_GENERATE_SECURE_KEY';
         secureStorage = createSecureMMKVStorage(encryptionKey);
       } catch {

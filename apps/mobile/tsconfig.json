@@ -15,8 +15,7 @@
       "@app/data": ["../../packages/data/src"],
       "@app/domain": ["../../packages/domain/src"],
       "@app/ui": ["../../packages/ui/src"],
-      "@app/copy": ["../../packages/copy/src"],
-      "@app/types": ["../../packages/types/src"]
+      "@app/copy": ["../../packages/copy/src"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],

@@ -86,15 +86,15 @@ function StatCard({
   trend?: 'up' | 'down' | 'neutral';
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-6 card-shadow">
+    <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-muted">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
-          <p className="mt-1 text-sm text-muted">{subtitle}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs sm:text-sm font-medium text-muted truncate">{title}</p>
+          <p className="mt-1 sm:mt-2 text-2xl sm:text-3xl font-bold text-foreground">{value}</p>
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted truncate">{subtitle}</p>
         </div>
         <div
-          className={`rounded-lg p-3 ${
+          className={`rounded-lg p-2 sm:p-3 ml-2 flex-shrink-0 ${
             trend === 'down'
               ? 'bg-success/10 text-success'
               : trend === 'up'
@@ -102,7 +102,7 @@ function StatCard({
               : 'bg-primary/10 text-primary'
           }`}
         >
-          <Icon className="h-6 w-6" />
+          <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
       </div>
     </div>
@@ -128,28 +128,28 @@ function RecentSessionCard({
   const painDiff = session.painBefore - session.painAfter;
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-border bg-surface p-4 hover:bg-card transition-colors">
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-          <Activity className="h-6 w-6 text-primary" />
+    <div className="flex items-center justify-between rounded-lg border border-border bg-surface p-3 sm:p-4 hover:bg-card transition-colors touch-target">
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+        <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+          <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
         </div>
-        <div>
-          <p className="font-medium text-foreground">
+        <div className="min-w-0">
+          <p className="font-medium text-foreground text-sm sm:text-base truncate">
             {new Date(session.date).toLocaleDateString('en-US', {
               weekday: 'short',
               month: 'short',
               day: 'numeric',
             })}
           </p>
-          <p className="text-sm text-muted">
+          <p className="text-xs sm:text-sm text-muted truncate">
             {session.duration} min - {completedExercises}/{totalExercises}{' '}
             exercises
           </p>
         </div>
       </div>
-      <div className="text-right">
+      <div className="text-right flex-shrink-0 ml-2">
         <p
-          className={`text-sm font-medium ${
+          className={`text-xs sm:text-sm font-medium ${
             painDiff > 0 ? 'text-success' : 'text-muted'
           }`}
         >
@@ -168,19 +168,19 @@ export default function DashboardPage() {
   const stats = useStats();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6 md:space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">
           Welcome back, {appState.user?.name?.split(' ')[0]}
         </h1>
-        <p className="mt-1 text-muted">
+        <p className="mt-1 text-sm sm:text-base text-muted">
           Here&apos;s your recovery summary for this week.
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Grid - 2 columns on mobile, 4 on desktop */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-4">
         <StatCard
           title="Sessions This Week"
           value={stats.sessionsThisWeek}
@@ -211,24 +211,24 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Content Grid */}
-      <div className="grid gap-8 lg:grid-cols-3">
+      {/* Content Grid - Stack on mobile */}
+      <div className="grid gap-4 sm:gap-6 md:gap-8 lg:grid-cols-3">
         {/* Recent Sessions */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 order-2 lg:order-1">
           <div className="rounded-xl border border-border bg-card card-shadow">
-            <div className="flex items-center justify-between border-b border-border p-6">
-              <h2 className="text-lg font-semibold text-foreground">
+            <div className="flex items-center justify-between border-b border-border p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-foreground">
                 Recent Sessions
               </h2>
               <Link
                 href="/history"
-                className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                className="flex items-center gap-1 text-sm font-medium text-primary hover:underline touch-target"
               >
                 View all
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="space-y-3 p-6">
+            <div className="space-y-2 sm:space-y-3 p-4 sm:p-6">
               {appState.sessions.slice(0, 4).map((session) => (
                 <RecentSessionCard key={session.id} session={session} />
               ))}
@@ -237,17 +237,17 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions & Body Status */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
           {/* Body Status */}
-          <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-            <h2 className="text-lg font-semibold text-foreground">
+          <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+            <h2 className="text-base sm:text-lg font-semibold text-foreground">
               Body Status
             </h2>
-            <p className="mt-1 text-sm text-muted">
+            <p className="mt-1 text-xs sm:text-sm text-muted">
               {stats.activePainAreas} areas need attention
             </p>
 
-            <div className="mt-4 space-y-3">
+            <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
               {appState.bodyRegions
                 .filter((r) => r.painLevel > 0)
                 .sort((a, b) => b.painLevel - a.painLevel)
@@ -257,9 +257,9 @@ export default function DashboardPage() {
                     key={region.id}
                     className="flex items-center justify-between"
                   >
-                    <span className="text-sm text-foreground">{region.name}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-16 rounded-full bg-surface">
+                    <span className="text-xs sm:text-sm text-foreground truncate mr-2">{region.name}</span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="h-2 w-12 sm:w-16 rounded-full bg-surface">
                         <div
                           className={`h-full rounded-full ${
                             region.painLevel >= 7
@@ -281,7 +281,7 @@ export default function DashboardPage() {
 
             <Link
               href="/body"
-              className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-border py-2 text-sm font-medium text-foreground hover:bg-surface transition-colors"
+              className="mt-3 sm:mt-4 flex items-center justify-center gap-2 rounded-lg border border-border py-2.5 sm:py-2 text-sm font-medium text-foreground hover:bg-surface transition-colors touch-target"
             >
               Update Body Map
               <ArrowRight className="h-4 w-4" />
@@ -289,21 +289,21 @@ export default function DashboardPage() {
           </div>
 
           {/* Mobile App Link */}
-          <div className="rounded-xl border border-border bg-gradient-to-br from-primary/10 to-primary/5 p-6">
+          <div className="rounded-xl border border-border bg-gradient-to-br from-primary/10 to-primary/5 p-4 sm:p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-white">
-                <Smartphone className="h-6 w-6" />
+              <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg bg-primary text-white flex-shrink-0">
+                <Smartphone className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              <div>
-                <h3 className="font-semibold text-foreground">Mobile App</h3>
-                <p className="text-sm text-muted">
+              <div className="min-w-0">
+                <h3 className="font-semibold text-foreground text-sm sm:text-base">Mobile App</h3>
+                <p className="text-xs sm:text-sm text-muted truncate">
                   Best for daily check-ins and workouts
                 </p>
               </div>
             </div>
             <a
               href="#"
-              className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
+              className="mt-3 sm:mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary py-2.5 sm:py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors touch-target"
             >
               Download for iOS/Android
             </a>

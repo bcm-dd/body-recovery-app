@@ -43,6 +43,35 @@ Your health data helps personalize your experience but is not used for medical d
       dismissOption: 'Tap here if you\'re safe and this was a misunderstanding',
     },
 
+    // Mental health crisis resources
+    mentalHealthCrisis: {
+      title: 'Mental health support is available',
+      message:
+        'If you\'re experiencing a mental health crisis, please reach out to one of these resources for immediate support.',
+      crisisResources: {
+        suicidePreventionLifeline: {
+          name: 'National Suicide Prevention Lifeline',
+          contact: '988',
+          region: 'US',
+          description: 'Call or text 988 for 24/7 support',
+        },
+        crisisTextLine: {
+          name: 'Crisis Text Line',
+          contact: 'Text HOME to 741741',
+          region: 'US',
+          description: 'Free 24/7 text-based crisis support',
+        },
+        internationalResources: {
+          name: 'International Association for Suicide Prevention',
+          contact: 'https://www.iasp.info/resources/Crisis_Centres/',
+          region: 'International',
+          description: 'Find crisis centers worldwide',
+        },
+      },
+      supportMessage:
+        'You are not alone. These services are free, confidential, and available 24/7.',
+    },
+
     // Category 2 - Professional consultation
     professional: {
       inline:

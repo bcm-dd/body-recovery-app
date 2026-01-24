@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Clock, Minus, Plus, RotateCcw, Save, History } from 'lucide-react';
+import { Clock, Minus, Plus, RotateCcw, Save, History, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAppState } from '../../providers';
 
 // Body regions with SVG positions (simplified for demo)
@@ -68,6 +68,9 @@ export default function BodyMapPage() {
     { region: string; from: number; to: number; timestamp: Date }[]
   >([]);
 
+  // Mobile: collapse history by default
+  const [showHistory, setShowHistory] = useState(false);
+
   const handleRegionClick = (regionId: string) => {
     setSelectedRegion(regionId);
   };
@@ -107,39 +110,100 @@ export default function BodyMapPage() {
   const currentPainLevel = selectedRegion ? painLevels[selectedRegion] || 0 : 0;
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 md:space-y-8">
+      {/* Page Header - Responsive */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Body Map</h1>
-          <p className="mt-1 text-muted">
-            Click on any region to update your pain level.
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Body Map</h1>
+          <p className="mt-1 text-sm text-muted">
+            Tap on any region to update your pain level.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-card transition-colors"
+            className="flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-lg border border-border px-3 sm:px-4 py-2.5 sm:py-2 text-sm font-medium text-foreground hover:bg-card transition-colors touch-target"
           >
             <RotateCcw className="h-4 w-4" />
-            Reset
+            <span className="hidden xs:inline">Reset</span>
           </button>
-          <button className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors">
+          <button className="flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-lg bg-primary px-3 sm:px-4 py-2.5 sm:py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors touch-target">
             <Save className="h-4 w-4" />
-            Save Changes
+            <span>Save</span>
           </button>
         </div>
       </div>
 
+      {/* Mobile: Pain Level Editor at top when region selected */}
+      {selectedRegion && (
+        <div className="lg:hidden rounded-xl border border-border bg-card p-4 card-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs text-muted">Selected Region</p>
+              <p className="text-lg font-semibold text-foreground">
+                {selectedRegionData?.name}
+              </p>
+            </div>
+            <span
+              className={`text-sm font-medium px-3 py-1 rounded-full ${
+                currentPainLevel <= 3
+                  ? 'bg-success/10 text-success'
+                  : currentPainLevel <= 6
+                  ? 'bg-warning/10 text-warning'
+                  : 'bg-error/10 text-error'
+              }`}
+            >
+              {currentPainLevel} - {getPainLabel(currentPainLevel)}
+            </span>
+          </div>
+
+          {/* Slider */}
+          <div className="mb-3">
+            <input
+              type="range"
+              min="0"
+              max="10"
+              value={currentPainLevel}
+              onChange={(e) => handlePainChange(parseInt(e.target.value))}
+              className="w-full accent-primary h-2"
+            />
+            <div className="flex justify-between text-xs text-muted mt-1">
+              <span>0</span>
+              <span>5</span>
+              <span>10</span>
+            </div>
+          </div>
+
+          {/* Quick buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => handlePainChange(Math.max(0, currentPainLevel - 1))}
+              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-3 text-sm font-medium text-foreground hover:bg-surface transition-colors touch-target"
+            >
+              <Minus className="h-5 w-5" />
+              Decrease
+            </button>
+            <button
+              onClick={() => handlePainChange(Math.min(10, currentPainLevel + 1))}
+              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-3 text-sm font-medium text-foreground hover:bg-surface transition-colors touch-target"
+            >
+              <Plus className="h-5 w-5" />
+              Increase
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 md:gap-8 lg:grid-cols-3">
         {/* Body Map Visualization */}
         <div className="lg:col-span-2">
-          <div className="rounded-xl border border-border bg-card p-8 card-shadow">
+          <div className="rounded-xl border border-border bg-card p-4 sm:p-6 md:p-8 card-shadow">
             <div className="flex justify-center">
               <svg
                 viewBox="0 0 320 460"
-                className="h-[600px] w-auto max-w-full"
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md h-auto"
+                style={{ touchAction: 'manipulation' }}
               >
                 {/* Body outline */}
                 <ellipse
@@ -155,7 +219,7 @@ export default function BodyMapPage() {
                   className="fill-surface stroke-border stroke-2"
                 />
 
-                {/* Clickable regions */}
+                {/* Clickable regions - larger touch targets */}
                 {bodyRegions.map((region) => (
                   <rect
                     key={region.id}
@@ -177,32 +241,32 @@ export default function BodyMapPage() {
               </svg>
             </div>
 
-            {/* Legend */}
-            <div className="mt-8 flex items-center justify-center gap-8">
+            {/* Legend - Responsive grid */}
+            <div className="mt-4 sm:mt-6 md:mt-8 grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center gap-2 sm:gap-4 md:gap-8">
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-surface border border-border" />
-                <span className="text-sm text-muted">No pain</span>
+                <div className="h-4 w-4 rounded bg-surface border border-border flex-shrink-0" />
+                <span className="text-xs sm:text-sm text-muted">No pain</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-success/30" />
-                <span className="text-sm text-muted">Mild (1-3)</span>
+                <div className="h-4 w-4 rounded bg-success/30 flex-shrink-0" />
+                <span className="text-xs sm:text-sm text-muted">Mild (1-3)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-warning/30" />
-                <span className="text-sm text-muted">Moderate (4-6)</span>
+                <div className="h-4 w-4 rounded bg-warning/30 flex-shrink-0" />
+                <span className="text-xs sm:text-sm text-muted">Moderate (4-6)</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-error/30" />
-                <span className="text-sm text-muted">Severe (7-10)</span>
+                <div className="h-4 w-4 rounded bg-error/30 flex-shrink-0" />
+                <span className="text-xs sm:text-sm text-muted">Severe (7-10)</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Panel */}
-        <div className="space-y-6">
-          {/* Pain Level Editor */}
-          <div className="rounded-xl border border-border bg-card p-6 card-shadow">
+        {/* Right Panel - Desktop only or collapsible on mobile */}
+        <div className="space-y-4 sm:space-y-6">
+          {/* Pain Level Editor - Desktop */}
+          <div className="hidden lg:block rounded-xl border border-border bg-card p-6 card-shadow">
             <h2 className="text-lg font-semibold text-foreground">
               Pain Level Editor
             </h2>
@@ -283,75 +347,94 @@ export default function BodyMapPage() {
             )}
           </div>
 
-          {/* Change History */}
-          <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-            <div className="flex items-center gap-2">
-              <History className="h-5 w-5 text-muted" />
-              <h2 className="text-lg font-semibold text-foreground">
-                Change History
-              </h2>
-            </div>
-
-            {history.length > 0 ? (
-              <div className="mt-4 space-y-3 max-h-64 overflow-y-auto">
-                {history.slice(0, 10).map((entry, index) => {
-                  const regionName = bodyRegions.find(
-                    (r) => r.id === entry.region
-                  )?.name;
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between rounded-lg bg-surface p-3"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-foreground">
-                          {regionName}
-                        </p>
-                        <p className="text-xs text-muted flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {entry.timestamp.toLocaleTimeString()}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`text-sm ${
-                            entry.from <= 3
-                              ? 'text-success'
-                              : entry.from <= 6
-                              ? 'text-warning'
-                              : 'text-error'
-                          }`}
-                        >
-                          {entry.from}
-                        </span>
-                        <span className="text-muted">to</span>
-                        <span
-                          className={`text-sm font-medium ${
-                            entry.to <= 3
-                              ? 'text-success'
-                              : entry.to <= 6
-                              ? 'text-warning'
-                              : 'text-error'
-                          }`}
-                        >
-                          {entry.to}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+          {/* Change History - Collapsible on mobile */}
+          <div className="rounded-xl border border-border bg-card card-shadow overflow-hidden">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="w-full flex items-center justify-between p-4 sm:p-6 lg:cursor-default touch-target"
+            >
+              <div className="flex items-center gap-2">
+                <History className="h-5 w-5 text-muted" />
+                <h2 className="text-base sm:text-lg font-semibold text-foreground">
+                  Change History
+                </h2>
+                {history.length > 0 && (
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                    {history.length}
+                  </span>
+                )}
               </div>
-            ) : (
-              <p className="mt-4 text-sm text-muted">
-                No changes made yet. Select a region and adjust the pain level.
-              </p>
-            )}
+              <div className="lg:hidden">
+                {showHistory ? (
+                  <ChevronUp className="h-5 w-5 text-muted" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted" />
+                )}
+              </div>
+            </button>
+
+            <div className={`${showHistory ? 'block' : 'hidden'} lg:block border-t border-border lg:border-t-0`}>
+              {history.length > 0 ? (
+                <div className="p-4 sm:p-6 pt-0 lg:pt-0 space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
+                  {history.slice(0, 10).map((entry, index) => {
+                    const regionName = bodyRegions.find(
+                      (r) => r.id === entry.region
+                    )?.name;
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between rounded-lg bg-surface p-2.5 sm:p-3"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">
+                            {regionName}
+                          </p>
+                          <p className="text-xs text-muted flex items-center gap-1">
+                            <Clock className="h-3 w-3 flex-shrink-0" />
+                            {entry.timestamp.toLocaleTimeString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span
+                            className={`text-sm ${
+                              entry.from <= 3
+                                ? 'text-success'
+                                : entry.from <= 6
+                                ? 'text-warning'
+                                : 'text-error'
+                            }`}
+                          >
+                            {entry.from}
+                          </span>
+                          <span className="text-muted">to</span>
+                          <span
+                            className={`text-sm font-medium ${
+                              entry.to <= 3
+                                ? 'text-success'
+                                : entry.to <= 6
+                                ? 'text-warning'
+                                : 'text-error'
+                            }`}
+                          >
+                            {entry.to}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="p-4 sm:p-6 pt-0 lg:pt-0 text-sm text-muted">
+                  No changes made yet. Select a region and adjust the pain level.
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Summary */}
-          <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-            <h2 className="text-lg font-semibold text-foreground">Summary</h2>
-            <div className="mt-4 space-y-3">
+          <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
+            <h2 className="text-base sm:text-lg font-semibold text-foreground">Summary</h2>
+            <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
               <div className="flex justify-between">
                 <span className="text-sm text-muted">Active Areas</span>
                 <span className="text-sm font-medium text-foreground">

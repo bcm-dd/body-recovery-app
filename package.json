@@ -29,10 +29,16 @@
     "vercel:deploy:prod": "vercel deploy --prod"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.0",
+    "eslint-plugin-import": "^2.29.0",
     "next": "15.1.0",
+    "prettier": "^3.2.0",
     "turbo": "^2.3.0",
     "typescript": "^5.4.0",
-    "prettier": "^3.2.0",
     "vercel": "^39.0.0"
   }
 }

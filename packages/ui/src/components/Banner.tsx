@@ -204,7 +204,7 @@ export function Banner({
               {title}
             </BannerText>
           )}
-          <BannerText variant={variant} variant={variant === 'info' ? 'body' : 'bodySmall'}>
+          <BannerText variant={variant}>
             {message}
           </BannerText>
         </Stack>
