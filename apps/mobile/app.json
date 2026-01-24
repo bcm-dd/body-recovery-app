@@ -1,0 +1,81 @@
+{
+  "expo": {
+    "name": "Body Recovery Companion",
+    "slug": "body-recovery-companion",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "bodyrecovery",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0A"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bodyrecovery.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "We use your health data to personalize your recovery recommendations based on sleep and heart rate variability.",
+        "NSHealthUpdateUsageDescription": "We log your recovery sessions to Apple Health for your records.",
+        "NSCameraUsageDescription": "Used to scan medical documents and capture form videos.",
+        "NSMicrophoneUsageDescription": "Used for voice commands during workouts.",
+        "UIBackgroundModes": ["fetch", "processing"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#0A0A0A"
+      },
+      "package": "com.bodyrecovery.app",
+      "permissions": [
+        "android.permission.health.READ_HEART_RATE",
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_SLEEP",
+        "android.permission.health.WRITE_EXERCISE",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.POST_NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow access to scan medical documents."
+        }
+      ],
+      "expo-haptics",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#3B82F6"
+        }
+      ],
+      [
+        "expo-background-fetch",
+        {
+          "minimumInterval": 900
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "body-recovery-companion"
+      }
+    }
+  }
+}
