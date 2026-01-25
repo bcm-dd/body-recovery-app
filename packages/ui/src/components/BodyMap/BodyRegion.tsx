@@ -5,8 +5,9 @@
  * Handles press events and displays pain level color coding.
  */
 
-import { Path, G } from 'react-native-svg';
 import { useCallback } from 'react';
+import { Path, G } from 'react-native-svg';
+
 import { palette } from '../../theme/tokens';
 
 /**
@@ -139,8 +140,6 @@ export function BodyRegion({
         onPress={handlePress}
         // Accessibility
         accessibilityLabel={`${id.replace(/_/g, ' ')} region`}
-        accessibilityRole="button"
-        accessibilityState={{ selected, disabled }}
       />
     </G>
   );

@@ -5,8 +5,9 @@
  * Supports multiple sizes and loading states.
  */
 
-import { styled, GetProps, Stack, Text } from 'tamagui';
 import type { ReactNode } from 'react';
+import type { GetProps} from 'tamagui';
+import { styled, Stack, Text } from 'tamagui';
 
 /**
  * Base button frame

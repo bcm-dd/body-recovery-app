@@ -9,13 +9,15 @@
  * - Pain status indicator
  */
 
-import { styled, Stack, XStack, YStack, GetProps } from 'tamagui';
 import { useCallback } from 'react';
-import { Text, H5 } from '../../primitives/Text';
-import { Card } from '../../primitives/Card';
-import { SetLogger, SetData } from './SetLogger';
-import { palette } from '../../theme/tokens';
+import type { GetProps } from 'tamagui';
+import { styled, Stack, XStack, YStack } from 'tamagui';
+
+import type { SetData } from './SetLogger';
+import { SetLogger } from './SetLogger';
 import type { PainLevel } from '../BodyMap/BodyRegion';
+import { Card } from '../../primitives/Card';
+import { Text, H5 } from '../../primitives/Text';
 
 /**
  * Exercise prescription data

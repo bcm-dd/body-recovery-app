@@ -44,7 +44,7 @@
  *    - Workout (read + write)
  */
 
-import {
+import type {
   HealthAdapter,
   HealthAvailability,
   HealthPermissionStatus,
@@ -60,8 +60,8 @@ import {
   DailyHealthSnapshot,
   HealthDataType,
   HealthWriteType,
-  HealthErrors,
 } from './types';
+import { HealthErrors } from './types';
 
 /**
  * HealthKit adapter stub for iOS

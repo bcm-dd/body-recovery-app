@@ -115,7 +115,7 @@ export default function WorkoutExecutionScreen() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [painLogOpen, setPainLogOpen] = useState(false);
 
-  const restTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const restTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const swipeAnim = useRef(new Animated.Value(0)).current;
 
   const workout = MOCK_WORKOUT;

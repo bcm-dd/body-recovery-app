@@ -5,11 +5,12 @@
  * Auto-dismisses after a timeout and supports actions.
  */
 
-import { styled, Stack, XStack, GetProps } from 'tamagui';
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import type { ReactNode} from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type { GetProps } from 'tamagui';
+import { styled, Stack, XStack } from 'tamagui';
+
 import { Text } from '../primitives/Text';
-import { Button } from '../primitives/Button';
-import { palette } from '../theme/tokens';
 
 /**
  * Toast variant types
@@ -41,12 +42,11 @@ const ToastFrame = styled(Stack, {
   maxWidth: 400,
   minWidth: 200,
 
-  // Shadow for elevation
+  // Shadow for elevation effect
   shadowColor: '$shadowColor',
   shadowOffset: { width: 0, height: 4 },
   shadowOpacity: 0.2,
   shadowRadius: 8,
-  elevation: 8,
 
   // Animation
   animation: 'toast',
@@ -114,22 +114,23 @@ const ToastText = styled(Text, {
   fontSize: '$4',
 
   variants: {
-    variant: {
+    toastVariant: {
       default: {
         color: '$textPrimary',
       },
       success: {
-        color: 'white',
+        color: '$white',
       },
       warning: {
-        color: 'white',
+        color: '$white',
       },
       error: {
-        color: 'white',
+        color: '$white',
       },
     },
   } as const,
-});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any);
 
 /**
  * Toast action button
@@ -239,7 +240,7 @@ export function Toast({
     <ToastFrame variant={variant} {...frameProps}>
       <ToastContent>
         {icon}
-        <ToastText variant={variant}>{message}</ToastText>
+        <ToastText toastVariant={variant}>{message}</ToastText>
       </ToastContent>
 
       {actionText && (

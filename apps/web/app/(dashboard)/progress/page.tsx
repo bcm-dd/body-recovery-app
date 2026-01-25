@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useState, useMemo, useId, useCallback } from 'react';
+import type { ComponentType } from 'react';
 
 import { SmartSuggestion, LazyChartWrapper } from '../../../src/components';
 import { VisuallyHidden, LiveRegion } from '../../../src/components/A11y';
@@ -20,7 +21,6 @@ import { useAppState } from '../../providers';
 // ============================================
 // LAZY LOADED RECHARTS - Reduces initial bundle by ~150KB
 // ============================================
-import type { ComponentType } from 'react';
 
 const LazyResponsiveContainer = dynamic(
   () => import('recharts').then((mod) => ({ default: mod.ResponsiveContainer })) as Promise<{ default: ComponentType<any> }>,

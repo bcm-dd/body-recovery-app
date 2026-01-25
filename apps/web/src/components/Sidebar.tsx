@@ -158,79 +158,137 @@ export function Sidebar() {
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Aurora Background Effect */}
+        {/* Premium Aurora Background Effect with Enhanced Depth */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-br from-[var(--aurora-1)] to-transparent blur-3xl opacity-60 animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-br from-[var(--aurora-2)] to-transparent blur-3xl opacity-40 animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 rounded-full bg-gradient-to-br from-[var(--aurora-4)] to-transparent blur-3xl opacity-30 animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
+          {/* Primary aurora blob */}
+          <div
+            className="absolute -top-1/4 -left-1/4 w-3/4 h-3/4 rounded-full bg-gradient-to-br from-[var(--aurora-1)] via-[var(--aurora-2)] to-transparent blur-3xl opacity-50"
+            style={{ animation: 'floatSubtle 12s ease-in-out infinite' }}
+          />
+          {/* Secondary aurora blob */}
+          <div
+            className="absolute -bottom-1/3 -right-1/4 w-2/3 h-2/3 rounded-full bg-gradient-to-br from-[var(--aurora-3)] via-cyan-500/30 to-transparent blur-3xl opacity-40"
+            style={{ animation: 'floatSubtle 15s ease-in-out infinite reverse', animationDelay: '3s' }}
+          />
+          {/* Tertiary ambient glow */}
+          <div
+            className="absolute top-1/3 left-1/2 -translate-x-1/2 w-1/2 h-1/2 rounded-full bg-gradient-radial from-[var(--primary)]/20 to-transparent blur-2xl opacity-30"
+            style={{ animation: 'breathe 6s ease-in-out infinite' }}
+          />
+          {/* Subtle noise overlay for texture */}
+          <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay bg-[var(--noise-texture)]" />
         </div>
 
-        {/* Specular Highlight */}
-        <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-[var(--specular-white)] to-transparent opacity-60" aria-hidden="true" />
+        {/* Premium Specular Highlight - Multi-layer */}
+        <div className="absolute top-0 left-0 right-0 h-px" aria-hidden="true">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+          <div className="absolute left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+        </div>
 
         <div className="flex h-full flex-col relative z-10">
-          {/* Logo/Brand with Enhanced Glow */}
-          <div className="flex h-16 items-center border-b border-[var(--glass-border)] px-6 relative">
-            <div className="flex items-center gap-3">
+          {/* Logo/Brand with Premium Enhanced Glow */}
+          <div className="flex h-16 items-center border-b border-[var(--glass-border)] px-6 relative overflow-hidden">
+            {/* Subtle animated gradient behind logo */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--primary)]/5 to-transparent animate-shimmer" style={{ animationDuration: '8s' }} aria-hidden="true" />
+
+            <div className="flex items-center gap-3 relative z-10">
               <div
-                className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary)] to-[#818cf8] glow-pulse group"
+                className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--primary)] via-[#818cf8] to-[var(--primary)] group shadow-lg shadow-[var(--glow-primary)]"
                 aria-hidden="true"
+                style={{ backgroundSize: '200% 200%', animation: 'buttonGradient 6s ease infinite' }}
               >
-                <Activity className="h-5 w-5 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[#818cf8] blur-xl opacity-60 transition-opacity duration-300 group-hover:opacity-80" />
+                <Activity className="h-5 w-5 text-white relative z-10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12" aria-hidden="true" />
+                {/* Layered glow effect */}
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[var(--primary)] to-[#818cf8] blur-xl opacity-50 transition-opacity duration-500 group-hover:opacity-80" />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 {/* Inner specular highlight */}
-                <div className="absolute top-0 left-[20%] right-[20%] h-px rounded-full bg-white/40" />
+                <div className="absolute top-0.5 left-[15%] right-[15%] h-px rounded-full bg-white/50" />
+                {/* Bottom shadow */}
+                <div className="absolute bottom-0 left-[20%] right-[20%] h-px rounded-full bg-black/20" />
               </div>
               <div>
-                <span className="text-lg font-bold text-foreground bg-clip-text">
+                <span className="text-lg font-bold text-foreground tracking-tight">
                   {t('common.appName')}
                 </span>
-                <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                  <Sparkles className="h-3 w-3 text-[var(--primary)] animate-pulse" aria-hidden="true" />
-                  <span className="bg-gradient-to-r from-[var(--primary)] to-cyan-500 bg-clip-text text-transparent font-medium">{t('common.premium')}</span>
+                <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                  <Sparkles className="h-3 w-3 text-[var(--primary)]" style={{ animation: 'breathe 2s ease-in-out infinite' }} aria-hidden="true" />
+                  <span className="bg-gradient-to-r from-[var(--primary)] via-cyan-500 to-[var(--primary)] bg-[length:200%_100%] bg-clip-text text-transparent font-semibold uppercase tracking-wider text-[10px]" style={{ animation: 'buttonGradient 4s ease infinite' }}>{t('common.premium')}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Navigation with Glass Effects */}
+          {/* Navigation with Premium Glass Effects */}
           <nav
-            className="flex-1 space-y-1 p-4 stagger-in"
+            className="flex-1 p-4 stagger-in relative"
             aria-label={t('accessibility.mainNavigation') || 'Main navigation'}
             id={desktopNavId}
           >
-            <ul role="list" className="space-y-1">
+            <ul role="list" className="space-y-1.5">
               {navItems.map((item, index) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
                 const label = getNavLabel(item.labelKey);
 
                 return (
-                  <li key={item.href} role="none">
+                  <li key={item.href} role="none" className="relative">
+                    {/* Premium Active Indicator - Vertical Bar */}
+                    {isActive && (
+                      <div
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-[var(--primary)] via-[#818cf8] to-cyan-500 rounded-r-full shadow-lg"
+                        style={{ boxShadow: '0 0 12px var(--glow-primary), 0 0 24px var(--glow-primary-soft)' }}
+                        aria-hidden="true"
+                      />
+                    )}
                     <Link
                       ref={(el) => {
                         navItemRefs.current[index] = el;
                       }}
                       href={item.href}
-                      className={`glass-nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium ${
+                      className={`relative flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-300 group overflow-hidden ${
                         isActive
-                          ? 'glass-nav-item-active text-white'
-                          : 'text-[var(--text-muted)] hover:text-foreground'
+                          ? 'bg-gradient-to-r from-[var(--primary)]/15 to-[var(--primary)]/5 text-foreground ml-1 shadow-lg'
+                          : 'text-[var(--text-muted)] hover:text-foreground hover:bg-[var(--glass-bg-subtle)] hover:translate-x-1'
                       }`}
-                      style={{ animationDelay: `${index * 50}ms` }}
+                      style={{
+                        animationDelay: `${index * 60}ms`,
+                        boxShadow: isActive ? '0 4px 20px var(--glow-primary-soft), inset 0 1px 0 rgba(255,255,255,0.1)' : undefined,
+                      }}
                       aria-current={isActive ? 'page' : undefined}
                       aria-describedby={isActive ? `${desktopNavId}-current` : undefined}
                       tabIndex={isActive ? 0 : -1}
                       onKeyDown={(e) => handleNavKeyDown(e, navItemRefs)}
                       onClick={() => handleNavigation(label)}
                     >
-                      <div className={`icon-glow relative ${isActive ? '' : ''}`}>
-                        <Icon className="h-5 w-5 relative z-10" aria-hidden="true" />
+                      {/* Hover shimmer effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" aria-hidden="true" />
+
+                      {/* Icon with premium styling */}
+                      <div className={`relative flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300 ${
+                        isActive
+                          ? 'bg-gradient-to-br from-[var(--primary)] to-[#818cf8] shadow-md'
+                          : 'bg-[var(--glass-bg-subtle)] group-hover:bg-[var(--glass-bg)]'
+                      }`}>
+                        <Icon
+                          className={`h-4.5 w-4.5 relative z-10 transition-all duration-300 ${
+                            isActive
+                              ? 'text-white'
+                              : 'text-[var(--text-muted)] group-hover:text-[var(--primary)]'
+                          }`}
+                          aria-hidden="true"
+                        />
+                        {/* Icon glow on active */}
+                        {isActive && (
+                          <div className="absolute inset-0 rounded-lg bg-[var(--primary)] blur-md opacity-40" aria-hidden="true" />
+                        )}
                       </div>
-                      <span className="relative z-10">{label}</span>
+
+                      <span className={`relative z-10 font-medium ${isActive ? 'text-foreground' : ''}`}>{label}</span>
+
                       {isActive && (
                         <ChevronRight
-                          className="ml-auto h-4 w-4 relative z-10"
+                          className="ml-auto h-4 w-4 relative z-10 text-[var(--primary)] animate-pulse"
+                          style={{ animationDuration: '2s' }}
                           aria-hidden="true"
                         />
                       )}

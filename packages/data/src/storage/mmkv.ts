@@ -9,7 +9,7 @@
  * - Expo development build (not Expo Go)
  */
 
-import {
+import type {
   StorageAdapter,
   StorageValue,
   StorageOptions,

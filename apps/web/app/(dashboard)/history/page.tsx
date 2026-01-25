@@ -10,9 +10,14 @@ import {
   Filter,
   Activity,
   TrendingDown,
+  TrendingUp,
+  Sparkles,
+  History,
+  Zap,
 } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 
+import { VisuallyHidden } from '../../../src/components/A11y';
 import { useAppState } from '../../providers';
 
 interface SessionDetail {
@@ -65,80 +70,95 @@ function SessionCard({
   const totalCount = session.exercises.length;
   const completionPercent = Math.round((completedCount / totalCount) * 100);
   const painReduction = session.painBefore - session.painAfter;
+  const cardId = useId();
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden card-shadow">
+    <article
+      className="session-card-premium"
+      aria-labelledby={`${cardId}-title`}
+    >
       {/* Session Header */}
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between p-6 text-left hover:bg-surface/50 transition-colors"
+        className="session-header w-full text-left touch-target"
+        aria-expanded={isExpanded}
+        aria-controls={`${cardId}-details`}
       >
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-            <Activity className="h-6 w-6 text-primary" />
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div
+            className="icon-badge-premium flex-shrink-0"
+            aria-hidden="true"
+          >
+            <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--primary)]" />
           </div>
-          <div>
-            <h3 className="font-semibold text-foreground">
+          <div className="min-w-0">
+            <h3
+              id={`${cardId}-title`}
+              className="font-semibold text-foreground text-sm sm:text-base truncate"
+            >
               {formatRelativeDate(session.date)}
             </h3>
-            <p className="text-sm text-muted">
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] truncate">
               {formatDate(session.date)}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          {/* Duration */}
-          <div className="text-right">
-            <div className="flex items-center gap-1 text-foreground">
-              <Clock className="h-4 w-4 text-muted" />
-              <span className="font-medium">{session.duration} min</span>
+        <div className="flex items-center gap-3 sm:gap-6 flex-shrink-0">
+          {/* Duration - Hidden on mobile */}
+          <div className="text-right hidden sm:block">
+            <div className="flex items-center gap-1.5 text-foreground">
+              <Clock className="h-4 w-4 text-[var(--text-muted)]" aria-hidden="true" />
+              <span className="font-medium text-sm">{session.duration} min</span>
             </div>
           </div>
 
           {/* Completion */}
           <div className="text-right">
-            <div className="flex items-center gap-1">
-              <CheckCircle2 className="h-4 w-4 text-success" />
-              <span className="font-medium text-foreground">
+            <div className="flex items-center gap-1.5">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" aria-hidden="true" />
+              <span className="font-medium text-foreground text-sm">
                 {completedCount}/{totalCount}
               </span>
             </div>
-            <p className="text-xs text-muted">{completionPercent}% complete</p>
+            <p className="text-xs text-[var(--text-muted)] hidden sm:block">{completionPercent}% complete</p>
           </div>
 
           {/* Pain Change */}
-          <div className="text-right min-w-[80px]">
+          <div className="text-right min-w-[60px] sm:min-w-[80px]">
             <span
-              className={`flex items-center justify-end gap-1 font-medium ${
+              className={`flex items-center justify-end gap-1 font-medium text-sm ${
                 painReduction > 0
-                  ? 'text-success'
+                  ? 'text-emerald-500'
                   : painReduction < 0
-                  ? 'text-error'
-                  : 'text-muted'
+                  ? 'text-rose-500'
+                  : 'text-[var(--text-muted)]'
               }`}
+              aria-label={`Pain ${painReduction > 0 ? 'reduced by' : painReduction < 0 ? 'increased by' : 'unchanged'} ${Math.abs(painReduction)}`}
             >
               {painReduction > 0 ? (
                 <>
-                  <TrendingDown className="h-4 w-4" />-{painReduction}
+                  <TrendingDown className="h-4 w-4" aria-hidden="true" />-{painReduction}
                 </>
               ) : painReduction < 0 ? (
-                <>+{Math.abs(painReduction)}</>
+                <>
+                  <TrendingUp className="h-4 w-4" aria-hidden="true" />+{Math.abs(painReduction)}
+                </>
               ) : (
-                'No change'
+                '--'
               )}
             </span>
-            <p className="text-xs text-muted">
+            <p className="text-xs text-[var(--text-muted)] hidden sm:block">
               {session.painBefore} to {session.painAfter}
             </p>
           </div>
 
           {/* Expand Icon */}
-          <div className="text-muted">
+          <div className="text-[var(--text-muted)] ml-1">
             {isExpanded ? (
-              <ChevronUp className="h-5 w-5" />
+              <ChevronUp className="h-5 w-5 transition-transform duration-300" aria-hidden="true" />
             ) : (
-              <ChevronDown className="h-5 w-5" />
+              <ChevronDown className="h-5 w-5 transition-transform duration-300" aria-hidden="true" />
             )}
           </div>
         </div>
@@ -146,29 +166,40 @@ function SessionCard({
 
       {/* Expanded Details */}
       {isExpanded && (
-        <div className="border-t border-border bg-surface/50 p-6">
-          <h4 className="text-sm font-medium text-muted mb-4">
-            Exercises Completed
-          </h4>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          id={`${cardId}-details`}
+          className="session-details animate-fadeInUp"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-4 w-4 text-[var(--primary)]" aria-hidden="true" />
+            <h4 className="text-sm font-medium text-[var(--text-muted)]">
+              Exercises Completed
+            </h4>
+          </div>
+          <div className="grid gap-2 sm:gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {session.exercises.map((exercise) => {
               const isComplete = exercise.setsCompleted === exercise.setsTarget;
               return (
                 <div
                   key={exercise.id}
-                  className="flex items-center justify-between rounded-lg border border-border bg-card p-4"
+                  className="flex items-center justify-between glass-panel-subtle rounded-xl p-3 sm:p-4 micro-bounce"
+                  role="listitem"
+                  aria-label={`${exercise.name}: ${exercise.setsCompleted} of ${exercise.setsTarget} sets ${isComplete ? 'complete' : 'incomplete'}`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     {isComplete ? (
-                      <CheckCircle2 className="h-5 w-5 text-success" />
+                      <div className="relative flex-shrink-0">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500" aria-hidden="true" />
+                        <div className="absolute inset-0 bg-emerald-500/30 blur-md rounded-full" aria-hidden="true" />
+                      </div>
                     ) : (
-                      <XCircle className="h-5 w-5 text-warning" />
+                      <XCircle className="h-5 w-5 text-amber-500 flex-shrink-0" aria-hidden="true" />
                     )}
-                    <div>
-                      <p className="text-sm font-medium text-foreground">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {exercise.name}
                       </p>
-                      <p className="text-xs text-muted">
+                      <p className="text-xs text-[var(--text-muted)]">
                         {exercise.setsCompleted}/{exercise.setsTarget} sets
                       </p>
                     </div>
@@ -179,29 +210,29 @@ function SessionCard({
           </div>
 
           {/* Session Stats */}
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-lg border border-border bg-card p-4">
-              <p className="text-xs text-muted">Duration</p>
-              <p className="text-lg font-semibold text-foreground">
-                {session.duration} minutes
+          <div className="mt-4 sm:mt-6 grid gap-2 sm:gap-4 grid-cols-3">
+            <div className="glass-panel-subtle rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xs text-[var(--text-muted)] mb-1">Duration</p>
+              <p className="text-base sm:text-lg font-semibold text-foreground">
+                {session.duration}<span className="text-xs sm:text-sm font-normal text-[var(--text-muted)]"> min</span>
               </p>
             </div>
-            <div className="rounded-lg border border-border bg-card p-4">
-              <p className="text-xs text-muted">Pain Before</p>
-              <p className="text-lg font-semibold text-foreground">
-                {session.painBefore}/10
+            <div className="glass-panel-subtle rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xs text-[var(--text-muted)] mb-1">Pain Before</p>
+              <p className="text-base sm:text-lg font-semibold text-foreground">
+                {session.painBefore}<span className="text-xs sm:text-sm font-normal text-[var(--text-muted)]">/10</span>
               </p>
             </div>
-            <div className="rounded-lg border border-border bg-card p-4">
-              <p className="text-xs text-muted">Pain After</p>
-              <p className="text-lg font-semibold text-foreground">
-                {session.painAfter}/10
+            <div className="glass-panel-subtle rounded-xl p-3 sm:p-4 text-center">
+              <p className="text-xs text-[var(--text-muted)] mb-1">Pain After</p>
+              <p className="text-base sm:text-lg font-semibold text-foreground">
+                {session.painAfter}<span className="text-xs sm:text-sm font-normal text-[var(--text-muted)]">/10</span>
               </p>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </article>
   );
 }
 
@@ -211,6 +242,7 @@ export default function HistoryPage() {
   const [dateFilter, setDateFilter] = useState<'all' | '7d' | '30d' | '90d'>(
     'all'
   );
+  const filterGroupId = useId();
 
   const filteredSessions = useMemo(() => {
     if (dateFilter === 'all') return appState.sessions;
@@ -243,123 +275,150 @@ export default function HistoryPage() {
       : 0;
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Session History</h1>
-          <p className="mt-1 text-muted">
-            Review your past recovery sessions and exercises.
-          </p>
-        </div>
+    <div className="space-y-4 sm:space-y-6 md:space-y-8">
+      {/* Page Header - Premium Glass Effect */}
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          {/* Date Filter */}
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2">
-            <Filter className="h-4 w-4 text-muted" />
-            <select
-              value={dateFilter}
-              onChange={(e) =>
-                setDateFilter(e.target.value as 'all' | '7d' | '30d' | '90d')
-              }
-              className="bg-transparent text-sm text-foreground outline-none"
-            >
-              <option value="all">All time</option>
-              <option value="7d">Last 7 days</option>
-              <option value="30d">Last 30 days</option>
-              <option value="90d">Last 90 days</option>
-            </select>
+          <div className="relative p-2.5 rounded-xl bg-[var(--primary)]/10 group">
+            <History className="h-6 w-6 text-[var(--primary)] transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
+            <div className="absolute inset-0 rounded-xl bg-[var(--primary)] opacity-20 blur-sm group-hover:opacity-40 transition-opacity duration-300" aria-hidden="true" />
           </div>
-        </div>
-      </div>
-
-      {/* Stats Summary */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Calendar className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">
-                {totalSessions}
-              </p>
-              <p className="text-sm text-muted">Total Sessions</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Clock className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">
-                {totalMinutes}
-              </p>
-              <p className="text-sm text-muted">Total Minutes</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
-              <TrendingDown className="h-5 w-5 text-success" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">
-                -{avgPainReduction.toFixed(1)}
-              </p>
-              <p className="text-sm text-muted">Avg Pain Reduction</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border bg-card p-6 card-shadow">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <CheckCircle2 className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">
-                {Math.round(completionRate * 100)}%
-              </p>
-              <p className="text-sm text-muted">Completion Rate</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sessions List */}
-      <div className="space-y-4">
-        {filteredSessions.length > 0 ? (
-          filteredSessions.map((session) => (
-            <SessionCard
-              key={session.id}
-              session={session}
-              isExpanded={expandedSession === session.id}
-              onToggle={() =>
-                setExpandedSession(
-                  expandedSession === session.id ? null : session.id
-                )
-              }
-            />
-          ))
-        ) : (
-          <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center">
-            <Calendar className="mx-auto h-12 w-12 text-muted" />
-            <h3 className="mt-4 text-lg font-medium text-foreground">
-              No sessions found
-            </h3>
-            <p className="mt-2 text-sm text-muted">
-              {dateFilter === 'all'
-                ? 'Start your first recovery session to see it here.'
-                : 'No sessions in the selected time period. Try expanding the date range.'}
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Session History</h1>
+            <p className="text-sm text-[var(--text-muted)]">
+              Review your past recovery sessions
             </p>
           </div>
-        )}
-      </div>
+        </div>
+
+        {/* Date Filter - Premium Styling */}
+        <fieldset className="filter-premium" role="group" aria-labelledby={filterGroupId}>
+          <legend id={filterGroupId} className="sr-only">Filter sessions by date range</legend>
+          <Filter className="h-4 w-4 text-[var(--text-muted)]" aria-hidden="true" />
+          <select
+            value={dateFilter}
+            onChange={(e) =>
+              setDateFilter(e.target.value as 'all' | '7d' | '30d' | '90d')
+            }
+            aria-label="Filter by time period"
+          >
+            <option value="all">All time</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+          </select>
+        </fieldset>
+      </header>
+
+      {/* Stats Summary - Premium Glass Cards */}
+      <section aria-labelledby="stats-summary-heading">
+        <VisuallyHidden as="h2" id="stats-summary-heading">
+          Session Statistics Summary
+        </VisuallyHidden>
+        <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4 stagger-in">
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift" aria-labelledby="total-sessions-stat">
+            <div className="flex items-center gap-2.5 sm:gap-3 relative z-10">
+              <div className="icon-badge-premium p-2 sm:p-2.5" aria-hidden="true">
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--primary)]" />
+              </div>
+              <div>
+                <p id="total-sessions-stat" className="text-xl sm:text-2xl font-bold text-foreground">
+                  {totalSessions}
+                </p>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)]">Total Sessions</p>
+              </div>
+            </div>
+          </article>
+
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift" aria-labelledby="total-minutes-stat">
+            <div className="flex items-center gap-2.5 sm:gap-3 relative z-10">
+              <div className="icon-badge-premium p-2 sm:p-2.5 !bg-cyan-500/15" aria-hidden="true">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-cyan-500" />
+              </div>
+              <div>
+                <p id="total-minutes-stat" className="text-xl sm:text-2xl font-bold text-foreground">
+                  {totalMinutes}
+                </p>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)]">Total Minutes</p>
+              </div>
+            </div>
+          </article>
+
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift" aria-labelledby="pain-reduction-stat">
+            <div className="flex items-center gap-2.5 sm:gap-3 relative z-10">
+              <div className="icon-badge-premium p-2 sm:p-2.5 !bg-emerald-500/15" aria-hidden="true">
+                <TrendingDown className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500" />
+              </div>
+              <div>
+                <p id="pain-reduction-stat" className="text-xl sm:text-2xl font-bold text-foreground">
+                  -{avgPainReduction.toFixed(1)}
+                </p>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)]">Avg Pain Reduction</p>
+              </div>
+            </div>
+          </article>
+
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift" aria-labelledby="completion-rate-stat">
+            <div className="flex items-center gap-2.5 sm:gap-3 relative z-10">
+              <div className="icon-badge-premium p-2 sm:p-2.5 !bg-amber-500/15" aria-hidden="true">
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
+              </div>
+              <div>
+                <p id="completion-rate-stat" className="text-xl sm:text-2xl font-bold text-foreground">
+                  {Math.round(completionRate * 100)}%
+                </p>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)]">Completion Rate</p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      {/* Sessions List - Premium Glass Cards */}
+      <section aria-labelledby="sessions-list-heading">
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
+          <h2 id="sessions-list-heading" className="text-base sm:text-lg font-semibold text-foreground">
+            All Sessions
+          </h2>
+          {filteredSessions.length > 0 && (
+            <span className="glass-badge-primary text-xs">
+              {filteredSessions.length}
+            </span>
+          )}
+        </div>
+
+        <div className="space-y-3 sm:space-y-4" role="list" aria-label="Recovery sessions">
+          {filteredSessions.length > 0 ? (
+            filteredSessions.map((session) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                isExpanded={expandedSession === session.id}
+                onToggle={() =>
+                  setExpandedSession(
+                    expandedSession === session.id ? null : session.id
+                  )
+                }
+              />
+            ))
+          ) : (
+            <div className="empty-state-premium">
+              <div className="icon-container" aria-hidden="true">
+                <Calendar className="h-10 w-10 text-[var(--text-muted)]" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2 relative z-10">
+                No sessions found
+              </h3>
+              <p className="text-sm text-[var(--text-muted)] max-w-sm relative z-10">
+                {dateFilter === 'all'
+                  ? 'Start your first recovery session to see it here. Your progress will be tracked automatically.'
+                  : 'No sessions in the selected time period. Try expanding the date range to see more history.'}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

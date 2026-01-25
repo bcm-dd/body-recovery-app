@@ -5,7 +5,7 @@
  * Uses seeded random for reproducible data generation.
  */
 
-import {
+import type {
   HealthAdapter,
   HealthAvailability,
   HealthPermissionStatus,

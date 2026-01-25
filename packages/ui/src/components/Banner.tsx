@@ -5,10 +5,13 @@
  * Supports different variants and dismissible functionality.
  */
 
-import { styled, Stack, XStack, GetProps } from 'tamagui';
-import { ReactNode, useCallback } from 'react';
-import { Text } from '../primitives/Text';
+import type { ReactNode} from 'react';
+import { useCallback } from 'react';
+import type { GetProps } from 'tamagui';
+import { styled, Stack, XStack } from 'tamagui';
+
 import { Button } from '../primitives/Button';
+import { Text } from '../primitives/Text';
 
 /**
  * Banner variant types
@@ -116,9 +119,9 @@ const BannerText = styled(Text, {
   flex: 1,
 
   variants: {
-    variant: {
+    bannerVariant: {
       info: {
-        color: 'white',
+        color: '$white',
       },
       success: {
         color: '$success',
@@ -131,7 +134,8 @@ const BannerText = styled(Text, {
       },
     },
   } as const,
-});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any);
 
 /**
  * Dismiss button
@@ -200,11 +204,11 @@ export function Banner({
 
         <Stack flex={1}>
           {title && (
-            <BannerText variant={variant} weight="semibold">
+            <BannerText bannerVariant={variant} weight="semibold">
               {title}
             </BannerText>
           )}
-          <BannerText variant={variant}>
+          <BannerText bannerVariant={variant}>
             {message}
           </BannerText>
         </Stack>

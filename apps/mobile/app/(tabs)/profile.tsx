@@ -214,7 +214,7 @@ export default function ProfileScreen() {
                   onCheckedChange={handleToggleReminder}
                   backgroundColor={MOCK_PREFERENCES.reminderEnabled ? '$primary' : '$backgroundPress'}
                 >
-                  <Switch.Thumb animation="quick" backgroundColor="white" />
+                  <Switch.Thumb backgroundColor="white" />
                 </Switch>
               }
             />
@@ -229,7 +229,7 @@ export default function ProfileScreen() {
                   onCheckedChange={handleToggleReminder}
                   backgroundColor={MOCK_PREFERENCES.eveningReminderEnabled ? '$primary' : '$backgroundPress'}
                 >
-                  <Switch.Thumb animation="quick" backgroundColor="white" />
+                  <Switch.Thumb backgroundColor="white" />
                 </Switch>
               }
             />

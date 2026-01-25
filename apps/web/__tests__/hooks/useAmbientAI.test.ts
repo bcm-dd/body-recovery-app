@@ -19,10 +19,17 @@ vi.mock('../../src/lib/ambient-ai', () => ({
   generateSmartSuggestions: (...args: unknown[]) => mockGenerateSmartSuggestions(...args),
   generatePredictiveSuggestions: (...args: unknown[]) => mockGeneratePredictiveSuggestions(...args),
   defaultInsightPreferences: {
-    enableInsights: true,
-    enablePredictions: true,
     dismissedInsights: [],
-    insightCategories: ['recovery', 'progress', 'tips'],
+    permanentlyDismissedKeys: [],
+    preferredCategories: [],
+    lastSeenTimestamp: null,
+    maxVisibleInsights: 3,
+    enableGreetings: true,
+    enableCelebrations: true,
+    enableTips: true,
+    enableWarnings: true,
+    enablePatternSuggestions: true,
+    insightFrequency: 'balanced',
   },
 }));
 
@@ -37,8 +44,13 @@ const mockSessions: SessionData[] = [
     duration: 20,
     painBefore: 5,
     painAfter: 3,
-    exercisesCompleted: 4,
-    exercisesTotal: 5,
+    exercises: [
+      { setsCompleted: 3, setsTarget: 3 },
+      { setsCompleted: 3, setsTarget: 3 },
+      { setsCompleted: 2, setsTarget: 3 },
+      { setsCompleted: 3, setsTarget: 3 },
+      { setsCompleted: 0, setsTarget: 3 },
+    ],
   },
   {
     id: 'session-2',
@@ -46,14 +58,19 @@ const mockSessions: SessionData[] = [
     duration: 25,
     painBefore: 6,
     painAfter: 4,
-    exercisesCompleted: 5,
-    exercisesTotal: 5,
+    exercises: [
+      { setsCompleted: 3, setsTarget: 3 },
+      { setsCompleted: 3, setsTarget: 3 },
+      { setsCompleted: 3, setsTarget: 3 },
+      { setsCompleted: 3, setsTarget: 3 },
+      { setsCompleted: 3, setsTarget: 3 },
+    ],
   },
 ];
 
 const mockBodyRegions: BodyRegionData[] = [
-  { id: 'lower-back', name: 'Lower Back', painLevel: 4 },
-  { id: 'knee', name: 'Right Knee', painLevel: 3 },
+  { id: 'lower-back', name: 'Lower Back', painLevel: 4, lastUpdated: new Date() },
+  { id: 'knee', name: 'Right Knee', painLevel: 3, lastUpdated: new Date() },
 ];
 
 describe('useAmbientAI', () => {
@@ -150,7 +167,7 @@ describe('useAmbientAI', () => {
       });
 
       expect(result.current.preferences).toBeDefined();
-      expect(result.current.preferences.enableInsights).toBe(true);
+      expect(result.current.preferences.enableGreetings).toBe(true);
     });
   });
 
@@ -311,17 +328,17 @@ describe('useAmbientAI', () => {
       });
 
       act(() => {
-        result.current.updatePreferences({ enablePredictions: false });
+        result.current.updatePreferences({ enablePatternSuggestions: false });
       });
 
-      expect(result.current.preferences.enablePredictions).toBe(false);
+      expect(result.current.preferences.enablePatternSuggestions).toBe(false);
     });
 
     it('should load preferences from localStorage', async () => {
       localStorage.setItem(
         'ambient-ai-preferences',
         JSON.stringify({
-          enableInsights: false,
+          enableGreetings: false,
           dismissedInsights: ['old-insight'],
         })
       );
@@ -337,7 +354,7 @@ describe('useAmbientAI', () => {
         expect(result.current.isLoading).toBe(false);
       });
 
-      expect(result.current.preferences.enableInsights).toBe(false);
+      expect(result.current.preferences.enableGreetings).toBe(false);
       expect(result.current.preferences.dismissedInsights).toContain('old-insight');
     });
   });

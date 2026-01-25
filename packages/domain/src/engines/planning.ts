@@ -3,16 +3,17 @@
  * Rules-based plan generation with transparent rationale
  */
 
+import { MUSCLE_RECOVERY_ESTIMATES, MUSCLE_GROUPS } from '../constants/muscles';
+import { BODY_REGION_TO_MUSCLES } from '../constants/regions';
+import type { BodyRegion } from '../types/body';
+import type { MuscleGroup } from '../types/exercise';
+import type { DailySignals } from '../types/health';
 import type {
   DayPlan,
   PlanType,
   PlanBlock,
   BlockType,
-  PlannedExercise,
-  ExercisePrescription,
   PlanRationale,
-  PlanReason,
-  PlanAvoidance,
   AlternativePlan,
   PlanGenerationInput,
   PlanInputs,
@@ -20,11 +21,6 @@ import type {
   RecentWorkoutSummary,
   UserTrainingPreferences,
 } from '../types/plan';
-import type { DailySignals } from '../types/health';
-import type { BodyMap, BodyRegion, BodyRegionStatus, MovementConstraint } from '../types/body';
-import type { Exercise, MuscleGroup, Equipment } from '../types/exercise';
-import { MUSCLE_RECOVERY_ESTIMATES, MUSCLE_GROUPS } from '../constants/muscles';
-import { BODY_REGION_TO_MUSCLES } from '../constants/regions';
 
 /**
  * Generate a unique ID
@@ -93,7 +89,7 @@ const READINESS_RULES: ReadinessRule[] = [
 /**
  * Sleep modification rules
  */
-interface SleepModification {
+interface _SleepModification {
   maxIntensity?: 'moderate' | 'low';
   volumeMultiplier: number;
   addWarning?: string;
@@ -484,7 +480,7 @@ function generateAlternatives(
 function buildPlanBlocks(
   planType: PlanType,
   userPreferences: UserTrainingPreferences,
-  availableTime: number
+  _availableTime: number
 ): PlanBlock[] {
   const blocks: PlanBlock[] = [];
   const planId = generateId();
@@ -633,7 +629,12 @@ export class PlanningEngine implements IPlanningEngine {
       rationale
     );
     planType = sleepResult.planType;
-    let volumeMultiplier = sleepResult.volumeMultiplier;
+    // Volume multiplier calculated for future use in exercise prescription
+    const _volumeMultiplier = Math.min(
+      sleepResult.volumeMultiplier,
+      applyHRVModifications(input.dailySignals, planType, rationale).volumeMultiplier
+    );
+    void _volumeMultiplier; // Reserved for exercise prescription phase
 
     // Step 3: Apply HRV modifications
     const hrvResult = applyHRVModifications(
@@ -642,7 +643,6 @@ export class PlanningEngine implements IPlanningEngine {
       rationale
     );
     planType = hrvResult.planType;
-    volumeMultiplier = Math.min(volumeMultiplier, hrvResult.volumeMultiplier);
 
     // Step 4: Apply pain/injury rules (can override everything)
     const painResult = applyPainRules(input, planType, rationale);
@@ -652,8 +652,9 @@ export class PlanningEngine implements IPlanningEngine {
     // Step 5: Calculate muscle recovery status
     const muscleRecovery = calculateMuscleRecoveryStatus(input.recentWorkouts);
 
-    // Step 6: Get muscles to avoid based on pain regions
-    const musclesToAvoid = getMusclesFromRegions(regionsToAvoid);
+    // Step 6: Get muscles to avoid based on pain regions (for exercise selection)
+    const _musclesToAvoid = getMusclesFromRegions(regionsToAvoid);
+    void _musclesToAvoid; // Reserved for exercise selection phase
 
     // Step 7: Build plan blocks
     const availableTime = input.availableTime || input.userPreferences.typicalSessionLength;

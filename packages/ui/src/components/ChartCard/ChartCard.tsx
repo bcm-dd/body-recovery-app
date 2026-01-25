@@ -5,11 +5,13 @@
  * Includes header, optional time period selector, and chart area.
  */
 
-import { styled, Stack, XStack, YStack, GetProps } from 'tamagui';
-import { useState, useCallback, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { useState, useCallback } from 'react';
+import type { GetProps } from 'tamagui';
+import { styled, Stack, XStack, YStack } from 'tamagui';
+
+import { Card } from '../../primitives/Card';
 import { Text, H5 } from '../../primitives/Text';
-import { Card, CardHeader, CardBody } from '../../primitives/Card';
-import { Button } from '../../primitives/Button';
 import { palette } from '../../theme/tokens';
 
 /**

@@ -3,18 +3,16 @@
  * Finds and ranks exercise substitutes based on similarity scoring
  */
 
+import { calculateMuscleOverlap } from '../constants/muscles';
+import { areSimilarPatterns } from '../constants/patterns';
+import type { MovementConstraint } from '../types/body';
 import type {
   Exercise,
-  MuscleGroup,
-  MovementPattern,
   Equipment,
   JointAction,
   SkillLevel,
 } from '../types/exercise';
-import type { MovementConstraint } from '../types/body';
 import type { SubstituteExercise, UserTrainingPreferences } from '../types/plan';
-import { calculateMuscleOverlap, areMusclesSimilar } from '../constants/muscles';
-import { areSimilarPatterns } from '../constants/patterns';
 
 /**
  * Context for finding substitutes

@@ -37,7 +37,7 @@ export function shallowEqual<T extends object>(objA: T, objB: T): boolean {
 /**
  * Deep equality check for objects
  */
-export function deepEqual(a: any, b: any): boolean {
+export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (typeof a !== typeof b) return false;
   if (a === null || b === null) return a === b;
@@ -46,16 +46,19 @@ export function deepEqual(a: any, b: any): boolean {
   if (Array.isArray(a) !== Array.isArray(b)) return false;
 
   if (Array.isArray(a)) {
-    if (a.length !== b.length) return false;
-    return a.every((item, index) => deepEqual(item, b[index]));
+    const arrB = b as unknown[];
+    if (a.length !== arrB.length) return false;
+    return a.every((item, index) => deepEqual(item, arrB[index]));
   }
 
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
 
   if (keysA.length !== keysB.length) return false;
 
-  return keysA.every((key) => deepEqual(a[key], b[key]));
+  return keysA.every((key) => deepEqual(objA[key], objB[key]));
 }
 
 /**
@@ -88,13 +91,13 @@ export function createPropsComparison<P extends object>(
 /**
  * Memoize a function with custom cache key generator
  */
-export function memoize<T extends (...args: any[]) => any>(
-  fn: T,
-  keyGenerator: (...args: Parameters<T>) => string = (...args) => JSON.stringify(args)
-): T {
-  const cache = new Map<string, ReturnType<T>>();
+export function memoize<TArgs extends unknown[], TReturn>(
+  fn: (...args: TArgs) => TReturn,
+  keyGenerator: (...args: TArgs) => string = (...args) => JSON.stringify(args)
+): (...args: TArgs) => TReturn {
+  const cache = new Map<string, TReturn>();
 
-  return ((...args: Parameters<T>) => {
+  return (...args: TArgs): TReturn => {
     const key = keyGenerator(...args);
 
     if (cache.has(key)) {
@@ -104,7 +107,7 @@ export function memoize<T extends (...args: any[]) => any>(
     const result = fn(...args);
     cache.set(key, result);
     return result;
-  }) as T;
+  };
 }
 
 /**
@@ -125,7 +128,9 @@ export function useStableValue<T>(value: T): T {
  * Hook that returns a stable callback reference
  * The callback is always up-to-date but the reference never changes
  */
-export function useStableCallback<T extends (...args: any[]) => any>(callback: T): T {
+export function useStableCallback<TArgs extends unknown[], TReturn>(
+  callback: (...args: TArgs) => TReturn
+): (...args: TArgs) => TReturn {
   const callbackRef = useRef(callback);
 
   useEffect(() => {
@@ -133,7 +138,7 @@ export function useStableCallback<T extends (...args: any[]) => any>(callback: T
   }, [callback]);
 
   return useCallback(
-    ((...args: Parameters<T>) => callbackRef.current(...args)) as T,
+    (...args: TArgs) => callbackRef.current(...args),
     []
   );
 }
@@ -258,20 +263,22 @@ export function createSelector<S, R1, R2, R3, Result>(
   selector3: Selector<S, R3>,
   combiner: (result1: R1, result2: R2, result3: R3) => Result
 ): Selector<S, Result>;
-export function createSelector(...args: any[]): any {
-  const selectors = args.slice(0, -1);
-  const combiner = args[args.length - 1];
+export function createSelector<S, Result>(
+  ...args: [...Selector<S, unknown>[], (...results: unknown[]) => Result]
+): Selector<S, Result> {
+  const selectors = args.slice(0, -1) as Selector<S, unknown>[];
+  const combiner = args[args.length - 1] as (...results: unknown[]) => Result;
 
-  let lastResults: any[] | null = null;
-  let lastValue: any = null;
+  let lastResults: unknown[] | null = null;
+  let lastValue: Result | null = null;
 
-  return (state: any) => {
-    const results = selectors.map((selector: any) => selector(state));
+  return (state: S): Result => {
+    const results = selectors.map((selector) => selector(state));
 
     if (lastResults !== null) {
       const allEqual = results.every((result, index) => result === lastResults![index]);
       if (allEqual) {
-        return lastValue;
+        return lastValue as Result;
       }
     }
 

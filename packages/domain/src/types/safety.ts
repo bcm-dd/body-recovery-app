@@ -4,8 +4,8 @@
  */
 
 import type { BodyRegionStatus } from './body';
-import type { ExerciseFeedback } from './plan';
 import type { CheckIn } from './health';
+import type { ExerciseFeedback } from './plan';
 
 /**
  * Safety action levels - what to do when a safety issue is detected

@@ -107,7 +107,6 @@ export type {
   AnalyticsProviderProps,
   AnalyticsContextValue,
   WebVitals,
-  FeatureName,
 } from './AnalyticsProvider';
 
 // PWA Components

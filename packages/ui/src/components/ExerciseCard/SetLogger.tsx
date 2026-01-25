@@ -6,10 +6,11 @@
  * and remaining sets as empty circles.
  */
 
-import { styled, Stack, GetProps } from 'tamagui';
 import { useCallback } from 'react';
+import type { GetProps } from 'tamagui';
+import { styled, Stack } from 'tamagui';
+
 import { Text } from '../../primitives/Text';
-import { palette } from '../../theme/tokens';
 
 /**
  * Set data structure
@@ -158,14 +159,14 @@ const SetNumber = styled(Text, {
         color: '$primary',
       },
       completed: {
-        color: 'white',
+        color: '$white',
       },
       skipped: {
         color: '$textMuted',
       },
     },
 
-    size: {
+    indicatorSize: {
       sm: {
         fontSize: '$2',
       },
@@ -177,7 +178,8 @@ const SetNumber = styled(Text, {
       },
     },
   } as const,
-});
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any);
 
 /**
  * Check mark for completed sets
@@ -284,7 +286,7 @@ export function SetLogger({
             {status === 'completed' ? (
               <CheckMark />
             ) : showNumbers ? (
-              <SetNumber status={status} size={size}>
+              <SetNumber status={status} indicatorSize={size}>
                 {index + 1}
               </SetNumber>
             ) : null}

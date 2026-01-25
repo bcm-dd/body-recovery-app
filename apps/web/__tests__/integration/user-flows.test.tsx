@@ -9,8 +9,39 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 
+// Mock workout types
+interface MockExercise {
+  exerciseId: string;
+  name: string;
+  targetSets: number;
+  sets: { completed: boolean }[];
+  completed: boolean;
+  skipped: boolean;
+}
+
+interface MockWorkout {
+  id: string;
+  planId: string;
+  exercises: MockExercise[];
+  currentExerciseIndex: number;
+  currentSetIndex: number;
+  startTime: Date;
+  isPaused: boolean;
+  isResting: boolean;
+}
+
 // Mock stores
-const mockWorkoutStore = {
+const mockWorkoutStore: {
+  activeWorkout: MockWorkout | null;
+  isWorkoutActive: boolean;
+  completedWorkouts: MockWorkout[];
+  startWorkout: ReturnType<typeof vi.fn>;
+  completeSet: ReturnType<typeof vi.fn>;
+  skipExercise: ReturnType<typeof vi.fn>;
+  substituteExercise: ReturnType<typeof vi.fn>;
+  endWorkout: ReturnType<typeof vi.fn>;
+  cancelWorkout: ReturnType<typeof vi.fn>;
+} = {
   activeWorkout: null,
   isWorkoutActive: false,
   completedWorkouts: [],
@@ -22,13 +53,20 @@ const mockWorkoutStore = {
   cancelWorkout: vi.fn(),
 };
 
+interface PainIssue {
+  region: string;
+  level: number;
+  sensation: string;
+  timestamp: Date;
+}
+
 const mockBodyMapStore = {
   regions: new Map(),
   history: [],
   updateRegion: vi.fn(),
   updateMultipleRegions: vi.fn(),
-  getActiveIssues: vi.fn(() => []),
-  getRegionsWithPain: vi.fn(() => []),
+  getActiveIssues: vi.fn((): PainIssue[] => []),
+  getRegionsWithPain: vi.fn((): string[] => []),
   clearRegion: vi.fn(),
 };
 
@@ -39,7 +77,7 @@ vi.mock('@app/data', () => ({
 
 // Mock planning engine
 const mockPlanningEngine = {
-  generatePlan: vi.fn(() => ({
+  generatePlan: vi.fn((_options?: { focusAreas?: string[]; duration?: number; skillLevel?: string; excludePainfulMovements?: boolean }) => ({
     id: 'plan-1',
     exercises: [
       {
@@ -62,21 +100,27 @@ const mockPlanningEngine = {
   })),
 };
 
+// Mock safety engine instance
+const mockSafetyEngine = {
+  checkContraindications: vi.fn((_exercises: string[], _issues: PainIssue[]) => ({
+    safe: true,
+    warnings: [] as string[],
+    contraindicated: [] as string[],
+  })),
+  modifyForPain: vi.fn((exercises: unknown[]) => exercises),
+};
+
+// Mock substitution engine instance
+const mockSubstitutionEngine = {
+  findSubstitutes: vi.fn((_exerciseId: string, _options: { reason: string; painAreas: string[] }) => [
+    { exerciseId: 'pelvic-tilts', name: 'Pelvic Tilts', reason: 'Easier variation' },
+  ]),
+};
+
 vi.mock('@app/domain', () => ({
   createPlanningEngine: () => mockPlanningEngine,
-  createSubstitutionEngine: () => ({
-    findSubstitutes: vi.fn(() => [
-      { exerciseId: 'pelvic-tilts', name: 'Pelvic Tilts', reason: 'Easier variation' },
-    ]),
-  }),
-  createSafetyEngine: () => ({
-    checkContraindications: vi.fn(() => ({
-      safe: true,
-      warnings: [],
-      contraindicated: [],
-    })),
-    modifyForPain: vi.fn((exercises) => exercises),
-  }),
+  createSubstitutionEngine: () => mockSubstitutionEngine,
+  createSafetyEngine: () => mockSafetyEngine,
   EXERCISES: [],
 }));
 
@@ -204,8 +248,7 @@ describe('User Flow: Mark Pain -> Get Modified Plan', () => {
     expect(issues[0].level).toBe(7);
 
     // Safety engine should recommend modifications
-    const safetyEngine = (await import('@app/domain')).createSafetyEngine();
-    const result = safetyEngine.checkContraindications(['squat'], issues);
+    const result = mockSafetyEngine.checkContraindications(['squat'], issues);
 
     expect(result).toBeDefined();
   });
@@ -274,8 +317,7 @@ describe('User Flow: Substitute Exercise Mid-Session', () => {
   });
 
   it('should provide alternative exercises based on current exercise', async () => {
-    const substitutionEngine = (await import('@app/domain')).createSubstitutionEngine();
-    const alternatives = substitutionEngine.findSubstitutes('cat-cow', {
+    const alternatives = mockSubstitutionEngine.findSubstitutes('cat-cow', {
       reason: 'too_difficult',
       painAreas: ['lower_back'],
     });

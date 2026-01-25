@@ -77,7 +77,6 @@ export {
 export type {
   UseAnalyticsOptions,
   UseAnalyticsReturn,
-  FeatureName,
 } from './useAnalytics';
 
 // PWA Hooks

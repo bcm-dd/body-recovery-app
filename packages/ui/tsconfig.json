@@ -17,7 +17,11 @@
     "composite": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "types": ["react-native"]
+    "types": ["react-native"],
+    "paths": {
+      "@app/copy": ["../copy/src/index.ts"],
+      "@app/copy/*": ["../copy/src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

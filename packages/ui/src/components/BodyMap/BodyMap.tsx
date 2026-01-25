@@ -10,15 +10,19 @@
  */
 
 import { useMemo, useCallback } from 'react';
-import { styled, Stack, GetProps } from 'tamagui';
 import Svg, { G, Rect, Defs, LinearGradient, Stop } from 'react-native-svg';
+import type { GetProps } from 'tamagui';
+import { styled, Stack } from 'tamagui';
+
+import type {
+  BodyRegionId,
+  PainLevel} from './BodyRegion';
 import {
   BodyRegion,
-  BodyRegionId,
-  PainLevel,
   FRONT_BODY_REGIONS,
   REGION_LABELS,
 } from './BodyRegion';
+import { Text } from '../../primitives/Text';
 import { palette } from '../../theme/tokens';
 
 /**
@@ -261,7 +265,6 @@ const LegendDot = styled(Stack, {
   borderRadius: '$full',
 });
 
-import { Text } from '../../primitives/Text';
 
 export interface BodyMapLegendProps {
   /** Show all levels or just active ones */
@@ -303,5 +306,3 @@ export function BodyMapLegend({
 // Attach legend as sub-component
 BodyMap.Legend = BodyMapLegend;
 BodyMap.Container = BodyMapContainer;
-
-export { REGION_LABELS };

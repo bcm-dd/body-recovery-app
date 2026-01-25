@@ -679,4 +679,3 @@ export function useTrackVisibility(
 // ============================================================================
 
 export { Features, AnalyticsEvents };
-export type { FeatureName };

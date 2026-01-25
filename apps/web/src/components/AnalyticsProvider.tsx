@@ -520,4 +520,3 @@ export function ConsentBanner({
 // ============================================================================
 
 export { Features };
-export type { FeatureName };

@@ -137,7 +137,7 @@ function generateId(prefix: string): string {
 }
 
 function createSets(targetSets: number): WorkoutSet[] {
-  return Array.from({ length: targetSets }, (_, i) => ({
+  return Array.from({ length: targetSets }, () => ({
     id: generateId('set'),
     completed: false,
   }));

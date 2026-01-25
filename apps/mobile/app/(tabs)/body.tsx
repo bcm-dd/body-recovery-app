@@ -301,10 +301,14 @@ export default function BodyScreen() {
         if (existingIndex !== -1) {
           // Update existing issue
           const updated = [...prev];
+          const existing = prev[existingIndex]!;
           updated[existingIndex] = {
-            ...updated[existingIndex],
+            id: existing.id,
+            region: existing.region,
+            regionLabel: existing.regionLabel,
             severity,
             lastUpdated: new Date(),
+            description: existing.description,
           };
           return updated;
         }

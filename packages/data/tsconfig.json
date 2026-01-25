@@ -17,8 +17,12 @@
     "rootDir": "./src",
     "jsx": "react-jsx",
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@app/domain": ["../domain/src/index.ts"],
+      "@app/domain/*": ["../domain/src/*"]
+    }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "__tests__"]
 }

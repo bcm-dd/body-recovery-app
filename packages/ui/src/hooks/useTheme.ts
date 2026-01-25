@@ -5,9 +5,9 @@
  * Wrapper around Tamagui's useTheme with additional utilities.
  */
 
-import { useTheme as useTamaguiTheme, useThemeName } from 'tamagui';
 import { useCallback, useMemo } from 'react';
 import { useColorScheme, Platform } from 'react-native';
+import { useTheme as useTamaguiTheme, useThemeName } from 'tamagui';
 
 /**
  * Theme mode

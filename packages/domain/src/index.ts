@@ -6,10 +6,26 @@
  * - Types: Complete TypeScript interfaces for body map, exercises, plans, health, and safety
  * - Engines: Rules-based planning, substitution scoring, and safety detection
  * - Constants: Body regions, movement patterns, and muscle groups
+ * - Data: Exercise library and demo profiles
+ *
+ * @example
+ * ```tsx
+ * // Import types
+ * import type { BodyRegion, Exercise, DayPlan } from '@app/domain';
+ *
+ * // Import engines
+ * import { planningEngine, safetyEngine, substitutionEngine } from '@app/domain';
+ *
+ * // Import constants
+ * import { BODY_REGIONS, MUSCLE_GROUPS, MOVEMENT_PATTERNS } from '@app/domain';
+ *
+ * // Import exercise data
+ * import { EXERCISES, getExerciseById, DEMO_PROFILES } from '@app/domain';
+ * ```
  */
 
 // =============================================================================
-// Types
+// Types - Re-exported from types/index.ts
 // =============================================================================
 
 // Body types
@@ -166,3 +182,45 @@ export {
   calculateMuscleOverlap,
   areMusclesSimilar,
 } from './constants/muscles';
+
+// =============================================================================
+// Data - Exercise Library & Demo Profiles
+// =============================================================================
+
+// Exercise Library
+export {
+  EXERCISES,
+  EXERCISES_BY_ID,
+  CONTRAINDICATION_CONDITIONS,
+  getExerciseById,
+  getExercisesByCategory,
+  getExercisesByMuscleGroup,
+  getExercisesByMovementPattern,
+  getExercisesBySkillLevel,
+  getBodyweightExercises,
+  filterByEquipment,
+  filterByContraindications,
+  getAlternativesForContraindication,
+  type ContraindicationCondition,
+} from './data/exercises';
+
+// Demo Profiles
+export {
+  ACL_RECOVERY_PROFILE,
+  LOW_BACK_PROFILE,
+  SHOULDER_REHAB_PROFILE,
+  DEMO_PROFILES,
+  DEMO_PROFILES_BY_ID,
+  getDemoProfileById,
+  getDemoProfileIds,
+  getDemoProfileSummaries,
+  getProfileContraindications,
+  getRecommendedCategories,
+  type DemoProfile,
+} from './data/profiles';
+
+// Convenience exports
+export {
+  EXERCISE_COUNTS,
+  EXERCISE_IDS_BY_CATEGORY,
+} from './data';

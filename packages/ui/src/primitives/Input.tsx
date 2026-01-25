@@ -5,9 +5,12 @@
  * Includes label and error message support.
  */
 
-import { styled, Stack, Input as TamaguiInput, GetProps } from 'tamagui';
-import { Text, Label } from './Text';
 import type { ReactNode } from 'react';
+import type { GetProps } from 'tamagui';
+import { styled, Stack, Input as TamaguiInput } from 'tamagui';
+
+import { Text, Label } from './Text';
+
 
 /**
  * Input container
@@ -152,8 +155,12 @@ const InputFrame = styled(TamaguiInput, {
 const ErrorMessage = styled(Text, {
   name: 'ErrorMessage',
 
-  color: '$error',
   fontSize: '$3',
+
+  // Apply error color via the color variant
+  defaultVariants: {
+    color: 'error',
+  },
 });
 
 /**
@@ -162,8 +169,12 @@ const ErrorMessage = styled(Text, {
 const HelperText = styled(Text, {
   name: 'HelperText',
 
-  color: '$textSecondary',
   fontSize: '$3',
+
+  // Apply secondary color via the color variant
+  defaultVariants: {
+    color: 'secondary',
+  },
 });
 
 /**
@@ -189,7 +200,7 @@ const IconContainer = styled(Stack, {
   paddingHorizontal: '$3',
 
   variants: {
-    position: {
+    side: {
       left: {
         left: 0,
       },
@@ -249,7 +260,7 @@ export function Input({
 
       <InputWrapper>
         {leftIcon && (
-          <IconContainer position="left">
+          <IconContainer side="left">
             {leftIcon}
           </IconContainer>
         )}
@@ -264,7 +275,7 @@ export function Input({
         />
 
         {rightIcon && (
-          <IconContainer position="right">
+          <IconContainer side="right">
             {rightIcon}
           </IconContainer>
         )}

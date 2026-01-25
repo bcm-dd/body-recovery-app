@@ -5,7 +5,7 @@
  * Provides the same interface as MMKV for cross-platform compatibility.
  */
 
-import {
+import type {
   StorageAdapter,
   StorageValue,
   StorageOptions,

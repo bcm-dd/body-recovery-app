@@ -5,7 +5,8 @@
  * Used as the base for exercise cards, stat displays, and content sections.
  */
 
-import { styled, Stack, GetProps } from 'tamagui';
+import type { GetProps } from 'tamagui';
+import { styled, Stack } from 'tamagui';
 
 /**
  * Base card container

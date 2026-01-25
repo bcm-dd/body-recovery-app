@@ -6,13 +6,21 @@
 
 export type WebVitalName = 'CLS' | 'FID' | 'FCP' | 'LCP' | 'TTFB' | 'INP';
 
+// Type for the metric returned by web-vitals library
+interface WebVitalsLibraryMetric {
+  value: number;
+  delta: number;
+  id: string;
+  navigationType?: 'navigate' | 'reload' | 'back-forward' | 'prerender' | 'back-forward-cache' | 'restore';
+}
+
 export interface WebVitalMetric {
   name: WebVitalName;
   value: number;
   delta: number;
   id: string;
   rating: 'good' | 'needs-improvement' | 'poor';
-  navigationType?: 'navigate' | 'reload' | 'back-forward' | 'prerender';
+  navigationType?: 'navigate' | 'reload' | 'back-forward' | 'prerender' | 'back-forward-cache' | 'restore';
 }
 
 // Thresholds based on Google's Core Web Vitals guidelines
@@ -79,7 +87,7 @@ export async function initWebVitals(): Promise<void> {
     // Note: FID was deprecated in web-vitals v4+ in favor of INP
     const { onCLS, onFCP, onLCP, onTTFB, onINP } = await import('web-vitals');
 
-    const createHandler = (name: WebVitalName) => (metric: any) => {
+    const createHandler = (name: WebVitalName) => (metric: WebVitalsLibraryMetric) => {
       reportCallback({
         name,
         value: metric.value,
@@ -234,6 +242,11 @@ export function getLargeResources(threshold: number = 100000): ResourceTiming[] 
 // LONG TASK DETECTION
 // ============================================
 
+// Type for long task entries with attribution
+interface PerformanceLongTaskTiming extends PerformanceEntry {
+  attribution?: Array<{ name?: string }>;
+}
+
 /**
  * Detect long tasks that block the main thread
  */
@@ -249,7 +262,8 @@ export function observeLongTasks(
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         if (entry.duration > threshold) {
-          const attribution = (entry as any).attribution?.[0]?.name || 'unknown';
+          const longTaskEntry = entry as PerformanceLongTaskTiming;
+          const attribution = longTaskEntry.attribution?.[0]?.name || 'unknown';
           callback(entry.duration, attribution);
         }
       }
@@ -323,13 +337,23 @@ export interface MemoryInfo {
   jsHeapSizeLimit: number;
 }
 
+// Chrome-specific performance interface with memory property
+interface PerformanceWithMemory extends Performance {
+  memory?: {
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
+}
+
 /**
  * Get memory usage information (Chrome only)
  */
 export function getMemoryUsage(): MemoryInfo | null {
   if (typeof performance === 'undefined') return null;
 
-  const memory = (performance as any).memory;
+  const performanceWithMemory = performance as PerformanceWithMemory;
+  const memory = performanceWithMemory.memory;
   if (!memory) return null;
 
   return {

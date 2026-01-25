@@ -3,9 +3,9 @@
  * Defines day plans, plan blocks, and exercise prescriptions
  */
 
-import type { BodyMap, BodyRegionStatus, BodyRegion, MovementConstraint } from './body';
-import type { Exercise, Equipment, MuscleGroup, MovementPattern } from './exercise';
-import type { DailySignals, CheckIn, ReadinessScore } from './health';
+import type { BodyMap, BodyRegion } from './body';
+import type { Equipment, MuscleGroup, MovementPattern } from './exercise';
+import type { DailySignals, CheckIn } from './health';
 
 /**
  * Plan type classification

@@ -6,11 +6,9 @@
  */
 
 import { create } from 'zustand';
-import {
-  DailyHealthSnapshot,
-  ReadinessFactors,
-  getHealthAdapter,
-} from '../adapters/health';
+
+import { getHealthAdapter } from '../adapters/health';
+import type { DailyHealthSnapshot, ReadinessFactors } from '../adapters/health';
 
 // ============================================
 // TYPES

@@ -32,7 +32,7 @@ export function RestTimer({
   const { triggerHaptic } = useHaptics();
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Animated progress
   const progress = useSharedValue(1);

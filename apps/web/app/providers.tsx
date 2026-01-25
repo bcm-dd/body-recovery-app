@@ -4,10 +4,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NextIntlClientProvider } from 'next-intl';
 import { type ReactNode, useState, createContext, useContext, useEffect, useMemo } from 'react';
 
+import deMessages from '../messages/de.json';
 import enMessages from '../messages/en.json';
 import esMessages from '../messages/es.json';
 import frMessages from '../messages/fr.json';
-import deMessages from '../messages/de.json';
 import { PWAProvider } from '../src/components/PWAProvider';
 import { WebVitalsProvider } from '../src/components/WebVitalsProvider';
 import { defaultLocale, locales, type Locale, setStoredLocale, getStoredLocale, detectBrowserLocale, getTextDirection } from '../src/lib/i18n';

@@ -3,9 +3,9 @@
 import { Globe, Check, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect, useCallback, useId } from 'react';
 
+import { useLocaleContext } from '../../app/providers';
 import { useI18n } from '../hooks';
 import { localeMetadata, type Locale } from '../lib/i18n';
-import { useLocaleContext } from '../../app/providers';
 
 // ============================================================================
 // Types

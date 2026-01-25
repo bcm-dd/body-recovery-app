@@ -32,7 +32,7 @@ export {
 // PLATFORM-AWARE FACTORY
 // ============================================
 
-import { StorageAdapter, StorageOptions } from './interface';
+import type { StorageAdapter, StorageOptions } from './interface';
 import { createLocalStorage, createInMemoryStorage } from './localStorage';
 
 /**

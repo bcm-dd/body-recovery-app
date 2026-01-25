@@ -9,9 +9,11 @@
  */
 
 import { useMemo } from 'react';
-import { styled, Stack, YStack, GetProps } from 'tamagui';
-import Svg, { Circle, G, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { Text, H3 } from '../../primitives/Text';
+import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
+import type { GetProps } from 'tamagui';
+import { styled, Stack, YStack } from 'tamagui';
+
+import { Text } from '../../primitives/Text';
 import { palette } from '../../theme/tokens';
 
 /**
@@ -149,8 +151,8 @@ export interface ReadinessRingProps extends RingContainerProps {
 export function ReadinessRing({
   score: propScore,
   factors = DEFAULT_FACTORS,
-  showFactors = false,
-  animated = true,
+  showFactors: _showFactors = false,
+  animated: _animated = true,
   strokeWidth = 8,
   showLabel = true,
   label,

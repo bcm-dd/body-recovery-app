@@ -5,10 +5,10 @@
  * Use createHealthAdapter() to get a properly configured adapter.
  */
 
-import { HealthAdapter } from './types';
-import { MockHealthAdapter } from './mock';
-import { HealthKitAdapter } from './healthkit';
 import { HealthConnectAdapter } from './healthconnect';
+import { HealthKitAdapter } from './healthkit';
+import { MockHealthAdapter } from './mock';
+import type { HealthAdapter } from './types';
 
 // Re-export types and adapters
 export * from './types';

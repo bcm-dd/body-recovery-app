@@ -11,9 +11,7 @@ import type {
   SafetySeverity,
   RedFlag,
   EscalationUI,
-  EscalationAction,
 } from '../types/safety';
-import type { BodyRegionStatus } from '../types/body';
 
 /**
  * Keyword lists for detection

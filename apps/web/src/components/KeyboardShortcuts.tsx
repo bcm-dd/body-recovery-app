@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState, useCallback, useId } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Home,
   User,
@@ -12,6 +10,9 @@ import {
   Keyboard,
   Search,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, useId } from 'react';
+
 import { useKeyboardShortcuts } from './A11y';
 
 interface KeyboardShortcutsProps {

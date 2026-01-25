@@ -1,8 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import type { ReactNode} from 'react';
-import React, { Suspense, lazy, ComponentType, memo, useRef, useEffect, useState } from 'react';
+import type { ReactNode, ComponentType} from 'react';
+import React, { Suspense, lazy, memo, useRef, useEffect, useState } from 'react';
 
 import {
   SkeletonPage,

@@ -55,7 +55,7 @@
  *    - ExerciseSession
  */
 
-import {
+import type {
   HealthAdapter,
   HealthAvailability,
   HealthPermissionStatus,
@@ -71,8 +71,8 @@ import {
   DailyHealthSnapshot,
   HealthDataType,
   HealthWriteType,
-  HealthErrors,
 } from './types';
+import { HealthErrors } from './types';
 
 /**
  * Health Connect SDK availability status

@@ -5,7 +5,8 @@
  * Follows the typography system defined in tokens.
  */
 
-import { styled, Text as TamaguiText, GetProps } from 'tamagui';
+import type { GetProps } from 'tamagui';
+import { styled, Text as TamaguiText } from 'tamagui';
 
 /**
  * Base text component with semantic variants

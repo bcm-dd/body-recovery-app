@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import type React from 'react';
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 
 // ============================================
@@ -11,13 +12,13 @@ import { useCallback, useEffect, useRef, useState, type ComponentType } from 're
  * Creates a debounced function that delays invoking the callback
  * until after `delay` milliseconds have elapsed since the last time it was invoked.
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  return function (this: any, ...args: Parameters<T>) {
+  return function (this: unknown, ...args: Parameters<T>) {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -33,14 +34,14 @@ export function debounce<T extends (...args: any[]) => any>(
  * Creates a throttled function that only invokes the callback
  * at most once per every `limit` milliseconds.
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle = false;
   let lastArgs: Parameters<T> | null = null;
 
-  return function (this: any, ...args: Parameters<T>) {
+  return function (this: unknown, ...args: Parameters<T>) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
@@ -65,10 +66,10 @@ export function throttle<T extends (...args: any[]) => any>(
 /**
  * Hook that returns a debounced version of the callback
  */
-export function useDebounce<T extends (...args: any[]) => any>(
-  callback: T,
+export function useDebounce<TArgs extends unknown[], TReturn>(
+  callback: (...args: TArgs) => TReturn,
   delay: number
-): (...args: Parameters<T>) => void {
+): (...args: TArgs) => void {
   const callbackRef = useRef(callback);
 
   useEffect(() => {
@@ -76,9 +77,9 @@ export function useDebounce<T extends (...args: any[]) => any>(
   }, [callback]);
 
   return useCallback(
-    debounce((...args: Parameters<T>) => {
+    debounce(((...args: TArgs) => {
       callbackRef.current(...args);
-    }, delay),
+    }) as (...args: unknown[]) => unknown, delay) as (...args: TArgs) => void,
     [delay]
   );
 }
@@ -86,10 +87,10 @@ export function useDebounce<T extends (...args: any[]) => any>(
 /**
  * Hook that returns a throttled version of the callback
  */
-export function useThrottle<T extends (...args: any[]) => any>(
-  callback: T,
+export function useThrottle<TArgs extends unknown[], TReturn>(
+  callback: (...args: TArgs) => TReturn,
   limit: number
-): (...args: Parameters<T>) => void {
+): (...args: TArgs) => void {
   const callbackRef = useRef(callback);
 
   useEffect(() => {
@@ -97,9 +98,9 @@ export function useThrottle<T extends (...args: any[]) => any>(
   }, [callback]);
 
   return useCallback(
-    throttle((...args: Parameters<T>) => {
+    throttle(((...args: TArgs) => {
       callbackRef.current(...args);
-    }, limit),
+    }) as (...args: unknown[]) => unknown, limit) as (...args: TArgs) => void,
     [limit]
   );
 }
@@ -137,7 +138,8 @@ export function prefetchRoute(href: string): void {
 
   // Use Next.js router prefetch if available
   if (typeof window !== 'undefined' && 'next' in window) {
-    const router = (window as any).__NEXT_DATA__?.router;
+    const nextWindow = window as Window & { __NEXT_DATA__?: { router?: { prefetch?: (href: string) => void } } };
+    const router = nextWindow.__NEXT_DATA__?.router;
     if (router?.prefetch) {
       router.prefetch(href);
       prefetchedRoutes.add(href);
@@ -188,8 +190,8 @@ interface DynamicImportOptions {
 /**
  * Create a lazily loaded component with proper loading states
  */
-export function createLazyComponent<T extends ComponentType<any>>(
-  importFn: () => Promise<{ default: T }>,
+export function createLazyComponent<P extends object>(
+  importFn: () => Promise<{ default: ComponentType<P> }>,
   options: DynamicImportOptions = {}
 ) {
   return dynamic(importFn, {
@@ -286,9 +288,9 @@ export function useRenderCount(componentName: string): void {
  */
 export function useDeepMemo<T>(
   factory: () => T,
-  deps: any[]
+  deps: unknown[]
 ): T {
-  const ref = useRef<{ deps: any[]; value: T } | null>(null);
+  const ref = useRef<{ deps: unknown[]; value: T } | null>(null);
 
   if (!ref.current || !deepEqual(ref.current.deps, deps)) {
     ref.current = { deps, value: factory() };
@@ -297,18 +299,20 @@ export function useDeepMemo<T>(
   return ref.current.value;
 }
 
-function deepEqual(a: any, b: any): boolean {
+function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (typeof a !== typeof b) return false;
   if (typeof a !== 'object' || a === null || b === null) return false;
 
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
 
   if (keysA.length !== keysB.length) return false;
 
   for (const key of keysA) {
-    if (!keysB.includes(key) || !deepEqual(a[key], b[key])) {
+    if (!keysB.includes(key) || !deepEqual(objA[key], objB[key])) {
       return false;
     }
   }
@@ -320,6 +324,19 @@ function deepEqual(a: any, b: any): boolean {
 // IDLE CALLBACK UTILITIES
 // ============================================
 
+// Type definitions for requestIdleCallback (not in all TypeScript versions)
+type IdleRequestCallback = (deadline: IdleDeadline) => void;
+interface IdleDeadline {
+  didTimeout: boolean;
+  timeRemaining: () => number;
+}
+interface IdleRequestOptions {
+  timeout?: number;
+}
+type WindowWithIdleCallback = Window & {
+  requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+};
+
 /**
  * Schedule non-urgent work during browser idle time
  */
@@ -329,8 +346,9 @@ export function requestIdleCallback(
 ): number {
   if (typeof window === 'undefined') return 0;
 
-  if ('requestIdleCallback' in window) {
-    return (window as any).requestIdleCallback(callback, options);
+  const windowWithIdle = window as WindowWithIdleCallback;
+  if (windowWithIdle.requestIdleCallback) {
+    return windowWithIdle.requestIdleCallback(() => callback(), options);
   }
 
   // Fallback for Safari and older browsers
@@ -343,8 +361,8 @@ export function requestIdleCallback(
 export function cancelIdleCallback(id: number): void {
   if (typeof window === 'undefined') return;
 
-  if ('cancelIdleCallback' in window) {
-    (window as any).cancelIdleCallback(id);
+  if ('cancelIdleCallback' in window && typeof window.cancelIdleCallback === 'function') {
+    window.cancelIdleCallback(id);
   } else {
     clearTimeout(id);
   }
@@ -355,12 +373,13 @@ export function cancelIdleCallback(id: number): void {
  */
 export function useIdleCallback(
   callback: () => void,
-  deps: any[] = [],
+  deps: React.DependencyList = [],
   options?: { timeout?: number }
 ): void {
   useEffect(() => {
     const id = requestIdleCallback(callback, options);
     return () => cancelIdleCallback(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 

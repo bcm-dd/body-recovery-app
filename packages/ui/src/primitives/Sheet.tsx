@@ -5,8 +5,9 @@
  * Supports snap points, drag-to-dismiss, and keyboard avoidance.
  */
 
-import { styled, Stack, GetProps } from 'tamagui';
 import type { ReactNode } from 'react';
+import type { GetProps } from 'tamagui';
+import { styled, Stack } from 'tamagui';
 
 /**
  * Overlay backdrop
@@ -62,12 +63,11 @@ const SheetFrame = styled(Stack, {
   borderTopLeftRadius: '$4',
   borderTopRightRadius: '$4',
 
-  // Shadow for elevation
+  // Shadow for elevation effect
   shadowColor: '$shadowColor',
   shadowOffset: { width: 0, height: -4 },
   shadowOpacity: 0.2,
   shadowRadius: 16,
-  elevation: 16,
 
   // Animation
   animation: 'sheet',
@@ -89,9 +89,9 @@ const SheetFrame = styled(Stack, {
     },
 
     /**
-     * Sheet position variants
+     * Sheet placement variants
      */
-    position: {
+    placement: {
       bottom: {
         bottom: 0,
         left: 0,
@@ -121,7 +121,7 @@ const SheetFrame = styled(Stack, {
     /**
      * Sheet sizes
      */
-    size: {
+    sheetSize: {
       sm: {
         maxHeight: '30%',
       },
@@ -145,8 +145,8 @@ const SheetFrame = styled(Stack, {
   } as const,
 
   defaultVariants: {
-    position: 'bottom',
-    size: 'auto',
+    placement: 'bottom',
+    sheetSize: 'auto',
   },
 });
 
@@ -226,7 +226,7 @@ const SheetFooter = styled(Stack, {
 export type SheetFrameProps = GetProps<typeof SheetFrame>;
 export type SheetOverlayProps = GetProps<typeof SheetOverlay>;
 
-export interface SheetProps extends SheetFrameProps {
+export interface SheetProps extends Omit<SheetFrameProps, 'placement' | 'sheetSize'> {
   /** Whether the sheet is open */
   open?: boolean;
   /** Called when the sheet should close */
@@ -237,6 +237,10 @@ export interface SheetProps extends SheetFrameProps {
   closeOnOverlayPress?: boolean;
   /** Sheet content */
   children?: ReactNode;
+  /** Sheet placement */
+  placement?: 'bottom' | 'center' | 'fullscreen';
+  /** Sheet size */
+  sheetSize?: 'sm' | 'md' | 'lg' | 'xl' | 'auto';
 }
 
 /**
@@ -248,8 +252,8 @@ export function Sheet({
   showHandle = true,
   closeOnOverlayPress = true,
   children,
-  position = 'bottom',
-  size = 'auto',
+  placement = 'bottom',
+  sheetSize = 'auto',
   ...props
 }: SheetProps) {
   const handleOverlayPress = () => {
@@ -272,11 +276,11 @@ export function Sheet({
 
       <SheetFrame
         open={open}
-        position={position}
-        size={size}
+        placement={placement}
+        sheetSize={sheetSize}
         {...props}
       >
-        {showHandle && position === 'bottom' && <SheetHandle />}
+        {showHandle && placement === 'bottom' && <SheetHandle />}
         {children}
       </SheetFrame>
     </>
