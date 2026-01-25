@@ -75,7 +75,7 @@ img, video {
 .skeleton-placeholder {
   background: linear-gradient(90deg, var(--glass-bg-subtle) 25%, var(--glass-bg) 50%, var(--glass-bg-subtle) 75%);
   background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s infinite;
+  animation: skeleton-shimmer 1.2s infinite;
 }
 
 @keyframes skeleton-shimmer {
@@ -173,15 +173,15 @@ img, video {
   --shadow-inset-glass: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
   --shadow-depth: 0 1px 2px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.05), 0 16px 32px rgba(0,0,0,0.05);
 
-  /* Animation Timing - Spring Physics */
-  --transition-smooth: 400ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  --transition-liquid: 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --transition-spring: 800ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --transition-spring-snappy: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  --transition-spring-wobbly: 700ms cubic-bezier(0.23, 1.0, 0.32, 1.0);
-  --transition-magnetic: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-morph: 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Animation Timing - Spring Physics (optimized for snappy UX) */
+  --transition-smooth: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-liquid: 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-spring: 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-spring-snappy: 150ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-spring-wobbly: 350ms cubic-bezier(0.23, 1.0, 0.32, 1.0);
+  --transition-magnetic: 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-morph: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Noise texture - inline SVG for grain effect */
   --noise-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
@@ -798,7 +798,7 @@ body {
   box-shadow: var(--shadow-float-high);
   position: relative;
   transform: translateY(0);
-  transition: all var(--transition-spring);
+  transition: transform var(--transition-spring), box-shadow var(--transition-spring);
 }
 
 .glass-floating:hover {
@@ -859,7 +859,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   box-shadow: var(--shadow-glass);
-  transition: all var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
   position: relative;
   overflow: hidden;
 }
@@ -927,7 +927,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   box-shadow: var(--shadow-glass);
-  transition: all var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
   position: relative;
   overflow: hidden;
 }
@@ -962,7 +962,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   overflow: hidden;
-  transition: all var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
   box-shadow: 0 4px 15px var(--glow-primary);
 }
 
@@ -1024,7 +1024,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 12px;
   color: var(--foreground);
-  transition: all var(--transition-smooth);
+  transition: background var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition-smooth);
 }
 
 .glass-button-ghost:hover {
@@ -1045,7 +1045,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   overflow: hidden;
-  transition: all var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
   box-shadow:
     0 4px 20px var(--glow-primary),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -1134,7 +1134,7 @@ body {
   border-radius: 12px;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all var(--transition-smooth);
+  transition: background var(--transition-smooth), color var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition-smooth);
 }
 
 .glass-icon-button:hover {
@@ -1169,7 +1169,7 @@ body {
 }
 
 .hover-lift {
-  transition: all var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
 .hover-lift:hover {
@@ -1178,7 +1178,7 @@ body {
 }
 
 .hover-glow {
-  transition: all var(--transition-smooth);
+  transition: box-shadow var(--transition-smooth);
 }
 
 .hover-glow:hover {
@@ -1368,7 +1368,7 @@ body {
 .glass-nav-item {
   position: relative;
   border-radius: 12px;
-  transition: all var(--transition-smooth);
+  transition: background var(--transition-smooth), transform var(--transition-smooth);
   overflow: hidden;
 }
 
@@ -1437,7 +1437,7 @@ body {
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--glass-border);
   border-radius: 12px;
-  transition: all var(--transition-smooth);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
 .glass-input:focus {
@@ -1469,7 +1469,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 10px var(--glow-primary);
-  transition: all var(--transition-smooth);
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
@@ -1741,7 +1741,7 @@ input[type="range"]::-moz-range-thumb {
 
 /* Body region hover effect */
 .body-region-glow {
-  transition: all var(--transition-smooth);
+  transition: filter var(--transition-smooth);
 }
 
 .body-region-glow:hover {
@@ -1776,7 +1776,7 @@ input[type="range"]::-moz-range-thumb {
 
 .glass-bottom-nav-item {
   position: relative;
-  transition: all var(--transition-smooth);
+  transition: color var(--transition-smooth), transform var(--transition-smooth);
 }
 
 .glass-bottom-nav-item::before {
@@ -2778,7 +2778,7 @@ textarea:focus-visible {
    ====================================== */
 
 .interactive {
-  transition: all var(--transition-smooth);
+  transition: transform var(--transition-smooth);
   cursor: pointer;
 }
 
@@ -3577,7 +3577,7 @@ main:focus {
 /* Motion-safe utility for critical animations */
 @media (prefers-reduced-motion: no-preference) {
   .motion-safe-animate {
-    transition: all 0.3s ease-out;
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
   }
 }
 

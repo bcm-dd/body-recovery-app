@@ -178,7 +178,7 @@ export function MagneticButton({
       className={className}
       style={{
         transform: `translate(${offset.x}px, ${offset.y}px)`,
-        transition: offset.x === 0 && offset.y === 0 ? 'transform 0.3s ease-out' : 'none',
+        transition: offset.x === 0 && offset.y === 0 ? 'transform 0.15s ease-out' : 'none',
       }}
       {...props}
     >

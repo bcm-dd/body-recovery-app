@@ -223,7 +223,6 @@ export function Sidebar() {
                       tabIndex={isActive ? 0 : -1}
                       onKeyDown={(e) => handleNavKeyDown(e, navItemRefs)}
                       onClick={() => handleNavigation(label)}
-                      role="menuitem"
                     >
                       <div className={`icon-glow relative ${isActive ? '' : ''}`}>
                         <Icon className="h-5 w-5 relative z-10" aria-hidden="true" />
@@ -417,7 +416,6 @@ export function Sidebar() {
                             tabIndex={isActive ? 0 : -1}
                             onKeyDown={(e) => handleNavKeyDown(e, mobileNavItemRefs)}
                             onClick={() => handleNavigation(label)}
-                            role="menuitem"
                           >
                             <div className="icon-glow relative">
                               <Icon
@@ -515,7 +513,6 @@ export function Sidebar() {
                   aria-current={isActive ? 'page' : undefined}
                   aria-label={`${label}${isActive ? ' (current page)' : ''}`}
                   onClick={() => handleNavigation(label)}
-                  role="menuitem"
                 >
                   {/* Active indicator glow */}
                   {isActive && (

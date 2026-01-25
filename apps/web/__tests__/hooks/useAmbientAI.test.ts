@@ -389,45 +389,65 @@ describe('useAmbientGreeting', () => {
     vi.useRealTimers();
   });
 
-  it('should return morning greeting in the morning', () => {
+  it('should return morning greeting in the morning', async () => {
     vi.setSystemTime(new Date('2024-01-15T08:00:00'));
 
     const { result } = renderHook(() => useAmbientGreeting());
 
-    expect(result.current).toContain('morning');
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    expect(result.current.greeting.toLowerCase()).toContain('morning');
   });
 
-  it('should return afternoon greeting in the afternoon', () => {
+  it('should return afternoon greeting in the afternoon', async () => {
     vi.setSystemTime(new Date('2024-01-15T14:00:00'));
 
     const { result } = renderHook(() => useAmbientGreeting());
 
-    expect(result.current).toContain('afternoon');
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    expect(result.current.greeting.toLowerCase()).toContain('afternoon');
   });
 
-  it('should return evening greeting in the evening', () => {
+  it('should return evening greeting in the evening', async () => {
     vi.setSystemTime(new Date('2024-01-15T19:00:00'));
 
     const { result } = renderHook(() => useAmbientGreeting());
 
-    expect(result.current).toContain('evening');
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    expect(result.current.greeting.toLowerCase()).toContain('evening');
   });
 
-  it('should return welcome back greeting at night', () => {
+  it('should return welcome back greeting at night', async () => {
     vi.setSystemTime(new Date('2024-01-15T23:00:00'));
 
     const { result } = renderHook(() => useAmbientGreeting());
 
-    expect(result.current).toContain('Welcome back');
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    expect(result.current.greeting).toContain('Welcome back');
   });
 
-  it('should include user first name when provided', () => {
+  it('should include user first name when provided', async () => {
     vi.setSystemTime(new Date('2024-01-15T08:00:00'));
 
     const { result } = renderHook(() => useAmbientGreeting('John Smith'));
 
-    expect(result.current).toContain('John');
-    expect(result.current).not.toContain('Smith');
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    expect(result.current.greeting).toContain('John');
+    expect(result.current.greeting).not.toContain('Smith');
   });
 });
 

@@ -31,7 +31,7 @@ export function PageTransition({ children, className = '' }: PageTransitionProps
 
   return (
     <div
-      className={`transition-all duration-500 ease-out ${className}`}
+      className={`transition-all duration-300 ease-out ${className}`}
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
@@ -76,7 +76,7 @@ export function StaggerContainer({
           style={{
             opacity: isVisible ? 1 : 0,
             transform: isVisible ? 'translateY(0)' : 'translateY(15px)',
-            transition: `opacity 0.4s ease-out ${index * delay}ms, transform 0.4s ease-out ${index * delay}ms`,
+            transition: `opacity 0.25s ease-out ${index * delay}ms, transform 0.25s ease-out ${index * delay}ms`,
           }}
         >
           {child}
