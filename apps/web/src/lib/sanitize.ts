@@ -157,9 +157,11 @@ export function escapeSQL(str: string): string {
     .replace(/\\/g, '\\\\')
     .replace(/'/g, "\\'")
     .replace(/"/g, '\\"')
+    // eslint-disable-next-line no-control-regex
     .replace(/\x00/g, '\\0')
     .replace(/\n/g, '\\n')
     .replace(/\r/g, '\\r')
+    // eslint-disable-next-line no-control-regex
     .replace(/\x1a/g, '\\Z');
 }
 
@@ -461,6 +463,7 @@ export function sanitizePath(path: string): string {
     .replace(/\.\./g, '') // Remove parent directory references
     .replace(/\/+/g, '/') // Normalize multiple slashes
     .replace(/^\//, '') // Remove leading slash
+    // eslint-disable-next-line no-control-regex
     .replace(/[<>:"|?*\x00-\x1f]/g, ''); // Remove invalid characters
 }
 

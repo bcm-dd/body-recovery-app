@@ -10,7 +10,7 @@
  * - Translation utilities and adapters
  */
 
-import { getRequestConfig } from 'next-intl/server';
+// Note: getRequestConfig is used in /apps/web/i18n/request.ts for server-side config
 
 // ============================================================================
 // Configuration

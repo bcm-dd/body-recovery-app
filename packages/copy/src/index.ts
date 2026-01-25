@@ -27,9 +27,3 @@ export * from './strings';
 
 // Export types and utilities
 export * from './types';
-
-// Re-export individual string modules for convenience
-export { common } from './strings/common';
-export { onboarding } from './strings/onboarding';
-export { workout } from './strings/workout';
-export { safety } from './strings/safety';

@@ -367,7 +367,11 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "navigation": "Navigation",
-    "mainContent": "Main content"
+    "mainContent": "Main content",
+    "quickNavigation": "Quick navigation",
+    "mainNavigation": "Main navigation",
+    "skipToContent": "Skip to content",
+    "skipToNav": "Skip to navigation"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

@@ -224,8 +224,4 @@ export const LOCALE_COOKIE_NAME = 'NEXT_LOCALE';
  */
 export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
-// ============================================================================
-// Type Exports
-// ============================================================================
-
-export type { Locale };
+// Note: Locale type is already exported at line 25

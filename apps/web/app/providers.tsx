@@ -192,9 +192,9 @@ function createMockAppState(): AppState {
 
 const allMessages: Record<Locale, typeof enMessages> = {
   en: enMessages,
-  es: esMessages as typeof enMessages,
-  fr: frMessages as typeof enMessages,
-  de: deMessages as typeof enMessages,
+  es: esMessages as unknown as typeof enMessages,
+  fr: frMessages as unknown as typeof enMessages,
+  de: deMessages as unknown as typeof enMessages,
 };
 
 interface ProvidersProps {

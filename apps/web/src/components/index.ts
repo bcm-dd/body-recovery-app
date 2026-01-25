@@ -193,7 +193,7 @@ export {
   AccessibleError,
   AccessibleDescription,
   RequiredIndicator,
-  useHighContrastMode,
+  // Note: useHighContrastMode is exported from hooks/useA11y.tsx to avoid duplicates
   // New WCAG 2.1 AA compliance components
   AnimationPauseControl,
   AccessibleSlider,

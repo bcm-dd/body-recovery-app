@@ -12,7 +12,6 @@
  */
 
 import {
-  errorMonitoring,
   captureError as baseCaptureError,
   captureMessage as baseCaptureMessage,
   addBreadcrumb,

@@ -356,7 +356,7 @@ export const PrefetchLink = memo(function PrefetchLink({
  * This significantly reduces initial bundle size
  */
 export const LazyLineChart = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.LineChart })),
+  () => import('recharts').then((mod) => ({ default: mod.LineChart })) as Promise<{ default: ComponentType<any> }>,
   {
     loading: () => <Skeleton height="256px" />,
     ssr: false,
@@ -364,7 +364,7 @@ export const LazyLineChart = dynamic(
 );
 
 export const LazyAreaChart = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.AreaChart })),
+  () => import('recharts').then((mod) => ({ default: mod.AreaChart })) as Promise<{ default: ComponentType<any> }>,
   {
     loading: () => <Skeleton height="256px" />,
     ssr: false,
@@ -372,7 +372,7 @@ export const LazyAreaChart = dynamic(
 );
 
 export const LazyBarChart = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.BarChart })),
+  () => import('recharts').then((mod) => ({ default: mod.BarChart })) as Promise<{ default: ComponentType<any> }>,
   {
     loading: () => <Skeleton height="256px" />,
     ssr: false,
@@ -380,7 +380,7 @@ export const LazyBarChart = dynamic(
 );
 
 export const LazyResponsiveContainer = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.ResponsiveContainer })),
+  () => import('recharts').then((mod) => ({ default: mod.ResponsiveContainer })) as Promise<{ default: ComponentType<any> }>,
   {
     loading: () => <Skeleton height="100%" />,
     ssr: false,
@@ -389,42 +389,42 @@ export const LazyResponsiveContainer = dynamic(
 
 // Additional Recharts components for complete lazy loading
 export const LazyLine = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.Line })),
+  () => import('recharts').then((mod) => ({ default: mod.Line })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 export const LazyArea = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.Area })),
+  () => import('recharts').then((mod) => ({ default: mod.Area })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 export const LazyBar = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.Bar })),
+  () => import('recharts').then((mod) => ({ default: mod.Bar })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 export const LazyXAxis = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.XAxis })),
+  () => import('recharts').then((mod) => ({ default: mod.XAxis })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 export const LazyYAxis = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.YAxis })),
+  () => import('recharts').then((mod) => ({ default: mod.YAxis })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 export const LazyCartesianGrid = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.CartesianGrid })),
+  () => import('recharts').then((mod) => ({ default: mod.CartesianGrid })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 export const LazyTooltip = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.Tooltip })),
+  () => import('recharts').then((mod) => ({ default: mod.Tooltip })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 export const LazyLegend = dynamic(
-  () => import('recharts').then((mod) => ({ default: mod.Legend })),
+  () => import('recharts').then((mod) => ({ default: mod.Legend })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 

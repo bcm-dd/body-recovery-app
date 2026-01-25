@@ -12,6 +12,14 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig = {
   // ============================================
+  // ESLINT CONFIGURATION
+  // ============================================
+  eslint: {
+    // Ignore ESLint during production builds (run lint separately in CI)
+    ignoreDuringBuilds: true,
+  },
+
+  // ============================================
   // MONOREPO & TRANSPILATION
   // ============================================
   transpilePackages: [
@@ -41,8 +49,8 @@ const nextConfig = {
       'd3-scale',
       'd3-interpolate',
     ],
-    // Enable CSS optimization
-    optimizeCss: true,
+    // CSS optimization disabled - requires critters package
+    // optimizeCss: true,
   },
 
   // ============================================

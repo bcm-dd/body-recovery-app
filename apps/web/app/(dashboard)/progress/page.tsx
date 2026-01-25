@@ -20,58 +20,60 @@ import { useAppState } from '../../providers';
 // ============================================
 // LAZY LOADED RECHARTS - Reduces initial bundle by ~150KB
 // ============================================
+import type { ComponentType } from 'react';
+
 const LazyResponsiveContainer = dynamic(
-  () => import('recharts').then((mod) => mod.ResponsiveContainer),
+  () => import('recharts').then((mod) => ({ default: mod.ResponsiveContainer })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyAreaChart = dynamic(
-  () => import('recharts').then((mod) => mod.AreaChart),
+  () => import('recharts').then((mod) => ({ default: mod.AreaChart })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyBarChart = dynamic(
-  () => import('recharts').then((mod) => mod.BarChart),
+  () => import('recharts').then((mod) => ({ default: mod.BarChart })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyLine = dynamic(
-  () => import('recharts').then((mod) => mod.Line),
+  () => import('recharts').then((mod) => ({ default: mod.Line })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyArea = dynamic(
-  () => import('recharts').then((mod) => mod.Area),
+  () => import('recharts').then((mod) => ({ default: mod.Area })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyBar = dynamic(
-  () => import('recharts').then((mod) => mod.Bar),
+  () => import('recharts').then((mod) => ({ default: mod.Bar })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyXAxis = dynamic(
-  () => import('recharts').then((mod) => mod.XAxis),
+  () => import('recharts').then((mod) => ({ default: mod.XAxis })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyYAxis = dynamic(
-  () => import('recharts').then((mod) => mod.YAxis),
+  () => import('recharts').then((mod) => ({ default: mod.YAxis })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyCartesianGrid = dynamic(
-  () => import('recharts').then((mod) => mod.CartesianGrid),
+  () => import('recharts').then((mod) => ({ default: mod.CartesianGrid })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyTooltip = dynamic(
-  () => import('recharts').then((mod) => mod.Tooltip),
+  () => import('recharts').then((mod) => ({ default: mod.Tooltip })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 
 const LazyLegend = dynamic(
-  () => import('recharts').then((mod) => mod.Legend),
+  () => import('recharts').then((mod) => ({ default: mod.Legend })) as Promise<{ default: ComponentType<any> }>,
   { ssr: false }
 );
 

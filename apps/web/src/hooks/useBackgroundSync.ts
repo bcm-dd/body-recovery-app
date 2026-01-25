@@ -449,7 +449,9 @@ declare global {
   }
 
   interface Window {
-    SyncManager: typeof SyncManager;
+    SyncManager: {
+      new (): SyncManager;
+    };
   }
 }
 

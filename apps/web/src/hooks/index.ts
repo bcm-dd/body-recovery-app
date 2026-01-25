@@ -112,12 +112,13 @@ export {
 } from './useCache';
 
 // Accessibility (A11y) hooks
+// Note: useHighContrastMode is aliased to avoid duplicate export with components/A11y.tsx
 export {
   useReducedMotion as useA11yReducedMotion,
   useFocusReturn,
   useArrowNavigation,
   useAnnounce,
-  useHighContrastMode,
+  useHighContrastMode as useA11yHighContrastMode,
   useFocusVisible,
   useScreenReaderDetection,
   useSkipLinkTarget,

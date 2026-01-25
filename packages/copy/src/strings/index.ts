@@ -10,8 +10,8 @@ export * from './safety';
 // Combined strings type
 import type { CommonStrings } from './common';
 import type { OnboardingStrings } from './onboarding';
-import type { WorkoutStrings } from './workout';
 import type { SafetyStrings } from './safety';
+import type { WorkoutStrings } from './workout';
 
 export interface AllStrings {
   common: CommonStrings;

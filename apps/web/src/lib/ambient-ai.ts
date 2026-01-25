@@ -369,7 +369,7 @@ function calculateRecoveryVelocity(sessions: SessionData[]): 'fast' | 'moderate'
 // Calculate predicted readiness
 function calculatePredictedReadiness(
   context: Partial<AmbientContext>,
-  sessions: SessionData[]
+  _sessions: SessionData[]
 ): number {
   let readiness = 70; // Base readiness
 
@@ -1392,8 +1392,9 @@ export function generateSmartSuggestions(
       }
 
       // Suggest based on time of day effectiveness
-      const currentTimeOfDay = context.timeOfDay;
-      if (currentTimeOfDay === 'morning' && context.morningSessionEffectiveness >= 70) {
+      {
+        const currentTimeOfDay = context.timeOfDay;
+        if (currentTimeOfDay === 'morning' && context.morningSessionEffectiveness >= 70) {
         suggestions.push({
           id: 'body-morning-effective',
           type: 'observation',
@@ -1424,6 +1425,7 @@ export function generateSmartSuggestions(
           category: 'exercise',
         });
       }
+      }
       break;
 
     case 'history':
@@ -1451,19 +1453,21 @@ export function generateSmartSuggestions(
       }
 
       // Completion rate by time insight
-      const bestTimeSlot = Object.entries(context.sessionCompletionByTimeOfDay)
-        .filter(([_, rate]) => rate > 0)
-        .sort(([, a], [, b]) => b - a)[0];
+      {
+        const bestTimeSlot = Object.entries(context.sessionCompletionByTimeOfDay)
+          .filter(([_, rate]) => rate > 0)
+          .sort(([, a], [, b]) => b - a)[0];
 
-      if (bestTimeSlot && bestTimeSlot[1] >= 80) {
-        suggestions.push({
-          id: 'history-completion-time',
-          type: 'observation',
-          message: `You complete ${bestTimeSlot[1]}% of exercises during ${bestTimeSlot[0]} sessions - your most productive time.`,
-          priority: 'low',
-          dismissible: true,
-          category: 'pattern',
-        });
+        if (bestTimeSlot && bestTimeSlot[1] >= 80) {
+          suggestions.push({
+            id: 'history-completion-time',
+            type: 'observation',
+            message: `You complete ${bestTimeSlot[1]}% of exercises during ${bestTimeSlot[0]} sessions - your most productive time.`,
+            priority: 'low',
+            dismissible: true,
+            category: 'pattern',
+          });
+        }
       }
       break;
 
