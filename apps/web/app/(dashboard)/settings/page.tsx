@@ -1010,7 +1010,7 @@ export default function SettingsPage() {
             <div className="absolute top-0 left-[20%] right-[20%] h-px rounded-full bg-white/20" />
           </div>
           <div>
-            <h1 id={pageHeadingId} className="text-xl sm:text-2xl font-bold text-foreground">Settings</h1>
+            <h1 id={pageHeadingId} className="heading-premium text-xl sm:text-2xl">Settings</h1>
             <p className="text-sm text-[var(--text-muted)]">
               Manage your account and preferences
             </p>

@@ -206,7 +206,7 @@ export default function ProgressPage() {
         <div className="flex items-center gap-2">
           <BarChart3 className="h-6 w-6 text-[var(--primary)]" aria-hidden="true" />
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Progress</h1>
+            <h1 className="heading-premium text-xl sm:text-2xl">Progress</h1>
             <p className="mt-1 text-sm text-[var(--text-muted)]">
               Track your recovery journey and pain trends over time.
             </p>
@@ -234,7 +234,7 @@ export default function ProgressPage() {
           </fieldset>
           <button
             onClick={handleExportData}
-            className="glass-button-ghost flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 sm:py-2.5 text-sm font-medium text-foreground touch-target ripple"
+            className="button-premium flex items-center justify-center gap-2 rounded-xl px-4 py-3 sm:py-3 text-sm font-semibold text-white touch-target min-h-[48px]"
             aria-label="Export all progress data as JSON file"
           >
             <Download className="h-4 w-4" aria-hidden="true" />
@@ -249,7 +249,7 @@ export default function ProgressPage() {
           Statistics Overview
         </VisuallyHidden>
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-4 stagger-in">
-          <article className="glass-stat-card p-4 sm:p-6 hover-lift" aria-labelledby="avg-pain-stat">
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift rounded-2xl" aria-labelledby="avg-pain-stat">
             <div className="flex items-center gap-2">
               <div className="relative rounded-lg p-2 bg-[var(--primary)]/10" aria-hidden="true">
                 <Activity className="h-4 w-4 text-[var(--primary)] relative z-10" />
@@ -263,7 +263,7 @@ export default function ProgressPage() {
             <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-[var(--text-muted)]">out of 10</p>
           </article>
 
-          <article className="glass-stat-card p-4 sm:p-6 hover-lift" aria-labelledby="pain-trend-stat">
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift rounded-2xl" aria-labelledby="pain-trend-stat">
             <div className="flex items-center gap-2">
               <div className={`relative rounded-lg p-2 ${painChange < 0 ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`} aria-hidden="true">
                 {painChange < 0 ? (
@@ -292,7 +292,7 @@ export default function ProgressPage() {
             <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-[var(--text-muted)]">vs start of period</p>
           </article>
 
-          <article className="glass-stat-card p-4 sm:p-6 hover-lift" aria-labelledby="sessions-stat">
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift rounded-2xl" aria-labelledby="sessions-stat">
             <div className="flex items-center gap-2">
               <div className="relative rounded-lg p-2 bg-cyan-500/10" aria-hidden="true">
                 <Target className="h-4 w-4 text-cyan-500 relative z-10" />
@@ -308,7 +308,7 @@ export default function ProgressPage() {
             </p>
           </article>
 
-          <article className="glass-stat-card p-4 sm:p-6 hover-lift" aria-labelledby="active-areas-stat">
+          <article className="glass-stat-card-premium p-4 sm:p-6 hover-lift rounded-2xl" aria-labelledby="active-areas-stat">
             <div className="flex items-center gap-2">
               <div className="relative rounded-lg p-2 bg-rose-500/10" aria-hidden="true">
                 <Sparkles className="h-4 w-4 text-rose-500 relative z-10" />
@@ -341,7 +341,7 @@ export default function ProgressPage() {
       {/* Charts - Premium Liquid Glass Containers */}
       <div className="grid gap-4 sm:gap-6 md:gap-8 lg:grid-cols-2">
         {/* Pain Trend Chart - Premium Glass */}
-        <section className="glass-chart-container p-4 sm:p-6 relative overflow-hidden group" aria-labelledby="pain-trend-chart-heading">
+        <section className="glass-card-luxury p-4 sm:p-6 relative overflow-hidden group rounded-2xl" aria-labelledby="pain-trend-chart-heading">
           {/* Aurora background effect */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
             <div className="absolute -top-1/2 -left-1/2 w-full h-full rounded-full bg-gradient-to-br from-[var(--aurora-1)] to-transparent blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-700" />
@@ -425,7 +425,7 @@ export default function ProgressPage() {
         </section>
 
         {/* Region Breakdown - Premium Glass */}
-        <section className="glass-chart-container p-4 sm:p-6 relative overflow-hidden group" aria-labelledby="region-chart-heading">
+        <section className="glass-card-luxury p-4 sm:p-6 relative overflow-hidden group rounded-2xl" aria-labelledby="region-chart-heading">
           {/* Aurora background effect */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
             <div className="absolute -top-1/2 -right-1/2 w-full h-full rounded-full bg-gradient-to-br from-[var(--aurora-2)] to-transparent blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-700" />
@@ -504,7 +504,7 @@ export default function ProgressPage() {
       </div>
 
       {/* Region Details Table - Premium Glass Table */}
-      <section className="glass-table overflow-hidden relative" aria-labelledby="region-table-heading">
+      <section className="glass-card-luxury overflow-hidden relative rounded-2xl" aria-labelledby="region-table-heading">
         {/* Subtle aurora effect */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
           <div className="absolute top-0 left-1/4 w-1/2 h-1/4 rounded-full bg-gradient-to-b from-[var(--aurora-3)] to-transparent blur-3xl opacity-25" />

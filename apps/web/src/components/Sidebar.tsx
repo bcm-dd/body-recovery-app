@@ -540,20 +540,30 @@ export function Sidebar() {
 
       {/* Mobile Bottom Navigation - Premium Liquid Glass Effect */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 glass-bottom-nav md:hidden safe-area-padding slide-up"
+        className="fixed bottom-0 left-0 right-0 z-40 md:hidden safe-area-padding slide-up"
         role="navigation"
         aria-label={t('accessibility.quickNavigation') || 'Quick navigation'}
         id={bottomNavId}
+        style={{
+          background: 'var(--glass-bg-strong)',
+          backdropFilter: 'blur(var(--glass-blur-strong)) saturate(var(--glass-saturate-strong))',
+          WebkitBackdropFilter: 'blur(var(--glass-blur-strong)) saturate(var(--glass-saturate-strong))',
+          borderTop: '1px solid var(--glass-border-strong)',
+        }}
       >
-        {/* Top specular highlight */}
-        <div className="absolute top-0 left-[10%] right-[10%] h-px bg-gradient-to-r from-transparent via-[var(--specular-soft)] to-transparent opacity-40" aria-hidden="true" />
-
-        {/* Subtle aurora glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute top-0 left-1/4 w-1/2 h-full bg-gradient-to-b from-[var(--aurora-1)] to-transparent opacity-20 blur-2xl" />
+        {/* Top specular highlight - premium */}
+        <div className="absolute top-0 left-0 right-0 h-px" aria-hidden="true">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+          <div className="absolute left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
         </div>
 
-        <ul role="list" className="grid grid-cols-4 gap-1 px-2 py-2 relative z-10">
+        {/* Premium aurora glow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute top-0 left-1/4 w-1/2 h-full bg-gradient-to-b from-[var(--aurora-1)] to-transparent opacity-30 blur-2xl" />
+          <div className="absolute top-0 right-1/4 w-1/3 h-full bg-gradient-to-b from-[var(--aurora-2)] to-transparent opacity-20 blur-2xl" />
+        </div>
+
+        <ul role="list" className="grid grid-cols-4 gap-2 px-3 py-2 relative z-10">
           {bottomNavItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -563,33 +573,48 @@ export function Sidebar() {
               <li key={item.href} role="none">
                 <Link
                   href={item.href}
-                  className={`glass-bottom-nav-item flex flex-col items-center justify-center rounded-xl py-2 px-1 touch-target relative overflow-hidden ${
+                  className={`flex flex-col items-center justify-center rounded-2xl py-2.5 px-2 relative overflow-hidden transition-all duration-300 min-h-[56px] ${
                     isActive
-                      ? 'glass-bottom-nav-item-active text-[var(--primary)]'
-                      : 'text-[var(--text-muted)] hover:text-foreground'
+                      ? 'bg-gradient-to-b from-[var(--primary)]/20 to-[var(--primary)]/5 text-[var(--primary)] shadow-lg'
+                      : 'text-[var(--text-muted)] hover:text-foreground hover:bg-[var(--glass-bg)]'
                   }`}
+                  style={{
+                    boxShadow: isActive ? '0 4px 20px var(--glow-primary-soft), inset 0 1px 0 rgba(255,255,255,0.2)' : undefined,
+                  }}
                   aria-current={isActive ? 'page' : undefined}
                   aria-label={`${label}${isActive ? ' (current page)' : ''}`}
                   onClick={() => handleNavigation(label)}
                 >
-                  {/* Active indicator glow */}
+                  {/* Active indicator glow - premium */}
                   {isActive && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--primary)]/20 to-transparent rounded-xl" aria-hidden="true" />
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--primary)]/25 via-[var(--primary)]/10 to-transparent rounded-2xl" aria-hidden="true" />
+                      <div className="absolute top-0 left-[20%] right-[20%] h-px bg-gradient-to-r from-transparent via-[var(--primary)]/50 to-transparent" aria-hidden="true" />
+                    </>
                   )}
                   <div className={`relative ${isActive ? 'icon-glow' : ''}`}>
                     <Icon
                       className={`h-6 w-6 relative z-10 transition-all duration-300 ${
-                        isActive ? 'scale-110 drop-shadow-lg' : ''
+                        isActive ? 'scale-110' : ''
                       }`}
+                      style={{
+                        filter: isActive ? 'drop-shadow(0 0 8px var(--glow-primary))' : undefined,
+                      }}
                       aria-hidden="true"
                     />
-                    {/* Active dot indicator */}
+                    {/* Active dot indicator - premium */}
                     {isActive && (
-                      <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[var(--primary)] shadow-lg shadow-[var(--glow-primary)]" aria-hidden="true" />
+                      <div
+                        className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[var(--primary)]"
+                        style={{
+                          boxShadow: '0 0 8px var(--glow-primary), 0 0 16px var(--glow-primary-soft)',
+                        }}
+                        aria-hidden="true"
+                      />
                     )}
                   </div>
                   <span
-                    className={`mt-1 text-xs font-medium transition-all duration-300 relative z-10 ${
+                    className={`mt-1.5 text-xs font-medium transition-all duration-300 relative z-10 ${
                       isActive ? 'text-[var(--primary)] font-semibold' : ''
                     }`}
                     aria-hidden="true"

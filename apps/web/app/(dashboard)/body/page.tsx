@@ -153,7 +153,7 @@ export default function BodyMapPage() {
         <div className="flex items-center gap-2">
           <Target className="h-6 w-6 text-[var(--primary)]" aria-hidden="true" />
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Body Map</h1>
+            <h1 className="heading-premium text-xl sm:text-2xl">Body Map</h1>
             <p className="mt-1 text-sm text-[var(--text-muted)]">
               Tap on any region to update your pain level.
             </p>
@@ -162,14 +162,14 @@ export default function BodyMapPage() {
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handleReset}
-            className="glass-button-ghost flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 sm:py-2.5 text-sm font-medium text-foreground touch-target ripple"
+            className="glass-button-ghost flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl px-4 py-3 sm:py-3 text-sm font-medium text-foreground touch-target ripple min-h-[48px]"
             aria-label="Reset all pain levels to original values"
           >
             <RotateCcw className="h-4 w-4" aria-hidden="true" />
             <span>Reset</span>
           </button>
           <button
-            className="liquid-button flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2.5 sm:py-2.5 text-sm font-semibold text-white touch-target"
+            className="button-premium flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-3 sm:py-3 text-sm font-semibold text-white touch-target rounded-xl min-h-[48px]"
             aria-label="Save all pain level changes"
           >
             <Save className="h-4 w-4" aria-hidden="true" />
@@ -181,7 +181,7 @@ export default function BodyMapPage() {
       {/* Mobile: Pain Level Editor at top when region selected */}
       {selectedRegion && (
         <section
-          className="lg:hidden glass-card p-4 scale-in"
+          className="lg:hidden glass-card-luxury p-4 scale-in rounded-2xl"
           aria-labelledby="mobile-editor-heading"
         >
           <div className="relative z-10">
@@ -235,10 +235,10 @@ export default function BodyMapPage() {
             </div>
 
             {/* Quick buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button
                 onClick={() => handlePainChange(Math.max(0, currentPainLevel - 1))}
-                className="glass-button-ghost flex flex-1 items-center justify-center gap-1 rounded-xl py-3 text-sm font-medium text-foreground touch-target ripple"
+                className="glass-button-ghost flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium text-foreground touch-target ripple min-h-[48px]"
                 aria-label={`Decrease pain level to ${Math.max(0, currentPainLevel - 1)}`}
                 disabled={currentPainLevel === 0}
               >
@@ -247,7 +247,7 @@ export default function BodyMapPage() {
               </button>
               <button
                 onClick={() => handlePainChange(Math.min(10, currentPainLevel + 1))}
-                className="glass-button-ghost flex flex-1 items-center justify-center gap-1 rounded-xl py-3 text-sm font-medium text-foreground touch-target ripple"
+                className="glass-button-ghost flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium text-foreground touch-target ripple min-h-[48px]"
                 aria-label={`Increase pain level to ${Math.min(10, currentPainLevel + 1)}`}
                 disabled={currentPainLevel === 10}
               >
@@ -266,7 +266,7 @@ export default function BodyMapPage() {
           <VisuallyHidden as="h2" id="body-map-heading">
             Interactive Body Map
           </VisuallyHidden>
-          <div className="glass-body-map p-4 sm:p-6 md:p-8 relative overflow-hidden">
+          <div className="glass-card-luxury p-4 sm:p-6 md:p-8 relative overflow-hidden rounded-2xl">
             {/* Aurora background effect for body map */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
               <div className="absolute top-0 left-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-br from-[var(--aurora-1)] to-transparent blur-3xl opacity-40 animate-pulse" style={{ animationDuration: '10s' }} />
@@ -410,7 +410,7 @@ export default function BodyMapPage() {
         <aside className="space-y-4 sm:space-y-6">
           {/* Pain Level Editor - Desktop - Glass Card */}
           <section
-            className="hidden lg:block glass-card p-6"
+            className="hidden lg:block glass-card-luxury p-6 rounded-2xl"
             aria-labelledby="pain-editor-heading"
           >
             <div className="relative z-10">
@@ -513,7 +513,7 @@ export default function BodyMapPage() {
           </section>
 
           {/* Change History - Glass Card with Collapsible */}
-          <section className="glass-card overflow-hidden" aria-labelledby="history-heading">
+          <section className="glass-card-luxury overflow-hidden rounded-2xl" aria-labelledby="history-heading">
             <button
               onClick={() => setShowHistory(!showHistory)}
               className="w-full flex items-center justify-between p-4 sm:p-6 lg:cursor-default touch-target relative z-10"
@@ -610,7 +610,7 @@ export default function BodyMapPage() {
           </section>
 
           {/* Summary - Glass Stat Card */}
-          <section className="glass-stat-card p-4 sm:p-6" aria-labelledby="summary-heading">
+          <section className="glass-stat-card-premium p-4 sm:p-6 rounded-2xl" aria-labelledby="summary-heading">
             <div className="flex items-center gap-2 mb-4">
               <Activity className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
               <h2 id="summary-heading" className="text-base sm:text-lg font-semibold text-foreground">

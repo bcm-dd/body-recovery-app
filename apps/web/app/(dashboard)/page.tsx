@@ -133,7 +133,7 @@ function StatCard({
 
   return (
     <article
-      className="glass-stat-card p-4 sm:p-6 hover-lift micro-bounce relative overflow-hidden group"
+      className="glass-stat-card-premium p-4 sm:p-6 hover-lift micro-bounce relative overflow-hidden group rounded-2xl"
       aria-labelledby={statId}
     >
       {/* Aurora background effect */}
@@ -285,7 +285,7 @@ export default function DashboardPage() {
       <header className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+            <h1 className="heading-premium text-xl sm:text-2xl">
               {greeting}
             </h1>
             <Sparkles
@@ -401,7 +401,7 @@ export default function DashboardPage() {
           className="lg:col-span-2 order-2 lg:order-1"
           aria-labelledby="recent-sessions-heading"
         >
-          <div className="glass-card overflow-hidden">
+          <div className="glass-card-luxury overflow-hidden rounded-2xl">
             <div className="flex items-center justify-between border-b border-[var(--glass-border)] p-4 sm:p-6 relative z-10">
               <div className="flex items-center gap-2">
                 <Zap
@@ -454,10 +454,10 @@ export default function DashboardPage() {
 
           {/* Body Status - Glass Card with Glow Border */}
           <section
-            className="glass-card-glow p-4 sm:p-6"
+            className="premium-border-glow"
             aria-labelledby="body-status-heading"
           >
-            <div className="relative z-10">
+            <div className="glass-card-luxury p-4 sm:p-6 rounded-[19px] relative z-10">
               <div className="flex items-center gap-2">
                 <h2
                   id="body-status-heading"
@@ -527,7 +527,7 @@ export default function DashboardPage() {
 
               <Link
                 href="/body"
-                className="mt-3 sm:mt-4 flex items-center justify-center gap-2 rounded-xl glass-button-ghost py-2.5 sm:py-3 text-sm font-medium text-foreground touch-target group"
+                className="mt-3 sm:mt-4 button-premium flex items-center justify-center gap-2 rounded-xl py-3 sm:py-3.5 text-sm font-semibold text-white touch-target min-h-[48px]"
               >
                 Update Body Map
                 <ArrowRight
@@ -540,7 +540,7 @@ export default function DashboardPage() {
 
           {/* Mobile App Link - Premium Glass Card */}
           <section
-            className="glass-card overflow-hidden"
+            className="glass-card-luxury overflow-hidden rounded-2xl"
             aria-labelledby="mobile-app-heading"
           >
             <div
@@ -573,7 +573,7 @@ export default function DashboardPage() {
               </div>
               <a
                 href="#"
-                className="mt-4 sm:mt-5 liquid-button flex items-center justify-center gap-2 py-3 sm:py-3.5 text-sm font-semibold text-white touch-target"
+                className="mt-4 sm:mt-5 button-premium flex items-center justify-center gap-2 py-3.5 sm:py-4 text-sm font-semibold text-white touch-target min-h-[48px] rounded-xl"
                 aria-label="Download Recovery app for iOS and Android devices"
               >
                 <Sparkles className="h-4 w-4" aria-hidden="true" />
