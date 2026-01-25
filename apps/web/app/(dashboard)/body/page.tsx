@@ -1,7 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { Clock, Minus, Plus, RotateCcw, Save, History, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, Minus, Plus, RotateCcw, Save, History, ChevronDown, ChevronUp, Sparkles, Target, Activity } from 'lucide-react';
+import { useState, useCallback, useId } from 'react';
+
+import { SmartSuggestion } from '../../../src/components';
+import { VisuallyHidden, LiveRegion } from '../../../src/components/A11y';
+import { useAmbientAI } from '../../../src/hooks';
 import { useAppState } from '../../providers';
 
 // Body regions with SVG positions (simplified for demo)
@@ -38,10 +42,10 @@ const bodyRegions: BodyRegionConfig[] = [
 ];
 
 function getPainColor(level: number): string {
-  if (level === 0) return 'fill-surface stroke-border';
-  if (level <= 3) return 'fill-success/30 stroke-success';
-  if (level <= 6) return 'fill-warning/30 stroke-warning';
-  return 'fill-error/30 stroke-error';
+  if (level === 0) return 'fill-[var(--glass-bg)] stroke-[var(--glass-border)]';
+  if (level <= 3) return 'fill-emerald-500/30 stroke-emerald-500';
+  if (level <= 6) return 'fill-amber-500/30 stroke-amber-500';
+  return 'fill-rose-500/30 stroke-rose-500';
 }
 
 function getPainLabel(level: number): string {
@@ -53,6 +57,15 @@ function getPainLabel(level: number): string {
 
 export default function BodyMapPage() {
   const appState = useAppState();
+  const sliderId = useId();
+  const announcementId = useId();
+
+  // Use ambient AI for contextual insights
+  const { smartSuggestions, dismissInsight, context } = useAmbientAI({
+    sessions: appState.sessions,
+    bodyRegions: appState.bodyRegions,
+    location: 'body',
+  });
 
   // Local state for editing
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -71,11 +84,25 @@ export default function BodyMapPage() {
   // Mobile: collapse history by default
   const [showHistory, setShowHistory] = useState(false);
 
-  const handleRegionClick = (regionId: string) => {
-    setSelectedRegion(regionId);
-  };
+  // Announcement for screen readers
+  const [announcement, setAnnouncement] = useState('');
 
-  const handlePainChange = (level: number) => {
+  const handleRegionClick = useCallback((regionId: string) => {
+    setSelectedRegion(regionId);
+    const region = bodyRegions.find((r) => r.id === regionId);
+    if (region) {
+      setAnnouncement(`${region.name} selected. Current pain level: ${painLevels[regionId] || 0} out of 10.`);
+    }
+  }, [painLevels]);
+
+  const handleRegionKeyDown = useCallback((event: React.KeyboardEvent, regionId: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleRegionClick(regionId);
+    }
+  }, [handleRegionClick]);
+
+  const handlePainChange = useCallback((level: number) => {
     if (!selectedRegion) return;
 
     const oldLevel = painLevels[selectedRegion] || 0;
@@ -94,9 +121,13 @@ export default function BodyMapPage() {
       },
       ...prev,
     ]);
-  };
 
-  const handleReset = () => {
+    // Announce change
+    const regionName = bodyRegions.find((r) => r.id === selectedRegion)?.name;
+    setAnnouncement(`${regionName} pain level changed from ${oldLevel} to ${level}. ${getPainLabel(level)}.`);
+  }, [selectedRegion, painLevels]);
+
+  const handleReset = useCallback(() => {
     const levels: Record<string, number> = {};
     appState.bodyRegions.forEach((r) => {
       levels[r.id] = r.painLevel;
@@ -104,364 +135,570 @@ export default function BodyMapPage() {
     setPainLevels(levels);
     setHistory([]);
     setSelectedRegion(null);
-  };
+    setAnnouncement('Pain levels reset to original values.');
+  }, [appState.bodyRegions]);
 
   const selectedRegionData = bodyRegions.find((r) => r.id === selectedRegion);
   const currentPainLevel = selectedRegion ? painLevels[selectedRegion] || 0 : 0;
 
   return (
     <div className="space-y-4 sm:space-y-6 md:space-y-8">
-      {/* Page Header - Responsive */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Body Map</h1>
-          <p className="mt-1 text-sm text-muted">
-            Tap on any region to update your pain level.
-          </p>
+      {/* Live region for announcements */}
+      <LiveRegion aria-live="polite" clearAfter={5000}>
+        {announcement}
+      </LiveRegion>
+
+      {/* Page Header - Glass Effect */}
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <Target className="h-6 w-6 text-[var(--primary)]" aria-hidden="true" />
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Body Map</h1>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              Tap on any region to update your pain level.
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handleReset}
-            className="flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-lg border border-border px-3 sm:px-4 py-2.5 sm:py-2 text-sm font-medium text-foreground hover:bg-card transition-colors touch-target"
+            className="glass-button-ghost flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 sm:py-2.5 text-sm font-medium text-foreground touch-target ripple"
+            aria-label="Reset all pain levels to original values"
           >
-            <RotateCcw className="h-4 w-4" />
-            <span className="hidden xs:inline">Reset</span>
+            <RotateCcw className="h-4 w-4" aria-hidden="true" />
+            <span>Reset</span>
           </button>
-          <button className="flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-lg bg-primary px-3 sm:px-4 py-2.5 sm:py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors touch-target">
-            <Save className="h-4 w-4" />
+          <button
+            className="liquid-button flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2.5 sm:py-2.5 text-sm font-semibold text-white touch-target"
+            aria-label="Save all pain level changes"
+          >
+            <Save className="h-4 w-4" aria-hidden="true" />
             <span>Save</span>
           </button>
         </div>
-      </div>
+      </header>
 
       {/* Mobile: Pain Level Editor at top when region selected */}
       {selectedRegion && (
-        <div className="lg:hidden rounded-xl border border-border bg-card p-4 card-shadow">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-xs text-muted">Selected Region</p>
-              <p className="text-lg font-semibold text-foreground">
-                {selectedRegionData?.name}
-              </p>
+        <section
+          className="lg:hidden glass-card p-4 scale-in"
+          aria-labelledby="mobile-editor-heading"
+        >
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs text-[var(--text-muted)]">Selected Region</p>
+                <h2
+                  id="mobile-editor-heading"
+                  className="text-lg font-semibold text-foreground"
+                >
+                  {selectedRegionData?.name}
+                </h2>
+              </div>
+              <span
+                className={`text-sm font-medium px-3 py-1.5 rounded-full glass-badge ${
+                  currentPainLevel <= 3
+                    ? 'glass-badge-success'
+                    : currentPainLevel <= 6
+                    ? 'glass-badge-warning'
+                    : 'glass-badge-error'
+                }`}
+                aria-label={`Pain level: ${currentPainLevel}, ${getPainLabel(currentPainLevel)}`}
+              >
+                {currentPainLevel} - {getPainLabel(currentPainLevel)}
+              </span>
             </div>
-            <span
-              className={`text-sm font-medium px-3 py-1 rounded-full ${
-                currentPainLevel <= 3
-                  ? 'bg-success/10 text-success'
-                  : currentPainLevel <= 6
-                  ? 'bg-warning/10 text-warning'
-                  : 'bg-error/10 text-error'
-              }`}
-            >
-              {currentPainLevel} - {getPainLabel(currentPainLevel)}
-            </span>
-          </div>
 
-          {/* Slider */}
-          <div className="mb-3">
-            <input
-              type="range"
-              min="0"
-              max="10"
-              value={currentPainLevel}
-              onChange={(e) => handlePainChange(parseInt(e.target.value))}
-              className="w-full accent-primary h-2"
-            />
-            <div className="flex justify-between text-xs text-muted mt-1">
-              <span>0</span>
-              <span>5</span>
-              <span>10</span>
+            {/* Slider */}
+            <div className="mb-4">
+              <label htmlFor={`${sliderId}-mobile`} className="sr-only">
+                Pain level for {selectedRegionData?.name}
+              </label>
+              <input
+                id={`${sliderId}-mobile`}
+                type="range"
+                min="0"
+                max="10"
+                value={currentPainLevel}
+                onChange={(e) => handlePainChange(parseInt(e.target.value))}
+                className="w-full h-2"
+                aria-valuemin={0}
+                aria-valuemax={10}
+                aria-valuenow={currentPainLevel}
+                aria-valuetext={`${currentPainLevel} out of 10, ${getPainLabel(currentPainLevel)}`}
+              />
+              <div className="flex justify-between text-xs text-[var(--text-muted)] mt-2" aria-hidden="true">
+                <span>0</span>
+                <span>5</span>
+                <span>10</span>
+              </div>
+            </div>
+
+            {/* Quick buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => handlePainChange(Math.max(0, currentPainLevel - 1))}
+                className="glass-button-ghost flex flex-1 items-center justify-center gap-1 rounded-xl py-3 text-sm font-medium text-foreground touch-target ripple"
+                aria-label={`Decrease pain level to ${Math.max(0, currentPainLevel - 1)}`}
+                disabled={currentPainLevel === 0}
+              >
+                <Minus className="h-5 w-5" aria-hidden="true" />
+                Decrease
+              </button>
+              <button
+                onClick={() => handlePainChange(Math.min(10, currentPainLevel + 1))}
+                className="glass-button-ghost flex flex-1 items-center justify-center gap-1 rounded-xl py-3 text-sm font-medium text-foreground touch-target ripple"
+                aria-label={`Increase pain level to ${Math.min(10, currentPainLevel + 1)}`}
+                disabled={currentPainLevel === 10}
+              >
+                <Plus className="h-5 w-5" aria-hidden="true" />
+                Increase
+              </button>
             </div>
           </div>
-
-          {/* Quick buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => handlePainChange(Math.max(0, currentPainLevel - 1))}
-              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-3 text-sm font-medium text-foreground hover:bg-surface transition-colors touch-target"
-            >
-              <Minus className="h-5 w-5" />
-              Decrease
-            </button>
-            <button
-              onClick={() => handlePainChange(Math.min(10, currentPainLevel + 1))}
-              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-3 text-sm font-medium text-foreground hover:bg-surface transition-colors touch-target"
-            >
-              <Plus className="h-5 w-5" />
-              Increase
-            </button>
-          </div>
-        </div>
+        </section>
       )}
 
       {/* Main Content */}
       <div className="grid gap-4 sm:gap-6 md:gap-8 lg:grid-cols-3">
-        {/* Body Map Visualization */}
-        <div className="lg:col-span-2">
-          <div className="rounded-xl border border-border bg-card p-4 sm:p-6 md:p-8 card-shadow">
-            <div className="flex justify-center">
+        {/* Body Map Visualization - Premium Liquid Glass Container */}
+        <section className="lg:col-span-2" aria-labelledby="body-map-heading">
+          <VisuallyHidden as="h2" id="body-map-heading">
+            Interactive Body Map
+          </VisuallyHidden>
+          <div className="glass-body-map p-4 sm:p-6 md:p-8 relative overflow-hidden">
+            {/* Aurora background effect for body map */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+              <div className="absolute top-0 left-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-br from-[var(--aurora-1)] to-transparent blur-3xl opacity-40 animate-pulse" style={{ animationDuration: '10s' }} />
+              <div className="absolute bottom-0 right-1/4 w-1/2 h-1/2 rounded-full bg-gradient-to-br from-[var(--aurora-2)] to-transparent blur-3xl opacity-30 animate-pulse" style={{ animationDuration: '15s', animationDelay: '3s' }} />
+              <div className="absolute top-1/3 left-0 w-1/3 h-1/3 rounded-full bg-gradient-to-br from-[var(--aurora-5)] to-transparent blur-3xl opacity-25 animate-pulse" style={{ animationDuration: '12s', animationDelay: '6s' }} />
+            </div>
+
+            {/* Specular highlight at top */}
+            <div className="absolute top-0 left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-[var(--specular-white)] to-transparent opacity-50" aria-hidden="true" />
+
+            <div className="flex justify-center relative z-10">
               <svg
                 viewBox="0 0 320 460"
                 className="w-full max-w-xs sm:max-w-sm md:max-w-md h-auto"
                 style={{ touchAction: 'manipulation' }}
+                role="img"
+                aria-label="Interactive human body diagram showing pain levels for different body regions. Use arrow keys to navigate between regions when focused."
               >
-                {/* Body outline */}
+                <title>Body Pain Map</title>
+                <desc>An interactive diagram showing a human body outline with clickable regions. Each region can be selected to set a pain level from 0 to 10.</desc>
+
+                {/* Glow definitions */}
+                <defs>
+                  <filter id="glow-mild" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <filter id="glow-moderate" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <filter id="glow-severe" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="var(--glass-bg)" />
+                    <stop offset="100%" stopColor="var(--glass-bg-subtle)" />
+                  </linearGradient>
+                </defs>
+
+                {/* Body outline - Glass style (decorative) */}
                 <ellipse
                   cx="160"
                   cy="35"
                   rx="30"
                   ry="35"
-                  className="fill-surface stroke-border stroke-2"
+                  fill="url(#bodyGradient)"
+                  stroke="var(--glass-border)"
+                  strokeWidth="2"
+                  aria-hidden="true"
                 />
                 {/* Torso */}
                 <path
                   d="M 100 70 Q 100 90 90 120 L 90 200 Q 90 220 110 240 L 110 340 Q 110 360 120 370 L 120 440 Q 120 455 135 455 L 145 455 Q 150 455 150 440 L 150 360 Q 150 350 160 340 Q 170 350 170 360 L 170 440 Q 170 455 175 455 L 185 455 Q 200 455 200 440 L 200 370 Q 210 360 210 340 L 210 240 Q 230 220 230 200 L 230 120 Q 220 90 220 70 Z"
-                  className="fill-surface stroke-border stroke-2"
+                  fill="url(#bodyGradient)"
+                  stroke="var(--glass-border)"
+                  strokeWidth="2"
+                  aria-hidden="true"
                 />
 
-                {/* Clickable regions - larger touch targets */}
-                {bodyRegions.map((region) => (
-                  <rect
-                    key={region.id}
-                    x={region.x}
-                    y={region.y}
-                    width={region.width}
-                    height={region.height}
-                    rx={8}
-                    className={`cursor-pointer transition-all ${getPainColor(
-                      painLevels[region.id] || 0
-                    )} ${
-                      selectedRegion === region.id
-                        ? 'stroke-primary stroke-[3]'
-                        : 'stroke-2 hover:stroke-primary/50'
-                    }`}
-                    onClick={() => handleRegionClick(region.id)}
-                  />
-                ))}
+                {/* Clickable regions - with glass and glow effects */}
+                {bodyRegions.map((region) => {
+                  const level = painLevels[region.id] || 0;
+                  const isSelected = selectedRegion === region.id;
+                  const glowFilter = level <= 3 && level > 0
+                    ? 'url(#glow-mild)'
+                    : level <= 6 && level > 0
+                    ? 'url(#glow-moderate)'
+                    : level > 6
+                    ? 'url(#glow-severe)'
+                    : 'none';
+
+                  return (
+                    <rect
+                      key={region.id}
+                      x={region.x}
+                      y={region.y}
+                      width={region.width}
+                      height={region.height}
+                      rx={10}
+                      className={`cursor-pointer transition-all duration-300 ${getPainColor(level)} ${
+                        isSelected
+                          ? 'stroke-[var(--primary)] stroke-[3]'
+                          : 'stroke-2 hover:stroke-[var(--primary)]/50'
+                      } focus:outline-none focus:stroke-[var(--primary)] focus:stroke-[3]`}
+                      style={{
+                        filter: isSelected ? 'drop-shadow(0 0 12px var(--glow-primary))' : glowFilter,
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                        transformOrigin: 'center',
+                        transformBox: 'fill-box'
+                      }}
+                      onClick={() => handleRegionClick(region.id)}
+                      onKeyDown={(e) => handleRegionKeyDown(e, region.id)}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`${region.name}. Pain level: ${level} out of 10, ${getPainLabel(level)}. ${isSelected ? 'Selected.' : 'Press Enter to select.'}`}
+                      aria-pressed={isSelected}
+                    />
+                  );
+                })}
               </svg>
             </div>
 
-            {/* Legend - Responsive grid */}
-            <div className="mt-4 sm:mt-6 md:mt-8 grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center gap-2 sm:gap-4 md:gap-8">
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-surface border border-border flex-shrink-0" />
-                <span className="text-xs sm:text-sm text-muted">No pain</span>
+            {/* Legend - Glass Style */}
+            <div
+              className="mt-4 sm:mt-6 md:mt-8 grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center gap-2 sm:gap-4 md:gap-8 relative z-10"
+              role="list"
+              aria-label="Pain level legend"
+            >
+              <div className="flex items-center gap-2 glass-panel-subtle rounded-lg px-3 py-2" role="listitem">
+                <div className="h-4 w-4 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] flex-shrink-0" aria-hidden="true" />
+                <span className="text-xs sm:text-sm text-[var(--text-muted)]">No pain</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-success/30 flex-shrink-0" />
-                <span className="text-xs sm:text-sm text-muted">Mild (1-3)</span>
+              <div className="flex items-center gap-2 glass-panel-subtle rounded-lg px-3 py-2" role="listitem">
+                <div className="h-4 w-4 rounded-lg bg-emerald-500/30 flex-shrink-0" aria-hidden="true" />
+                <span className="text-xs sm:text-sm text-[var(--text-muted)]">Mild (1-3)</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-warning/30 flex-shrink-0" />
-                <span className="text-xs sm:text-sm text-muted">Moderate (4-6)</span>
+              <div className="flex items-center gap-2 glass-panel-subtle rounded-lg px-3 py-2" role="listitem">
+                <div className="h-4 w-4 rounded-lg bg-amber-500/30 flex-shrink-0" aria-hidden="true" />
+                <span className="text-xs sm:text-sm text-[var(--text-muted)]">Moderate (4-6)</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-error/30 flex-shrink-0" />
-                <span className="text-xs sm:text-sm text-muted">Severe (7-10)</span>
+              <div className="flex items-center gap-2 glass-panel-subtle rounded-lg px-3 py-2" role="listitem">
+                <div className="h-4 w-4 rounded-lg bg-rose-500/30 flex-shrink-0" aria-hidden="true" />
+                <span className="text-xs sm:text-sm text-[var(--text-muted)]">Severe (7-10)</span>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Right Panel - Desktop only or collapsible on mobile */}
-        <div className="space-y-4 sm:space-y-6">
-          {/* Pain Level Editor - Desktop */}
-          <div className="hidden lg:block rounded-xl border border-border bg-card p-6 card-shadow">
-            <h2 className="text-lg font-semibold text-foreground">
-              Pain Level Editor
-            </h2>
+        <aside className="space-y-4 sm:space-y-6">
+          {/* Pain Level Editor - Desktop - Glass Card */}
+          <section
+            className="hidden lg:block glass-card p-6"
+            aria-labelledby="pain-editor-heading"
+          >
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
+                <h2 id="pain-editor-heading" className="text-lg font-semibold text-foreground">
+                  Pain Level Editor
+                </h2>
+              </div>
 
-            {selectedRegion ? (
-              <div className="mt-4 space-y-4">
-                <div className="rounded-lg bg-surface p-4">
-                  <p className="text-sm text-muted">Selected Region</p>
-                  <p className="text-xl font-semibold text-foreground">
-                    {selectedRegionData?.name}
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted">Current Level</span>
-                    <span
-                      className={`text-sm font-medium ${
-                        currentPainLevel <= 3
-                          ? 'text-success'
-                          : currentPainLevel <= 6
-                          ? 'text-warning'
-                          : 'text-error'
-                      }`}
-                    >
-                      {currentPainLevel} - {getPainLabel(currentPainLevel)}
-                    </span>
+              {selectedRegion ? (
+                <div className="space-y-4">
+                  <div className="glass-panel-subtle rounded-xl p-4">
+                    <p className="text-sm text-[var(--text-muted)]">Selected Region</p>
+                    <p className="text-xl font-semibold text-foreground">
+                      {selectedRegionData?.name}
+                    </p>
                   </div>
 
-                  {/* Slider */}
-                  <div className="mt-3">
-                    <input
-                      type="range"
-                      min="0"
-                      max="10"
-                      value={currentPainLevel}
-                      onChange={(e) =>
-                        handlePainChange(parseInt(e.target.value))
-                      }
-                      className="w-full accent-primary"
-                    />
-                    <div className="mt-1 flex justify-between text-xs text-muted">
-                      <span>0</span>
-                      <span>5</span>
-                      <span>10</span>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-[var(--text-muted)]">Current Level</span>
+                      <span
+                        className={`text-sm font-medium glass-badge ${
+                          currentPainLevel <= 3
+                            ? 'glass-badge-success'
+                            : currentPainLevel <= 6
+                            ? 'glass-badge-warning'
+                            : 'glass-badge-error'
+                        }`}
+                        aria-live="polite"
+                      >
+                        {currentPainLevel} - {getPainLabel(currentPainLevel)}
+                      </span>
+                    </div>
+
+                    {/* Slider */}
+                    <div className="mt-3">
+                      <label htmlFor={`${sliderId}-desktop`} className="sr-only">
+                        Pain level for {selectedRegionData?.name}
+                      </label>
+                      <input
+                        id={`${sliderId}-desktop`}
+                        type="range"
+                        min="0"
+                        max="10"
+                        value={currentPainLevel}
+                        onChange={(e) =>
+                          handlePainChange(parseInt(e.target.value))
+                        }
+                        className="w-full"
+                        aria-valuemin={0}
+                        aria-valuemax={10}
+                        aria-valuenow={currentPainLevel}
+                        aria-valuetext={`${currentPainLevel} out of 10, ${getPainLabel(currentPainLevel)}`}
+                      />
+                      <div className="mt-2 flex justify-between text-xs text-[var(--text-muted)]" aria-hidden="true">
+                        <span>0</span>
+                        <span>5</span>
+                        <span>10</span>
+                      </div>
+                    </div>
+
+                    {/* Quick buttons */}
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() =>
+                          handlePainChange(Math.max(0, currentPainLevel - 1))
+                        }
+                        className="glass-button-ghost flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 text-sm font-medium text-foreground ripple"
+                        aria-label={`Decrease pain level to ${Math.max(0, currentPainLevel - 1)}`}
+                        disabled={currentPainLevel === 0}
+                      >
+                        <Minus className="h-4 w-4" aria-hidden="true" />
+                        Decrease
+                      </button>
+                      <button
+                        onClick={() =>
+                          handlePainChange(Math.min(10, currentPainLevel + 1))
+                        }
+                        className="glass-button-ghost flex flex-1 items-center justify-center gap-1 rounded-xl py-2.5 text-sm font-medium text-foreground ripple"
+                        aria-label={`Increase pain level to ${Math.min(10, currentPainLevel + 1)}`}
+                        disabled={currentPainLevel === 10}
+                      >
+                        <Plus className="h-4 w-4" aria-hidden="true" />
+                        Increase
+                      </button>
                     </div>
                   </div>
-
-                  {/* Quick buttons */}
-                  <div className="mt-4 flex gap-2">
-                    <button
-                      onClick={() =>
-                        handlePainChange(Math.max(0, currentPainLevel - 1))
-                      }
-                      className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-2 text-sm font-medium text-foreground hover:bg-surface transition-colors"
-                    >
-                      <Minus className="h-4 w-4" />
-                      Decrease
-                    </button>
-                    <button
-                      onClick={() =>
-                        handlePainChange(Math.min(10, currentPainLevel + 1))
-                      }
-                      className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-2 text-sm font-medium text-foreground hover:bg-surface transition-colors"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Increase
-                    </button>
-                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="mt-4 rounded-lg border border-dashed border-border p-8 text-center">
-                <p className="text-muted">
-                  Click on a body region to edit its pain level
-                </p>
-              </div>
-            )}
-          </div>
+              ) : (
+                <div className="glass-panel-subtle rounded-xl border border-dashed border-[var(--glass-border)] p-8 text-center">
+                  <Activity className="h-8 w-8 text-[var(--text-muted)] mx-auto mb-2" aria-hidden="true" />
+                  <p className="text-[var(--text-muted)]">
+                    Click on a body region to edit its pain level
+                  </p>
+                </div>
+              )}
+            </div>
+          </section>
 
-          {/* Change History - Collapsible on mobile */}
-          <div className="rounded-xl border border-border bg-card card-shadow overflow-hidden">
+          {/* Change History - Glass Card with Collapsible */}
+          <section className="glass-card overflow-hidden" aria-labelledby="history-heading">
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="w-full flex items-center justify-between p-4 sm:p-6 lg:cursor-default touch-target"
+              className="w-full flex items-center justify-between p-4 sm:p-6 lg:cursor-default touch-target relative z-10"
+              aria-expanded={showHistory}
+              aria-controls="history-panel"
             >
               <div className="flex items-center gap-2">
-                <History className="h-5 w-5 text-muted" />
-                <h2 className="text-base sm:text-lg font-semibold text-foreground">
+                <History className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
+                <h2 id="history-heading" className="text-base sm:text-lg font-semibold text-foreground">
                   Change History
                 </h2>
                 {history.length > 0 && (
-                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                  <span className="glass-badge-primary text-xs" aria-label={`${history.length} changes`}>
                     {history.length}
                   </span>
                 )}
               </div>
-              <div className="lg:hidden">
+              <div className="lg:hidden" aria-hidden="true">
                 {showHistory ? (
-                  <ChevronUp className="h-5 w-5 text-muted" />
+                  <ChevronUp className="h-5 w-5 text-[var(--text-muted)]" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-muted" />
+                  <ChevronDown className="h-5 w-5 text-[var(--text-muted)]" />
                 )}
               </div>
             </button>
 
-            <div className={`${showHistory ? 'block' : 'hidden'} lg:block border-t border-border lg:border-t-0`}>
+            <div
+              id="history-panel"
+              className={`${showHistory ? 'block' : 'hidden'} lg:block border-t border-[var(--glass-border)] lg:border-t-0 relative z-10`}
+            >
               {history.length > 0 ? (
-                <div className="p-4 sm:p-6 pt-0 lg:pt-0 space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
+                <ul
+                  className="p-4 sm:p-6 pt-0 lg:pt-0 space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto"
+                  aria-label="List of pain level changes"
+                >
                   {history.slice(0, 10).map((entry, index) => {
                     const regionName = bodyRegions.find(
                       (r) => r.id === entry.region
                     )?.name;
                     return (
-                      <div
+                      <li
                         key={index}
-                        className="flex items-center justify-between rounded-lg bg-surface p-2.5 sm:p-3"
+                        className="flex items-center justify-between glass-panel-subtle rounded-xl p-3"
                       >
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground truncate">
                             {regionName}
                           </p>
-                          <p className="text-xs text-muted flex items-center gap-1">
-                            <Clock className="h-3 w-3 flex-shrink-0" />
-                            {entry.timestamp.toLocaleTimeString()}
+                          <p className="text-xs text-[var(--text-muted)] flex items-center gap-1">
+                            <Clock className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
+                            <time dateTime={entry.timestamp.toISOString()}>
+                              {entry.timestamp.toLocaleTimeString()}
+                            </time>
                           </p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <span
-                            className={`text-sm ${
+                            className={`text-sm font-medium ${
                               entry.from <= 3
-                                ? 'text-success'
+                                ? 'text-emerald-500'
                                 : entry.from <= 6
-                                ? 'text-warning'
-                                : 'text-error'
+                                ? 'text-amber-500'
+                                : 'text-rose-500'
                             }`}
+                            aria-label={`From ${entry.from}`}
                           >
                             {entry.from}
                           </span>
-                          <span className="text-muted">to</span>
+                          <span className="text-[var(--text-muted)]" aria-hidden="true">→</span>
+                          <span className="sr-only">to</span>
                           <span
-                            className={`text-sm font-medium ${
+                            className={`text-sm font-semibold ${
                               entry.to <= 3
-                                ? 'text-success'
+                                ? 'text-emerald-500'
                                 : entry.to <= 6
-                                ? 'text-warning'
-                                : 'text-error'
+                                ? 'text-amber-500'
+                                : 'text-rose-500'
                             }`}
+                            aria-label={`to ${entry.to}`}
                           >
                             {entry.to}
                           </span>
                         </div>
-                      </div>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               ) : (
-                <p className="p-4 sm:p-6 pt-0 lg:pt-0 text-sm text-muted">
+                <p className="p-4 sm:p-6 pt-0 lg:pt-0 text-sm text-[var(--text-muted)]">
                   No changes made yet. Select a region and adjust the pain level.
                 </p>
               )}
             </div>
-          </div>
+          </section>
 
-          {/* Summary */}
-          <div className="rounded-xl border border-border bg-card p-4 sm:p-6 card-shadow">
-            <h2 className="text-base sm:text-lg font-semibold text-foreground">Summary</h2>
-            <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm text-muted">Active Areas</span>
-                <span className="text-sm font-medium text-foreground">
-                  {
-                    Object.values(painLevels).filter((level) => level > 0)
-                      .length
-                  }
-                </span>
+          {/* Summary - Glass Stat Card */}
+          <section className="glass-stat-card p-4 sm:p-6" aria-labelledby="summary-heading">
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="h-5 w-5 text-[var(--primary)]" aria-hidden="true" />
+              <h2 id="summary-heading" className="text-base sm:text-lg font-semibold text-foreground">
+                Summary
+              </h2>
+            </div>
+            <dl className="space-y-3">
+              <div className="flex justify-between items-center">
+                <dt className="text-sm text-[var(--text-muted)]">Active Areas</dt>
+                <dd className="text-sm font-semibold text-foreground glass-badge-primary">
+                  {Object.values(painLevels).filter((level) => level > 0).length}
+                </dd>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted">Avg Pain Level</span>
-                <span className="text-sm font-medium text-foreground">
+              <div className="flex justify-between items-center">
+                <dt className="text-sm text-[var(--text-muted)]">Avg Pain Level</dt>
+                <dd className="text-sm font-semibold text-foreground">
                   {(
                     Object.values(painLevels).reduce((a, b) => a + b, 0) /
                     Object.keys(painLevels).length
                   ).toFixed(1)}
-                </span>
+                </dd>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted">Highest Pain</span>
-                <span className="text-sm font-medium text-error">
+              <div className="flex justify-between items-center">
+                <dt className="text-sm text-[var(--text-muted)]">Highest Pain</dt>
+                <dd className="text-sm font-semibold text-rose-500">
                   {Math.max(...Object.values(painLevels))}
-                </span>
+                </dd>
               </div>
-            </div>
-          </div>
-        </div>
+              <div className="mt-4 pt-4 border-t border-[var(--glass-border)]">
+                <div
+                  className="glass-progress h-3 rounded-full"
+                  role="progressbar"
+                  aria-valuenow={Math.round(
+                    (Object.values(painLevels).filter((level) => level === 0).length /
+                      Object.keys(painLevels).length) *
+                    100
+                  )}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Percentage of pain-free areas"
+                >
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[var(--primary)] to-cyan-500 transition-all duration-500"
+                    style={{
+                      width: `${
+                        (Object.values(painLevels).filter((level) => level === 0).length /
+                          Object.keys(painLevels).length) *
+                        100
+                      }%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-[var(--text-muted)] mt-2 text-center">
+                  {Math.round(
+                    (Object.values(painLevels).filter((level) => level === 0).length /
+                      Object.keys(painLevels).length) *
+                    100
+                  )}% pain-free areas
+                </p>
+              </div>
+            </dl>
+          </section>
+
+          {/* AI Smart Prompts - Glass Style */}
+          {smartSuggestions.length > 0 && (
+            <section aria-labelledby="smart-tips-heading" className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="relative" aria-hidden="true">
+                  <Sparkles className="h-4 w-4 text-[var(--primary)]" />
+                  <div className="absolute inset-0 text-[var(--primary)] blur-sm opacity-50">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                </div>
+                <h2 id="smart-tips-heading" className="text-sm font-medium text-[var(--text-muted)]">
+                  Smart Tips
+                </h2>
+              </div>
+              {smartSuggestions.slice(0, 2).map((insight) => (
+                <SmartSuggestion
+                  key={insight.id}
+                  insight={insight}
+                  onDismiss={dismissInsight}
+                  variant="default"
+                />
+              ))}
+            </section>
+          )}
+        </aside>
       </div>
     </div>
   );

@@ -1,0 +1,404 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (leave empty for automatic)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - patch
+          - minor
+          - major
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  # Check if release is needed
+  check-release:
+    name: Check Release
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      release_type: ${{ steps.check.outputs.release_type }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for release-worthy commits
+        id: check
+        run: |
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tags found, will create initial release"
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "release_type=minor" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check for conventional commit types
+          COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"%s")
+
+          HAS_BREAKING=false
+          HAS_FEAT=false
+          HAS_FIX=false
+
+          while IFS= read -r commit; do
+            if echo "$commit" | grep -qE "^.*!:|BREAKING CHANGE"; then
+              HAS_BREAKING=true
+            elif echo "$commit" | grep -qE "^feat(\(.+\))?:"; then
+              HAS_FEAT=true
+            elif echo "$commit" | grep -qE "^fix(\(.+\))?:"; then
+              HAS_FIX=true
+            fi
+          done <<< "$COMMITS"
+
+          # Determine release type
+          if [ "${{ github.event.inputs.release_type }}" != "" ]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "release_type=${{ github.event.inputs.release_type }}" >> $GITHUB_OUTPUT
+          elif [ "$HAS_BREAKING" = true ]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "release_type=major" >> $GITHUB_OUTPUT
+          elif [ "$HAS_FEAT" = true ]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "release_type=minor" >> $GITHUB_OUTPUT
+          elif [ "$HAS_FIX" = true ]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "release_type=patch" >> $GITHUB_OUTPUT
+          else
+            echo "No release-worthy commits found"
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "release_type=" >> $GITHUB_OUTPUT
+          fi
+
+  # Run CI checks before release
+  ci-check:
+    name: CI Check
+    needs: check-release
+    if: needs.check-release.outputs.should_release == 'true'
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  # Create release
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [check-release, ci-check]
+    if: needs.check-release.outputs.should_release == 'true'
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Calculate new version
+        id: version
+        run: |
+          # Get current version from package.json
+          CURRENT_VERSION=$(jq -r '.version // "0.0.0"' package.json)
+
+          # If no version field, check for latest tag
+          if [ "$CURRENT_VERSION" = "null" ] || [ "$CURRENT_VERSION" = "0.0.0" ]; then
+            LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            CURRENT_VERSION=${LAST_TAG#v}
+          fi
+
+          echo "Current version: $CURRENT_VERSION"
+
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          MAJOR=${MAJOR:-0}
+          MINOR=${MINOR:-0}
+          PATCH=${PATCH:-0}
+
+          # Increment based on release type
+          RELEASE_TYPE="${{ needs.check-release.outputs.release_type }}"
+          case "$RELEASE_TYPE" in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "New version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          NEW_VERSION="${{ steps.version.outputs.version }}"
+
+          # Start changelog
+          CHANGELOG="## What's Changed in v$NEW_VERSION\n\n"
+
+          # Get commits since last tag (or all commits if no tag)
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"%H|%s|%an" --reverse)
+          else
+            COMMITS=$(git log $LAST_TAG..HEAD --pretty=format:"%H|%s|%an" --reverse)
+          fi
+
+          # Categorize commits
+          FEATURES=""
+          FIXES=""
+          DOCS=""
+          PERF=""
+          REFACTOR=""
+          CHORE=""
+          OTHER=""
+
+          while IFS='|' read -r hash subject author; do
+            # Skip empty lines
+            [ -z "$hash" ] && continue
+
+            SHORT_HASH=${hash:0:7}
+
+            if echo "$subject" | grep -qE "^feat(\(.+\))?:"; then
+              DESC=$(echo "$subject" | sed 's/^feat\(([^)]*)\)\?:\s*//')
+              FEATURES="$FEATURES- $DESC ($SHORT_HASH) @$author\n"
+            elif echo "$subject" | grep -qE "^fix(\(.+\))?:"; then
+              DESC=$(echo "$subject" | sed 's/^fix\(([^)]*)\)\?:\s*//')
+              FIXES="$FIXES- $DESC ($SHORT_HASH) @$author\n"
+            elif echo "$subject" | grep -qE "^docs(\(.+\))?:"; then
+              DESC=$(echo "$subject" | sed 's/^docs\(([^)]*)\)\?:\s*//')
+              DOCS="$DOCS- $DESC ($SHORT_HASH)\n"
+            elif echo "$subject" | grep -qE "^perf(\(.+\))?:"; then
+              DESC=$(echo "$subject" | sed 's/^perf\(([^)]*)\)\?:\s*//')
+              PERF="$PERF- $DESC ($SHORT_HASH)\n"
+            elif echo "$subject" | grep -qE "^refactor(\(.+\))?:"; then
+              DESC=$(echo "$subject" | sed 's/^refactor\(([^)]*)\)\?:\s*//')
+              REFACTOR="$REFACTOR- $DESC ($SHORT_HASH)\n"
+            elif echo "$subject" | grep -qE "^(chore|ci|build)(\(.+\))?:"; then
+              DESC=$(echo "$subject" | sed 's/^\(chore\|ci\|build\)\(([^)]*)\)\?:\s*//')
+              CHORE="$CHORE- $DESC ($SHORT_HASH)\n"
+            else
+              OTHER="$OTHER- $subject ($SHORT_HASH)\n"
+            fi
+          done <<< "$COMMITS"
+
+          # Build changelog sections
+          [ -n "$FEATURES" ] && CHANGELOG="$CHANGELOG### New Features\n$FEATURES\n"
+          [ -n "$FIXES" ] && CHANGELOG="$CHANGELOG### Bug Fixes\n$FIXES\n"
+          [ -n "$PERF" ] && CHANGELOG="$CHANGELOG### Performance Improvements\n$PERF\n"
+          [ -n "$DOCS" ] && CHANGELOG="$CHANGELOG### Documentation\n$DOCS\n"
+          [ -n "$REFACTOR" ] && CHANGELOG="$CHANGELOG### Code Refactoring\n$REFACTOR\n"
+          [ -n "$CHORE" ] && CHANGELOG="$CHANGELOG### Maintenance\n$CHORE\n"
+          [ -n "$OTHER" ] && CHANGELOG="$CHANGELOG### Other Changes\n$OTHER\n"
+
+          # Add comparison link
+          if [ -n "$LAST_TAG" ]; then
+            CHANGELOG="$CHANGELOG---\n\n**Full Changelog**: [$LAST_TAG...v$NEW_VERSION](${{ github.server_url }}/${{ github.repository }}/compare/$LAST_TAG...v$NEW_VERSION)"
+          fi
+
+          # Save changelog to file for multi-line output
+          echo -e "$CHANGELOG" > changelog.md
+
+          # Output for GitHub Actions (escape newlines)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat changelog.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Update package.json version
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.version }}"
+
+          # Update root package.json
+          jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+          # Update workspace package versions
+          for pkg in apps/web apps/mobile packages/ui packages/data packages/domain packages/copy; do
+            if [ -f "$pkg/package.json" ]; then
+              jq --arg v "$NEW_VERSION" '.version = $v' "$pkg/package.json" > "$pkg/package.json.tmp"
+              mv "$pkg/package.json.tmp" "$pkg/package.json"
+            fi
+          done
+
+      - name: Update CHANGELOG.md
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.version }}"
+          DATE=$(date +%Y-%m-%d)
+
+          # Create or update CHANGELOG.md
+          if [ -f "CHANGELOG.md" ]; then
+            # Insert new version after header
+            {
+              head -n 1 CHANGELOG.md
+              echo ""
+              echo "## [v$NEW_VERSION] - $DATE"
+              echo ""
+              cat changelog.md | tail -n +3  # Skip the "What's Changed" header
+              echo ""
+              tail -n +2 CHANGELOG.md
+            } > CHANGELOG.md.tmp
+            mv CHANGELOG.md.tmp CHANGELOG.md
+          else
+            # Create new CHANGELOG.md
+            {
+              echo "# Changelog"
+              echo ""
+              echo "All notable changes to this project will be documented in this file."
+              echo ""
+              echo "## [v$NEW_VERSION] - $DATE"
+              echo ""
+              cat changelog.md | tail -n +3
+            } > CHANGELOG.md
+          fi
+
+      - name: Commit version bump
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.version }}"
+
+          git add package.json CHANGELOG.md
+          git add apps/*/package.json packages/*/package.json 2>/dev/null || true
+
+          git commit -m "chore(release): v$NEW_VERSION [skip ci]" || echo "No changes to commit"
+
+      - name: Create and push tag
+        run: |
+          NEW_VERSION="${{ steps.version.outputs.version }}"
+
+          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+          git push origin main --follow-tags
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.version.outputs.version }}';
+            const changelog = `${{ steps.changelog.outputs.changelog }}`;
+
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${version}`,
+              name: `v${version}`,
+              body: changelog,
+              draft: false,
+              prerelease: false,
+              generate_release_notes: false
+            });
+
+            console.log(`Created release: ${release.data.html_url}`);
+
+  # Deploy to production after release
+  deploy:
+    name: Deploy to Production
+    needs: release
+    uses: ./.github/workflows/deploy-production.yml
+    secrets: inherit
+
+  # Notify about release
+  notify:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [release, deploy]
+    if: success()
+    steps:
+      - name: Send Slack Notification
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "New Release: v${{ needs.release.outputs.version }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "New Release: v${{ needs.release.outputs.version }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "A new version has been released and deployed to production."
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Release"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ needs.release.outputs.version }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Changelog"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/blob/main/CHANGELOG.md"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Post release summary
+        run: |
+          echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** v${{ needs.release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "${{ needs.release.outputs.changelog }}" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,386 @@
+{
+  "_meta": {
+    "language": "German",
+    "nativeName": "Deutsch",
+    "code": "de",
+    "direction": "ltr",
+    "status": "placeholder",
+    "lastUpdated": "2026-01-25",
+    "translationProgress": 0
+  },
+  "common": {
+    "appName": "Recovery",
+    "tagline": "[DE] Your body recovery companion",
+    "premium": "Premium",
+    "new": "Neu",
+    "loading": "Laden...",
+    "save": "Speichern",
+    "saveChanges": "Anderungen speichern",
+    "reset": "Zurucksetzen",
+    "cancel": "Abbrechen",
+    "close": "Schliessen",
+    "back": "Zuruck",
+    "next": "Weiter",
+    "done": "Fertig",
+    "confirm": "Bestatigen",
+    "delete": "Loschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufugen",
+    "submit": "Absenden",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "clear": "Loschen",
+    "apply": "Anwenden",
+    "viewAll": "Alle anzeigen",
+    "seeMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen",
+    "learnMore": "Mehr erfahren",
+    "getStarted": "Loslegen",
+    "continueText": "Fortfahren",
+    "skip": "Uberspringen",
+    "retry": "Erneut versuchen",
+    "areas": "{count} Bereiche",
+    "noChange": "Keine Anderung",
+    "of": "von {total}",
+    "days": "{count} Tage",
+    "minutes": "{count} Min",
+    "percentage": "{value}%",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "thisWeek": "Diese Woche",
+    "thisMonth": "Dieser Monat",
+    "all": "Alle",
+    "none": "Keine",
+    "yes": "Ja",
+    "no": "Nein",
+    "ok": "OK",
+    "or": "oder",
+    "and": "und",
+    "required": "Erforderlich",
+    "optional": "Optional"
+  },
+  "nav": {
+    "dashboard": "[DE] Dashboard",
+    "bodyMap": "[DE] Body Map",
+    "progress": "[DE] Progress",
+    "history": "[DE] History",
+    "settings": "[DE] Settings",
+    "getMobileApp": "[DE] Get Mobile App",
+    "lightMode": "[DE] Light Mode",
+    "darkMode": "[DE] Dark Mode"
+  },
+  "home": {
+    "greetingMorning": "[DE] Good morning",
+    "greetingAfternoon": "[DE] Good afternoon",
+    "greetingEvening": "[DE] Good evening",
+    "recoveryProgressing": "[DE] Your recovery is progressing well.",
+    "gentleRecovery": "[DE] Let's focus on gentle recovery today.",
+    "weeklySummary": "[DE] Here's your recovery summary for this week.",
+    "sessionsThisWeek": "[DE] Sessions This Week",
+    "ofRecommended": "[DE] of 7 recommended",
+    "completionRate": "[DE] Completion Rate",
+    "exercisesCompleted": "[DE] exercises completed",
+    "avgPainReduction": "[DE] Avg Pain Reduction",
+    "pointsPerSession": "[DE] points per session",
+    "totalTime": "[DE] Total Time",
+    "minutesThisWeek": "[DE] minutes this week",
+    "recentSessions": "[DE] Recent Sessions",
+    "personalizedInsights": "[DE] Personalized Insights",
+    "bodyStatus": "[DE] Body Status",
+    "areasNeedingAttention": "[DE] Areas needing attention",
+    "updateBodyMap": "[DE] Update Body Map",
+    "mobileApp": "[DE] Mobile App",
+    "mobileAppDescription": "[DE] Best for daily check-ins and workouts",
+    "downloadApp": "[DE] Download for iOS/Android",
+    "sessionDate": "{weekday}, {day}. {month}",
+    "sessionSummary": "{duration} Min - {completed}/{total} [DE] exercises",
+    "painReduced": "[DE] Pain -{reduction}",
+    "painUnchanged": "[DE] Pain unchanged",
+    "painRange": "{before} [DE] bis {after}"
+  },
+  "body": {
+    "title": "[DE] Body Map",
+    "subtitle": "[DE] Tap on any region to update your pain level.",
+    "selectedRegion": "[DE] Selected Region",
+    "currentLevel": "[DE] Current Level",
+    "decrease": "[DE] Decrease",
+    "increase": "[DE] Increase",
+    "painLevelEditor": "[DE] Pain Level Editor",
+    "clickToEdit": "[DE] Click on a body region to edit its pain level",
+    "changeHistory": "[DE] Change History",
+    "noChangesMade": "[DE] No changes made yet.",
+    "summary": "[DE] Summary",
+    "activeAreas": "[DE] Active Areas",
+    "avgPainLevel": "[DE] Avg Pain Level",
+    "highestPain": "[DE] Highest Pain",
+    "painFreeAreas": "[DE] {percentage}% pain-free areas",
+    "smartTips": "[DE] Smart Tips",
+    "legend": {
+      "noPain": "[DE] No pain",
+      "mild": "[DE] Mild (1-3)",
+      "moderate": "[DE] Moderate (4-6)",
+      "severe": "[DE] Severe (7-10)"
+    },
+    "painLabels": {
+      "none": "[DE] No pain",
+      "mild": "[DE] Mild",
+      "moderate": "[DE] Moderate",
+      "severe": "[DE] Severe"
+    },
+    "regions": {
+      "head": "[DE] Head",
+      "neck": "[DE] Neck",
+      "leftShoulder": "[DE] Left Shoulder",
+      "rightShoulder": "[DE] Right Shoulder",
+      "leftArm": "[DE] Left Arm",
+      "rightArm": "[DE] Right Arm",
+      "chest": "[DE] Chest",
+      "upperBack": "[DE] Upper Back",
+      "lowerBack": "[DE] Lower Back",
+      "abdomen": "[DE] Abdomen",
+      "leftHip": "[DE] Left Hip",
+      "rightHip": "[DE] Right Hip",
+      "leftThigh": "[DE] Left Thigh",
+      "rightThigh": "[DE] Right Thigh",
+      "leftKnee": "[DE] Left Knee",
+      "rightKnee": "[DE] Right Knee",
+      "leftCalf": "[DE] Left Calf",
+      "rightCalf": "[DE] Right Calf",
+      "leftAnkle": "[DE] Left Ankle",
+      "rightAnkle": "[DE] Right Ankle"
+    }
+  },
+  "progress": {
+    "title": "[DE] Progress",
+    "subtitle": "[DE] Track your recovery journey over time.",
+    "exportData": "[DE] Export Data",
+    "dateRanges": {
+      "7d": "7T",
+      "14d": "14T",
+      "30d": "30T",
+      "90d": "90T"
+    },
+    "averagePainLevel": "[DE] Average Pain Level",
+    "outOf10": "[DE] out of 10",
+    "painTrend": "[DE] Pain Trend",
+    "decrease": "[DE] decrease",
+    "increase": "[DE] increase",
+    "vsStartOfPeriod": "[DE] vs start of period",
+    "sessionsCompleted": "[DE] Sessions Completed",
+    "ofDays": "[DE] of {days} days ({percentage}%)",
+    "activePainAreas": "[DE] Active Pain Areas",
+    "regionsNeedAttention": "[DE] regions need attention",
+    "painTrendOverTime": "[DE] Pain Trend Over Time",
+    "dailyAveragePainLevel": "[DE] Daily average pain level",
+    "painByRegion": "[DE] Pain by Region",
+    "currentVsPrevious": "[DE] Current vs previous period",
+    "regionBreakdown": "[DE] Region-by-Region Breakdown",
+    "regionBreakdownDescription": "[DE] Detailed view of pain levels",
+    "tableHeaders": {
+      "region": "[DE] Region",
+      "currentLevel": "[DE] Current Level",
+      "previousLevel": "[DE] Previous Level",
+      "change": "[DE] Change",
+      "status": "[DE] Status"
+    },
+    "status": {
+      "improving": "[DE] Improving",
+      "worsening": "[DE] Worsening",
+      "stable": "[DE] Stable"
+    },
+    "current": "[DE] Current",
+    "previous": "[DE] Previous"
+  },
+  "settings": {
+    "title": "[DE] Settings",
+    "subtitle": "[DE] Manage your account and preferences",
+    "savedSuccessfully": "[DE] Settings saved successfully",
+    "sections": {
+      "profile": "[DE] Profile",
+      "preferences": "[DE] Preferences",
+      "interactions": "[DE] Interactions",
+      "notifications": "[DE] Notifications",
+      "data": "[DE] Data & Privacy"
+    },
+    "profile": {
+      "title": "[DE] Profile Information",
+      "subtitle": "[DE] Update your personal information",
+      "fullName": "[DE] Full Name",
+      "fullNamePlaceholder": "[DE] Enter your name",
+      "email": "[DE] Email Address",
+      "emailPlaceholder": "[DE] Enter your email",
+      "saveChanges": "[DE] Save Changes"
+    },
+    "preferences": {
+      "recovery": {
+        "title": "[DE] Recovery Preferences",
+        "subtitle": "[DE] Customize your recovery experience",
+        "sessionDuration": "[DE] Preferred Session Duration",
+        "reminderTime": "[DE] Daily Reminder Time"
+      },
+      "appearance": {
+        "title": "[DE] Appearance",
+        "subtitle": "[DE] Customize how the app looks",
+        "darkMode": "[DE] Dark Mode",
+        "darkModeDescription": "[DE] Use dark theme for the interface"
+      },
+      "durations": {
+        "10min": "10 Minuten",
+        "15min": "15 Minuten",
+        "20min": "20 Minuten",
+        "30min": "30 Minuten",
+        "45min": "45 Minuten"
+      }
+    },
+    "interactions": {
+      "soundHaptics": {
+        "title": "[DE] Sound & Haptics",
+        "subtitle": "[DE] Customize audio and tactile feedback",
+        "uiSounds": "[DE] UI Sounds",
+        "uiSoundsDescription": "[DE] Subtle audio feedback for interactions",
+        "hapticFeedback": "[DE] Haptic Feedback",
+        "hapticDescription": "[DE] Tactile vibration on touch interactions",
+        "testFeedback": "[DE] Test Feedback",
+        "tap": "[DE] Tap",
+        "success": "[DE] Success",
+        "warning": "[DE] Warning",
+        "complete": "[DE] Complete"
+      },
+      "animations": {
+        "title": "[DE] Animation Preferences",
+        "subtitle": "[DE] Animations respect system preferences",
+        "tip": "[DE] Tip:",
+        "tipContent": "[DE] To reduce or disable animations, enable \"Reduce motion\" in your device's accessibility settings."
+      }
+    },
+    "notifications": {
+      "title": "[DE] Notification Settings",
+      "subtitle": "[DE] Choose how you want to receive notifications",
+      "email": "[DE] Email Notifications",
+      "emailDescription": "[DE] Receive session reminders via email",
+      "push": "[DE] Push Notifications",
+      "pushDescription": "[DE] Receive push notifications on your devices",
+      "weeklyReport": "[DE] Weekly Report",
+      "weeklyReportDescription": "[DE] Get a weekly summary of your progress"
+    },
+    "data": {
+      "export": {
+        "title": "[DE] Export Your Data",
+        "subtitle": "[DE] Download all your data in JSON format",
+        "button": "[DE] Export All Data"
+      },
+      "danger": {
+        "title": "[DE] Danger Zone",
+        "subtitle": "[DE] Permanently delete your account",
+        "deleteAccount": "[DE] Delete Account"
+      }
+    },
+    "language": {
+      "title": "[DE] Language",
+      "subtitle": "[DE] Choose your preferred language",
+      "current": "[DE] Current language",
+      "comingSoon": "[DE] More languages coming soon"
+    },
+    "disclaimer": {
+      "title": "[DE] Important Disclaimer",
+      "content1": "[DE] This app provides guided self-care information for recovery purposes.",
+      "content2": "[DE] Never disregard professional medical advice."
+    }
+  },
+  "sidebar": {
+    "disclaimer": "[DE] This is guided self-care, not medical treatment."
+  },
+  "exercises": {
+    "nameKey": "name",
+    "descriptionKey": "description",
+    "cuesKey": "cues",
+    "defaultCue": "[DE] Follow the movement pattern shown",
+    "setsCompleted": "{completed}/{target} [DE] sets"
+  },
+  "formats": {
+    "date": {
+      "short": "{day}.{month}.{year}",
+      "medium": "{day}. {month} {year}",
+      "long": "{weekday}, {day}. {month} {year}",
+      "relative": {
+        "today": "Heute",
+        "yesterday": "Gestern",
+        "daysAgo": "Vor {count} Tagen"
+      }
+    },
+    "time": {
+      "short": "{hour}:{minute}",
+      "withPeriod": "{hour}:{minute} Uhr"
+    },
+    "number": {
+      "decimal": "{value}",
+      "percent": "{value}%",
+      "compact": "{value}"
+    }
+  },
+  "accessibility": {
+    "toggleTheme": "[DE] Toggle theme",
+    "openMenu": "[DE] Open menu",
+    "closeMenu": "[DE] Close menu",
+    "navigation": "[DE] Navigation",
+    "mainContent": "[DE] Main content"
+  },
+  "errors": {
+    "generic": "[DE] Something went wrong. Please try again.",
+    "networkError": "[DE] Check your connection and try again.",
+    "loadFailed": "[DE] Couldn't load that. Try again?",
+    "saveFailed": "[DE] Couldn't save. Try again?",
+    "notFound": "[DE] The requested resource was not found.",
+    "offline": "[DE] You're offline.",
+    "form": {
+      "required": "[DE] This field is required",
+      "email": "[DE] Please enter a valid email address"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "[DE] Install App",
+      "description": "[DE] Install Recovery for quick access",
+      "button": "[DE] Install",
+      "dismiss": "[DE] Not now"
+    },
+    "notification": {
+      "title": "[DE] Enable Notifications",
+      "description": "[DE] Get reminders for your sessions",
+      "button": "[DE] Enable",
+      "dismiss": "[DE] Maybe later"
+    },
+    "offline": {
+      "title": "[DE] You're Offline",
+      "description": "[DE] Some features may be unavailable",
+      "reconnecting": "[DE] Reconnecting..."
+    },
+    "update": {
+      "title": "[DE] Update Available",
+      "description": "[DE] A new version is available.",
+      "button": "[DE] Refresh",
+      "dismiss": "[DE] Later"
+    }
+  },
+  "ai": {
+    "assistant": {
+      "title": "[DE] AI Assistant",
+      "thinking": "[DE] Thinking...",
+      "greeting": "[DE] How can I help?",
+      "placeholder": "[DE] Ask me anything..."
+    },
+    "insights": {
+      "title": "[DE] AI Insights",
+      "dismiss": "[DE] Dismiss",
+      "dontShowAgain": "[DE] Don't show again"
+    }
+  },
+  "locale": {
+    "switcher": {
+      "title": "[DE] Language",
+      "ariaLabel": "[DE] Select language",
+      "current": "[DE] Current: {language}"
+    }
+  }
+}

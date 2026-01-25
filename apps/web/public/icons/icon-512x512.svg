@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#818cf8"/>
+    </linearGradient>
+    <linearGradient id="glowGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22d3ee;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="glow512" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle with gradient -->
+  <circle cx="256" cy="256" r="236" fill="url(#bgGrad512)"/>
+
+  <!-- Inner glow -->
+  <circle cx="256" cy="256" r="190" fill="url(#glowGrad512)" opacity="0.3"/>
+
+  <!-- Stylized human figure representing body recovery -->
+  <g fill="white" filter="url(#glow512)">
+    <!-- Head -->
+    <circle cx="256" cy="138" r="38"/>
+
+    <!-- Body/Torso -->
+    <path d="M256 186 L256 307" stroke="white" stroke-width="22" stroke-linecap="round"/>
+
+    <!-- Arms in recovery/stretching pose -->
+    <path d="M256 218 L181 173 L146 200" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M256 218 L331 173 L366 200" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- Legs -->
+    <path d="M256 307 L200 400" stroke="white" stroke-width="18" stroke-linecap="round"/>
+    <path d="M256 307 L312 400" stroke="white" stroke-width="18" stroke-linecap="round"/>
+
+    <!-- Recovery pulse/heartbeat line -->
+    <path d="M120 347 L160 347 L187 307 L213 387 L240 333 L267 360 L280 347 L392 347"
+          stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.8"/>
+  </g>
+
+  <!-- Subtle highlight -->
+  <circle cx="186" cy="133" r="67" fill="white" opacity="0.1"/>
+</svg>

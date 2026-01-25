@@ -1,8 +1,8 @@
 'use client';
 
+import { ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRight, Home } from 'lucide-react';
 
 const routeLabels: Record<string, string> = {
   '': 'Dashboard',

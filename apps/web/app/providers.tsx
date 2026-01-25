@@ -1,7 +1,16 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type ReactNode, useState, createContext, useContext, useEffect } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { type ReactNode, useState, createContext, useContext, useEffect, useMemo } from 'react';
+
+import enMessages from '../messages/en.json';
+import esMessages from '../messages/es.json';
+import frMessages from '../messages/fr.json';
+import deMessages from '../messages/de.json';
+import { PWAProvider } from '../src/components/PWAProvider';
+import { WebVitalsProvider } from '../src/components/WebVitalsProvider';
+import { defaultLocale, locales, type Locale, setStoredLocale, getStoredLocale, detectBrowserLocale, getTextDirection } from '../src/lib/i18n';
 
 // Theme context for dark mode toggle
 interface ThemeContextType {
@@ -16,6 +25,25 @@ const ThemeContext = createContext<ThemeContextType>({
 
 export function useTheme() {
   return useContext(ThemeContext);
+}
+
+// Locale context for language switching
+interface LocaleContextType {
+  locale: Locale;
+  setLocale: (locale: Locale) => void;
+  availableLocales: readonly Locale[];
+  dir: 'ltr' | 'rtl';
+}
+
+const LocaleContext = createContext<LocaleContextType>({
+  locale: defaultLocale,
+  setLocale: () => {},
+  availableLocales: locales,
+  dir: 'ltr',
+});
+
+export function useLocaleContext() {
+  return useContext(LocaleContext);
 }
 
 // Mock Zustand store integration - in production, would import from @app/data
@@ -159,25 +187,81 @@ function createMockAppState(): AppState {
   };
 }
 
+// Import messages for all supported locales
+// Messages are statically imported for better performance and type safety
+
+const allMessages: Record<Locale, typeof enMessages> = {
+  en: enMessages,
+  es: esMessages as typeof enMessages,
+  fr: frMessages as typeof enMessages,
+  de: deMessages as typeof enMessages,
+};
+
 interface ProvidersProps {
   children: ReactNode;
 }
 
 export function Providers({ children }: ProvidersProps) {
+  // Optimized QueryClient configuration for performance
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minute
+            // Data is fresh for 5 minutes (reduces unnecessary refetches)
+            staleTime: 5 * 60 * 1000,
+            // Keep unused data in cache for 30 minutes
+            gcTime: 30 * 60 * 1000,
+            // Don't refetch on window focus (reduces network requests)
             refetchOnWindowFocus: false,
+            // Refetch when reconnecting to network
+            refetchOnReconnect: true,
+            // Retry failed requests up to 3 times with exponential backoff
+            retry: 3,
+            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+            // Enable structural sharing for better memory efficiency
+            structuralSharing: true,
+          },
+          mutations: {
+            // Retry mutations once
+            retry: 1,
           },
         },
       })
   );
 
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [locale, setLocaleState] = useState<Locale>(defaultLocale);
   const [appState] = useState<AppState>(createMockAppState);
+
+  // Get text direction for current locale
+  const dir = useMemo(() => getTextDirection(locale), [locale]);
+
+  // Handle locale change
+  const setLocale = (newLocale: Locale) => {
+    setLocaleState(newLocale);
+    setStoredLocale(newLocale);
+    // Update document direction for RTL support
+    document.documentElement.dir = getTextDirection(newLocale);
+    document.documentElement.lang = newLocale;
+  };
+
+  // Initialize locale from storage or browser preference
+  useEffect(() => {
+    const storedLocale = getStoredLocale();
+    if (storedLocale && locales.includes(storedLocale)) {
+      setLocaleState(storedLocale);
+      document.documentElement.dir = getTextDirection(storedLocale);
+      document.documentElement.lang = storedLocale;
+    } else {
+      const browserLocale = detectBrowserLocale();
+      if (browserLocale !== defaultLocale) {
+        setLocaleState(browserLocale);
+        document.documentElement.dir = getTextDirection(browserLocale);
+        document.documentElement.lang = browserLocale;
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Check for saved preference or system preference
@@ -200,13 +284,37 @@ export function Providers({ children }: ProvidersProps) {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  // Get messages for current locale
+  const messages = allMessages[locale] || allMessages[defaultLocale];
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeContext.Provider value={{ theme, toggleTheme }}>
-        <AppStateContext.Provider value={appState}>
-          {children}
-        </AppStateContext.Provider>
-      </ThemeContext.Provider>
+      <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
+        <LocaleContext.Provider
+          value={{
+            locale,
+            setLocale,
+            availableLocales: locales,
+            dir,
+          }}
+        >
+          <ThemeContext.Provider value={{ theme, toggleTheme }}>
+            <AppStateContext.Provider value={appState}>
+              <PWAProvider
+                showInstallPrompt={true}
+                showNotificationPrompt={true}
+                showOfflineIndicator={true}
+                installPromptDelay={5000}
+                notificationPromptDelay={15000}
+              >
+                <WebVitalsProvider debug={process.env.NODE_ENV === 'development'}>
+                  {children}
+                </WebVitalsProvider>
+              </PWAProvider>
+            </AppStateContext.Provider>
+          </ThemeContext.Provider>
+        </LocaleContext.Provider>
+      </NextIntlClientProvider>
     </QueryClientProvider>
   );
 }

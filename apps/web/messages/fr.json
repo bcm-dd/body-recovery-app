@@ -1,0 +1,386 @@
+{
+  "_meta": {
+    "language": "French",
+    "nativeName": "Francais",
+    "code": "fr",
+    "direction": "ltr",
+    "status": "placeholder",
+    "lastUpdated": "2026-01-25",
+    "translationProgress": 0
+  },
+  "common": {
+    "appName": "Recovery",
+    "tagline": "[FR] Your body recovery companion",
+    "premium": "Premium",
+    "new": "Nouveau",
+    "loading": "Chargement...",
+    "save": "Sauvegarder",
+    "saveChanges": "Sauvegarder",
+    "reset": "Reinitialiser",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "done": "Termine",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "submit": "Soumettre",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "clear": "Effacer",
+    "apply": "Appliquer",
+    "viewAll": "Voir tout",
+    "seeMore": "Voir plus",
+    "showLess": "Voir moins",
+    "learnMore": "En savoir plus",
+    "getStarted": "Commencer",
+    "continueText": "Continuer",
+    "skip": "Passer",
+    "retry": "Reessayer",
+    "areas": "{count} zones",
+    "noChange": "Pas de changement",
+    "of": "sur {total}",
+    "days": "{count} jours",
+    "minutes": "{count} min",
+    "percentage": "{value}%",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois",
+    "all": "Tout",
+    "none": "Aucun",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "or": "ou",
+    "and": "et",
+    "required": "Requis",
+    "optional": "Optionnel"
+  },
+  "nav": {
+    "dashboard": "[FR] Dashboard",
+    "bodyMap": "[FR] Body Map",
+    "progress": "[FR] Progress",
+    "history": "[FR] History",
+    "settings": "[FR] Settings",
+    "getMobileApp": "[FR] Get Mobile App",
+    "lightMode": "[FR] Light Mode",
+    "darkMode": "[FR] Dark Mode"
+  },
+  "home": {
+    "greetingMorning": "[FR] Good morning",
+    "greetingAfternoon": "[FR] Good afternoon",
+    "greetingEvening": "[FR] Good evening",
+    "recoveryProgressing": "[FR] Your recovery is progressing well.",
+    "gentleRecovery": "[FR] Let's focus on gentle recovery today.",
+    "weeklySummary": "[FR] Here's your recovery summary for this week.",
+    "sessionsThisWeek": "[FR] Sessions This Week",
+    "ofRecommended": "[FR] of 7 recommended",
+    "completionRate": "[FR] Completion Rate",
+    "exercisesCompleted": "[FR] exercises completed",
+    "avgPainReduction": "[FR] Avg Pain Reduction",
+    "pointsPerSession": "[FR] points per session",
+    "totalTime": "[FR] Total Time",
+    "minutesThisWeek": "[FR] minutes this week",
+    "recentSessions": "[FR] Recent Sessions",
+    "personalizedInsights": "[FR] Personalized Insights",
+    "bodyStatus": "[FR] Body Status",
+    "areasNeedingAttention": "[FR] Areas needing attention",
+    "updateBodyMap": "[FR] Update Body Map",
+    "mobileApp": "[FR] Mobile App",
+    "mobileAppDescription": "[FR] Best for daily check-ins and workouts",
+    "downloadApp": "[FR] Download for iOS/Android",
+    "sessionDate": "{weekday}, {day} {month}",
+    "sessionSummary": "{duration} min - {completed}/{total} [FR] exercises",
+    "painReduced": "[FR] Pain -{reduction}",
+    "painUnchanged": "[FR] Pain unchanged",
+    "painRange": "{before} [FR] a {after}"
+  },
+  "body": {
+    "title": "[FR] Body Map",
+    "subtitle": "[FR] Tap on any region to update your pain level.",
+    "selectedRegion": "[FR] Selected Region",
+    "currentLevel": "[FR] Current Level",
+    "decrease": "[FR] Decrease",
+    "increase": "[FR] Increase",
+    "painLevelEditor": "[FR] Pain Level Editor",
+    "clickToEdit": "[FR] Click on a body region to edit its pain level",
+    "changeHistory": "[FR] Change History",
+    "noChangesMade": "[FR] No changes made yet.",
+    "summary": "[FR] Summary",
+    "activeAreas": "[FR] Active Areas",
+    "avgPainLevel": "[FR] Avg Pain Level",
+    "highestPain": "[FR] Highest Pain",
+    "painFreeAreas": "[FR] {percentage}% pain-free areas",
+    "smartTips": "[FR] Smart Tips",
+    "legend": {
+      "noPain": "[FR] No pain",
+      "mild": "[FR] Mild (1-3)",
+      "moderate": "[FR] Moderate (4-6)",
+      "severe": "[FR] Severe (7-10)"
+    },
+    "painLabels": {
+      "none": "[FR] No pain",
+      "mild": "[FR] Mild",
+      "moderate": "[FR] Moderate",
+      "severe": "[FR] Severe"
+    },
+    "regions": {
+      "head": "[FR] Head",
+      "neck": "[FR] Neck",
+      "leftShoulder": "[FR] Left Shoulder",
+      "rightShoulder": "[FR] Right Shoulder",
+      "leftArm": "[FR] Left Arm",
+      "rightArm": "[FR] Right Arm",
+      "chest": "[FR] Chest",
+      "upperBack": "[FR] Upper Back",
+      "lowerBack": "[FR] Lower Back",
+      "abdomen": "[FR] Abdomen",
+      "leftHip": "[FR] Left Hip",
+      "rightHip": "[FR] Right Hip",
+      "leftThigh": "[FR] Left Thigh",
+      "rightThigh": "[FR] Right Thigh",
+      "leftKnee": "[FR] Left Knee",
+      "rightKnee": "[FR] Right Knee",
+      "leftCalf": "[FR] Left Calf",
+      "rightCalf": "[FR] Right Calf",
+      "leftAnkle": "[FR] Left Ankle",
+      "rightAnkle": "[FR] Right Ankle"
+    }
+  },
+  "progress": {
+    "title": "[FR] Progress",
+    "subtitle": "[FR] Track your recovery journey over time.",
+    "exportData": "[FR] Export Data",
+    "dateRanges": {
+      "7d": "7j",
+      "14d": "14j",
+      "30d": "30j",
+      "90d": "90j"
+    },
+    "averagePainLevel": "[FR] Average Pain Level",
+    "outOf10": "[FR] out of 10",
+    "painTrend": "[FR] Pain Trend",
+    "decrease": "[FR] decrease",
+    "increase": "[FR] increase",
+    "vsStartOfPeriod": "[FR] vs start of period",
+    "sessionsCompleted": "[FR] Sessions Completed",
+    "ofDays": "[FR] of {days} days ({percentage}%)",
+    "activePainAreas": "[FR] Active Pain Areas",
+    "regionsNeedAttention": "[FR] regions need attention",
+    "painTrendOverTime": "[FR] Pain Trend Over Time",
+    "dailyAveragePainLevel": "[FR] Daily average pain level",
+    "painByRegion": "[FR] Pain by Region",
+    "currentVsPrevious": "[FR] Current vs previous period",
+    "regionBreakdown": "[FR] Region-by-Region Breakdown",
+    "regionBreakdownDescription": "[FR] Detailed view of pain levels",
+    "tableHeaders": {
+      "region": "[FR] Region",
+      "currentLevel": "[FR] Current Level",
+      "previousLevel": "[FR] Previous Level",
+      "change": "[FR] Change",
+      "status": "[FR] Status"
+    },
+    "status": {
+      "improving": "[FR] Improving",
+      "worsening": "[FR] Worsening",
+      "stable": "[FR] Stable"
+    },
+    "current": "[FR] Current",
+    "previous": "[FR] Previous"
+  },
+  "settings": {
+    "title": "[FR] Settings",
+    "subtitle": "[FR] Manage your account and preferences",
+    "savedSuccessfully": "[FR] Settings saved successfully",
+    "sections": {
+      "profile": "[FR] Profile",
+      "preferences": "[FR] Preferences",
+      "interactions": "[FR] Interactions",
+      "notifications": "[FR] Notifications",
+      "data": "[FR] Data & Privacy"
+    },
+    "profile": {
+      "title": "[FR] Profile Information",
+      "subtitle": "[FR] Update your personal information",
+      "fullName": "[FR] Full Name",
+      "fullNamePlaceholder": "[FR] Enter your name",
+      "email": "[FR] Email Address",
+      "emailPlaceholder": "[FR] Enter your email",
+      "saveChanges": "[FR] Save Changes"
+    },
+    "preferences": {
+      "recovery": {
+        "title": "[FR] Recovery Preferences",
+        "subtitle": "[FR] Customize your recovery experience",
+        "sessionDuration": "[FR] Preferred Session Duration",
+        "reminderTime": "[FR] Daily Reminder Time"
+      },
+      "appearance": {
+        "title": "[FR] Appearance",
+        "subtitle": "[FR] Customize how the app looks",
+        "darkMode": "[FR] Dark Mode",
+        "darkModeDescription": "[FR] Use dark theme for the interface"
+      },
+      "durations": {
+        "10min": "10 minutes",
+        "15min": "15 minutes",
+        "20min": "20 minutes",
+        "30min": "30 minutes",
+        "45min": "45 minutes"
+      }
+    },
+    "interactions": {
+      "soundHaptics": {
+        "title": "[FR] Sound & Haptics",
+        "subtitle": "[FR] Customize audio and tactile feedback",
+        "uiSounds": "[FR] UI Sounds",
+        "uiSoundsDescription": "[FR] Subtle audio feedback for interactions",
+        "hapticFeedback": "[FR] Haptic Feedback",
+        "hapticDescription": "[FR] Tactile vibration on touch interactions",
+        "testFeedback": "[FR] Test Feedback",
+        "tap": "[FR] Tap",
+        "success": "[FR] Success",
+        "warning": "[FR] Warning",
+        "complete": "[FR] Complete"
+      },
+      "animations": {
+        "title": "[FR] Animation Preferences",
+        "subtitle": "[FR] Animations respect system preferences",
+        "tip": "[FR] Tip:",
+        "tipContent": "[FR] To reduce or disable animations, enable \"Reduce motion\" in your device's accessibility settings."
+      }
+    },
+    "notifications": {
+      "title": "[FR] Notification Settings",
+      "subtitle": "[FR] Choose how you want to receive notifications",
+      "email": "[FR] Email Notifications",
+      "emailDescription": "[FR] Receive session reminders via email",
+      "push": "[FR] Push Notifications",
+      "pushDescription": "[FR] Receive push notifications on your devices",
+      "weeklyReport": "[FR] Weekly Report",
+      "weeklyReportDescription": "[FR] Get a weekly summary of your progress"
+    },
+    "data": {
+      "export": {
+        "title": "[FR] Export Your Data",
+        "subtitle": "[FR] Download all your data in JSON format",
+        "button": "[FR] Export All Data"
+      },
+      "danger": {
+        "title": "[FR] Danger Zone",
+        "subtitle": "[FR] Permanently delete your account",
+        "deleteAccount": "[FR] Delete Account"
+      }
+    },
+    "language": {
+      "title": "[FR] Language",
+      "subtitle": "[FR] Choose your preferred language",
+      "current": "[FR] Current language",
+      "comingSoon": "[FR] More languages coming soon"
+    },
+    "disclaimer": {
+      "title": "[FR] Important Disclaimer",
+      "content1": "[FR] This app provides guided self-care information for recovery purposes.",
+      "content2": "[FR] Never disregard professional medical advice."
+    }
+  },
+  "sidebar": {
+    "disclaimer": "[FR] This is guided self-care, not medical treatment."
+  },
+  "exercises": {
+    "nameKey": "name",
+    "descriptionKey": "description",
+    "cuesKey": "cues",
+    "defaultCue": "[FR] Follow the movement pattern shown",
+    "setsCompleted": "{completed}/{target} [FR] sets"
+  },
+  "formats": {
+    "date": {
+      "short": "{day}/{month}/{year}",
+      "medium": "{day} {month} {year}",
+      "long": "{weekday} {day} {month} {year}",
+      "relative": {
+        "today": "Aujourd'hui",
+        "yesterday": "Hier",
+        "daysAgo": "Il y a {count} jours"
+      }
+    },
+    "time": {
+      "short": "{hour}:{minute}",
+      "withPeriod": "{hour}:{minute}"
+    },
+    "number": {
+      "decimal": "{value}",
+      "percent": "{value}%",
+      "compact": "{value}"
+    }
+  },
+  "accessibility": {
+    "toggleTheme": "[FR] Toggle theme",
+    "openMenu": "[FR] Open menu",
+    "closeMenu": "[FR] Close menu",
+    "navigation": "[FR] Navigation",
+    "mainContent": "[FR] Main content"
+  },
+  "errors": {
+    "generic": "[FR] Something went wrong. Please try again.",
+    "networkError": "[FR] Check your connection and try again.",
+    "loadFailed": "[FR] Couldn't load that. Try again?",
+    "saveFailed": "[FR] Couldn't save. Try again?",
+    "notFound": "[FR] The requested resource was not found.",
+    "offline": "[FR] You're offline.",
+    "form": {
+      "required": "[FR] This field is required",
+      "email": "[FR] Please enter a valid email address"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "[FR] Install App",
+      "description": "[FR] Install Recovery for quick access",
+      "button": "[FR] Install",
+      "dismiss": "[FR] Not now"
+    },
+    "notification": {
+      "title": "[FR] Enable Notifications",
+      "description": "[FR] Get reminders for your sessions",
+      "button": "[FR] Enable",
+      "dismiss": "[FR] Maybe later"
+    },
+    "offline": {
+      "title": "[FR] You're Offline",
+      "description": "[FR] Some features may be unavailable",
+      "reconnecting": "[FR] Reconnecting..."
+    },
+    "update": {
+      "title": "[FR] Update Available",
+      "description": "[FR] A new version is available.",
+      "button": "[FR] Refresh",
+      "dismiss": "[FR] Later"
+    }
+  },
+  "ai": {
+    "assistant": {
+      "title": "[FR] AI Assistant",
+      "thinking": "[FR] Thinking...",
+      "greeting": "[FR] How can I help?",
+      "placeholder": "[FR] Ask me anything..."
+    },
+    "insights": {
+      "title": "[FR] AI Insights",
+      "dismiss": "[FR] Dismiss",
+      "dontShowAgain": "[FR] Don't show again"
+    }
+  },
+  "locale": {
+    "switcher": {
+      "title": "[FR] Language",
+      "ariaLabel": "[FR] Select language",
+      "current": "[FR] Current: {language}"
+    }
+  }
+}

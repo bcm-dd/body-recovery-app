@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useMemo } from 'react';
 import {
   Calendar,
   Clock,
@@ -12,6 +11,8 @@ import {
   Activity,
   TrendingDown,
 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+
 import { useAppState } from '../../providers';
 
 interface SessionDetail {

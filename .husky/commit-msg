@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+# Commit message hook
+# Validates commit message format using commitlint
+
+echo "Validating commit message..."
+
+pnpm exec commitlint --edit "$1"
+
+echo "Commit message is valid!"

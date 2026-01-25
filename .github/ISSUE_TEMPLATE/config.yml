@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/body-recovery-app/docs
+    about: Check our documentation for guides and FAQs
+  - name: Discussions
+    url: https://github.com/body-recovery-app/body-recovery-app/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: Security Issues
+    url: https://github.com/body-recovery-app/body-recovery-app/security/advisories/new
+    about: Report security vulnerabilities privately

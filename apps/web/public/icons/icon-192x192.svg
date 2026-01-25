@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#818cf8"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22d3ee;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle with gradient -->
+  <circle cx="96" cy="96" r="88" fill="url(#bgGrad)"/>
+
+  <!-- Inner glow -->
+  <circle cx="96" cy="96" r="70" fill="url(#glowGrad)" opacity="0.3"/>
+
+  <!-- Stylized human figure representing body recovery -->
+  <g fill="white" filter="url(#glow)">
+    <!-- Head -->
+    <circle cx="96" cy="52" r="14"/>
+
+    <!-- Body/Torso -->
+    <path d="M96 70 L96 115" stroke="white" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- Arms in recovery/stretching pose -->
+    <path d="M96 82 L68 65 L55 75" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M96 82 L124 65 L137 75" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+    <!-- Legs -->
+    <path d="M96 115 L75 150" stroke="white" stroke-width="7" stroke-linecap="round"/>
+    <path d="M96 115 L117 150" stroke="white" stroke-width="7" stroke-linecap="round"/>
+
+    <!-- Recovery pulse/heartbeat line -->
+    <path d="M45 130 L60 130 L70 115 L80 145 L90 125 L100 135 L105 130 L147 130"
+          stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.8"/>
+  </g>
+
+  <!-- Subtle highlight -->
+  <circle cx="70" cy="50" r="25" fill="white" opacity="0.1"/>
+</svg>

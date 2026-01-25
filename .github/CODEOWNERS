@@ -1,0 +1,33 @@
+# Body Recovery App Code Owners
+# These owners will be requested for review when someone opens a pull request.
+
+# Default owners for everything
+* @body-recovery-app/core-team
+
+# Web application
+/apps/web/ @body-recovery-app/frontend-team
+/apps/web/app/ @body-recovery-app/frontend-team
+
+# Mobile application
+/apps/mobile/ @body-recovery-app/mobile-team
+
+# Shared packages
+/packages/ui/ @body-recovery-app/frontend-team @body-recovery-app/mobile-team
+/packages/data/ @body-recovery-app/backend-team
+/packages/domain/ @body-recovery-app/core-team
+/packages/copy/ @body-recovery-app/frontend-team
+
+# CI/CD and DevOps
+/.github/ @body-recovery-app/devops-team
+/turbo.json @body-recovery-app/devops-team
+/pnpm-workspace.yaml @body-recovery-app/devops-team
+
+# Configuration files - require senior review
+package.json @body-recovery-app/core-team
+tsconfig.json @body-recovery-app/core-team
+*.config.js @body-recovery-app/core-team
+*.config.ts @body-recovery-app/core-team
+
+# Security-sensitive files
+.env* @body-recovery-app/security-team
+**/secrets* @body-recovery-app/security-team
