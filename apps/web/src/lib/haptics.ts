@@ -217,6 +217,59 @@ export const hapticPatterns: Record<string, HapticPattern> = {
     pattern: [15, 50, 15, 50, 30],
     description: 'New notification',
   },
+
+  // ============================================
+  // AMBIENT AI PATTERNS
+  // ============================================
+
+  // Gentle wave - ambient encouragement
+  ambientWave: {
+    name: 'Ambient Wave',
+    pattern: [8, 80, 12, 80, 8],
+    description: 'Gentle ambient wave for encouragement',
+  },
+
+  // Soft pulse - rest complete signal
+  ambientPulse: {
+    name: 'Ambient Pulse',
+    pattern: [12, 100, 12],
+    description: 'Soft pulse for ambient notifications',
+  },
+
+  // Breathing rhythm - calming feedback
+  ambientBreath: {
+    name: 'Ambient Breath',
+    pattern: [10, 150, 15, 150, 10],
+    description: 'Breathing rhythm for calming effect',
+  },
+
+  // Micro warmth - subtle positive feedback
+  ambientWarmth: {
+    name: 'Ambient Warmth',
+    pattern: [6, 50, 6],
+    description: 'Very subtle warmth feedback',
+  },
+
+  // Gentle attention - something needs notice
+  ambientAttention: {
+    name: 'Ambient Attention',
+    pattern: [15, 60, 10, 60, 15],
+    description: 'Gentle attention getter',
+  },
+
+  // Milestone - achievement reached
+  ambientMilestone: {
+    name: 'Ambient Milestone',
+    pattern: [20, 50, 15, 50, 25, 50, 30],
+    description: 'Milestone or achievement celebration',
+  },
+
+  // Ready signal - workout ready
+  ambientReady: {
+    name: 'Ambient Ready',
+    pattern: [10, 40, 10, 40, 20],
+    description: 'Ready state signal',
+  },
 };
 
 // ============================================
@@ -370,6 +423,59 @@ export function hapticNotification(): boolean {
   return vibrate(hapticPatterns.notification.pattern);
 }
 
+// ============================================
+// AMBIENT AI HAPTIC FUNCTIONS
+// ============================================
+
+/**
+ * Ambient wave - gentle encouragement
+ */
+export function hapticAmbientWave(): boolean {
+  return vibrate(hapticPatterns.ambientWave.pattern);
+}
+
+/**
+ * Ambient pulse - rest complete or soft notification
+ */
+export function hapticAmbientPulse(): boolean {
+  return vibrate(hapticPatterns.ambientPulse.pattern);
+}
+
+/**
+ * Ambient breath - calming rhythm
+ */
+export function hapticAmbientBreath(): boolean {
+  return vibrate(hapticPatterns.ambientBreath.pattern);
+}
+
+/**
+ * Ambient warmth - very subtle positive feedback
+ */
+export function hapticAmbientWarmth(): boolean {
+  return vibrate(hapticPatterns.ambientWarmth.pattern);
+}
+
+/**
+ * Ambient attention - gentle attention getter
+ */
+export function hapticAmbientAttention(): boolean {
+  return vibrate(hapticPatterns.ambientAttention.pattern);
+}
+
+/**
+ * Ambient milestone - achievement or milestone reached
+ */
+export function hapticAmbientMilestone(): boolean {
+  return vibrate(hapticPatterns.ambientMilestone.pattern);
+}
+
+/**
+ * Ambient ready - workout ready signal
+ */
+export function hapticAmbientReady(): boolean {
+  return vibrate(hapticPatterns.ambientReady.pattern);
+}
+
 /**
  * Impact feedback with intensity levels
  */
@@ -463,6 +569,15 @@ export class HapticManager {
   notification = hapticNotification;
   impact = hapticImpact;
   custom = hapticCustom;
+
+  // Ambient AI patterns
+  ambientWave = hapticAmbientWave;
+  ambientPulse = hapticAmbientPulse;
+  ambientBreath = hapticAmbientBreath;
+  ambientWarmth = hapticAmbientWarmth;
+  ambientAttention = hapticAmbientAttention;
+  ambientMilestone = hapticAmbientMilestone;
+  ambientReady = hapticAmbientReady;
 }
 
 // Export singleton instance
