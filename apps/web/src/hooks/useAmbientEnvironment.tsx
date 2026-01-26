@@ -8,10 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import type {
-  EnvironmentState,
-  FullAmbientContext,
-} from '../lib/ambient-ai/types';
+
 import {
   calculateEnvironmentState,
   interpolateEnvironment,
@@ -20,6 +17,7 @@ import {
   applyMicroCool,
   applySoften,
 } from '../lib/ambient-ai/environment-state';
+import type { EnvironmentState, FullAmbientContext } from '../lib/ambient-ai/types';
 
 // ============================================
 // TYPES
@@ -70,11 +68,7 @@ export function useAmbientEnvironment(
   context: FullAmbientContext | null,
   options: UseAmbientEnvironmentOptions = {}
 ): UseAmbientEnvironmentReturn {
-  const {
-    enabled = true,
-    transitionDuration = 2000,
-    updateInterval = 5000,
-  } = options;
+  const { enabled = true, transitionDuration = 2000, updateInterval = 5000 } = options;
 
   const [environmentState, setEnvironmentState] = useState<EnvironmentState>(DEFAULT_ENVIRONMENT);
   const [targetState, setTargetState] = useState<EnvironmentState>(DEFAULT_ENVIRONMENT);
@@ -93,41 +87,39 @@ export function useAmbientEnvironment(
   }, [context, enabled]);
 
   // Transition animation
-  const animateTransition = useCallback((
-    from: EnvironmentState,
-    to: EnvironmentState,
-    duration: number
-  ) => {
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-
-    setIsTransitioning(true);
-    startTimeRef.current = performance.now();
-    startStateRef.current = from;
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTimeRef.current;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Ease-in-out function
-      const eased = progress < 0.5
-        ? 2 * progress * progress
-        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-      const interpolated = interpolateEnvironment(startStateRef.current, to, eased);
-      setEnvironmentState(interpolated);
-
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        setIsTransitioning(false);
-        setTargetState(to);
+  const animateTransition = useCallback(
+    (from: EnvironmentState, to: EnvironmentState, duration: number) => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
-    };
 
-    animationRef.current = requestAnimationFrame(animate);
-  }, []);
+      setIsTransitioning(true);
+      startTimeRef.current = performance.now();
+      startStateRef.current = from;
+
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTimeRef.current;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Ease-in-out function
+        const eased =
+          progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        const interpolated = interpolateEnvironment(startStateRef.current, to, eased);
+        setEnvironmentState(interpolated);
+
+        if (progress < 1) {
+          animationRef.current = requestAnimationFrame(animate);
+        } else {
+          setIsTransitioning(false);
+          setTargetState(to);
+        }
+      };
+
+      animationRef.current = requestAnimationFrame(animate);
+    },
+    []
+  );
 
   // Update environment when context changes
   useEffect(() => {
@@ -196,10 +188,13 @@ export function useAmbientEnvironment(
   // ACTIONS
   // ============================================
 
-  const setPreset = useCallback((preset: keyof typeof ENVIRONMENT_PRESETS) => {
-    const presetState = ENVIRONMENT_PRESETS[preset];
-    animateTransition(environmentState, presetState, transitionDuration);
-  }, [environmentState, animateTransition, transitionDuration]);
+  const setPreset = useCallback(
+    (preset: keyof typeof ENVIRONMENT_PRESETS) => {
+      const presetState = ENVIRONMENT_PRESETS[preset];
+      animateTransition(environmentState, presetState, transitionDuration);
+    },
+    [environmentState, animateTransition, transitionDuration]
+  );
 
   const applyWarmth = useCallback(() => {
     const warmed = applyMicroWarmth(environmentState);
@@ -242,9 +237,12 @@ export function useAmbientEnvironment(
     }));
   }, []);
 
-  const transitionTo = useCallback((state: EnvironmentState, duration?: number) => {
-    animateTransition(environmentState, state, duration ?? transitionDuration);
-  }, [environmentState, animateTransition, transitionDuration]);
+  const transitionTo = useCallback(
+    (state: EnvironmentState, duration?: number) => {
+      animateTransition(environmentState, state, duration ?? transitionDuration);
+    },
+    [environmentState, animateTransition, transitionDuration]
+  );
 
   return {
     environmentState,
