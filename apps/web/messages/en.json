@@ -1,0 +1,535 @@
+{
+  "common": {
+    "appName": "Recovery",
+    "tagline": "Your body recovery companion",
+    "premium": "Premium",
+    "new": "New",
+    "loading": "Loading...",
+    "save": "Save",
+    "saveChanges": "Save Changes",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "apply": "Apply",
+    "viewAll": "View all",
+    "seeMore": "See more",
+    "showLess": "Show less",
+    "learnMore": "Learn more",
+    "getStarted": "Get started",
+    "continueText": "Continue",
+    "skip": "Skip",
+    "retry": "Retry",
+    "areas": "{count} areas",
+    "noChange": "No change",
+    "of": "of {total}",
+    "days": "{count} days",
+    "minutes": "{count} min",
+    "percentage": "{value}%",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "or": "or",
+    "and": "and",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "bodyMap": "Body Map",
+    "progress": "Progress",
+    "history": "History",
+    "settings": "Settings",
+    "getMobileApp": "Get Mobile App",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
+  },
+  "home": {
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "recoveryProgressing": "Your recovery is progressing well.",
+    "gentleRecovery": "Let's focus on gentle recovery today.",
+    "weeklySummary": "Here's your recovery summary for this week.",
+    "sessionsThisWeek": "Sessions This Week",
+    "ofRecommended": "of 7 recommended",
+    "completionRate": "Completion Rate",
+    "exercisesCompleted": "exercises completed",
+    "avgPainReduction": "Avg Pain Reduction",
+    "pointsPerSession": "points per session",
+    "totalTime": "Total Time",
+    "minutesThisWeek": "minutes this week",
+    "recentSessions": "Recent Sessions",
+    "personalizedInsights": "Personalized Insights",
+    "bodyStatus": "Body Status",
+    "areasNeedingAttention": "Areas needing attention",
+    "updateBodyMap": "Update Body Map",
+    "mobileApp": "Mobile App",
+    "mobileAppDescription": "Best for daily check-ins and workouts",
+    "downloadApp": "Download for iOS/Android",
+    "sessionDate": "{weekday}, {month} {day}",
+    "sessionSummary": "{duration} min - {completed}/{total} exercises",
+    "painReduced": "Pain -{reduction}",
+    "painUnchanged": "Pain unchanged",
+    "painRange": "{before} to {after}"
+  },
+  "body": {
+    "title": "Body Map",
+    "subtitle": "Tap on any region to update your pain level.",
+    "selectedRegion": "Selected Region",
+    "currentLevel": "Current Level",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "painLevelEditor": "Pain Level Editor",
+    "clickToEdit": "Click on a body region to edit its pain level",
+    "changeHistory": "Change History",
+    "noChangesMade": "No changes made yet. Select a region and adjust the pain level.",
+    "summary": "Summary",
+    "activeAreas": "Active Areas",
+    "avgPainLevel": "Avg Pain Level",
+    "highestPain": "Highest Pain",
+    "painFreeAreas": "{percentage}% pain-free areas",
+    "smartTips": "Smart Tips",
+    "legend": {
+      "noPain": "No pain",
+      "mild": "Mild (1-3)",
+      "moderate": "Moderate (4-6)",
+      "severe": "Severe (7-10)"
+    },
+    "painLabels": {
+      "none": "No pain",
+      "mild": "Mild",
+      "moderate": "Moderate",
+      "severe": "Severe"
+    },
+    "regions": {
+      "head": "Head",
+      "neck": "Neck",
+      "leftShoulder": "Left Shoulder",
+      "rightShoulder": "Right Shoulder",
+      "leftArm": "Left Arm",
+      "rightArm": "Right Arm",
+      "chest": "Chest",
+      "upperBack": "Upper Back",
+      "lowerBack": "Lower Back",
+      "abdomen": "Abdomen",
+      "leftHip": "Left Hip",
+      "rightHip": "Right Hip",
+      "leftThigh": "Left Thigh",
+      "rightThigh": "Right Thigh",
+      "leftKnee": "Left Knee",
+      "rightKnee": "Right Knee",
+      "leftCalf": "Left Calf",
+      "rightCalf": "Right Calf",
+      "leftAnkle": "Left Ankle",
+      "rightAnkle": "Right Ankle"
+    }
+  },
+  "progress": {
+    "title": "Progress",
+    "subtitle": "Track your recovery journey and pain trends over time.",
+    "exportData": "Export Data",
+    "dateRanges": {
+      "7d": "7d",
+      "14d": "14d",
+      "30d": "30d",
+      "90d": "90d"
+    },
+    "averagePainLevel": "Average Pain Level",
+    "outOf10": "out of 10",
+    "painTrend": "Pain Trend",
+    "decrease": "decrease",
+    "increase": "increase",
+    "vsStartOfPeriod": "vs start of period",
+    "sessionsCompleted": "Sessions Completed",
+    "ofDays": "of {days} days ({percentage}%)",
+    "activePainAreas": "Active Pain Areas",
+    "regionsNeedAttention": "regions need attention",
+    "painTrendOverTime": "Pain Trend Over Time",
+    "dailyAveragePainLevel": "Daily average pain level",
+    "painByRegion": "Pain by Region",
+    "currentVsPrevious": "Current vs previous period",
+    "regionBreakdown": "Region-by-Region Breakdown",
+    "regionBreakdownDescription": "Detailed view of pain levels across all tracked body regions",
+    "tableHeaders": {
+      "region": "Region",
+      "currentLevel": "Current Level",
+      "previousLevel": "Previous Level",
+      "change": "Change",
+      "status": "Status"
+    },
+    "status": {
+      "improving": "Improving",
+      "worsening": "Worsening",
+      "stable": "Stable"
+    },
+    "current": "Current",
+    "previous": "Previous"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "savedSuccessfully": "Settings saved successfully",
+    "sections": {
+      "profile": "Profile",
+      "preferences": "Preferences",
+      "interactions": "Interactions",
+      "notifications": "Notifications",
+      "data": "Data & Privacy"
+    },
+    "profile": {
+      "title": "Profile Information",
+      "subtitle": "Update your personal information",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "saveChanges": "Save Changes"
+    },
+    "preferences": {
+      "recovery": {
+        "title": "Recovery Preferences",
+        "subtitle": "Customize your recovery experience",
+        "sessionDuration": "Preferred Session Duration",
+        "reminderTime": "Daily Reminder Time"
+      },
+      "appearance": {
+        "title": "Appearance",
+        "subtitle": "Customize how the app looks",
+        "darkMode": "Dark Mode",
+        "darkModeDescription": "Use dark theme for the interface"
+      },
+      "durations": {
+        "10min": "10 minutes",
+        "15min": "15 minutes",
+        "20min": "20 minutes",
+        "30min": "30 minutes",
+        "45min": "45 minutes"
+      }
+    },
+    "interactions": {
+      "soundHaptics": {
+        "title": "Sound & Haptics",
+        "subtitle": "Customize audio and tactile feedback",
+        "uiSounds": "UI Sounds",
+        "uiSoundsDescription": "Subtle audio feedback for interactions",
+        "hapticFeedback": "Haptic Feedback",
+        "hapticDescription": "Tactile vibration on touch interactions",
+        "testFeedback": "Test Feedback",
+        "tap": "Tap",
+        "success": "Success",
+        "warning": "Warning",
+        "complete": "Complete"
+      },
+      "animations": {
+        "title": "Animation Preferences",
+        "subtitle": "Animations respect system preferences",
+        "tip": "Tip:",
+        "tipContent": "To reduce or disable animations, enable \"Reduce motion\" in your device's accessibility settings."
+      }
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "subtitle": "Choose how you want to receive notifications",
+      "email": "Email Notifications",
+      "emailDescription": "Receive session reminders via email",
+      "push": "Push Notifications",
+      "pushDescription": "Receive push notifications on your devices",
+      "weeklyReport": "Weekly Report",
+      "weeklyReportDescription": "Get a weekly summary of your progress"
+    },
+    "data": {
+      "export": {
+        "title": "Export Your Data",
+        "subtitle": "Download all your data in JSON format",
+        "button": "Export All Data"
+      },
+      "danger": {
+        "title": "Danger Zone",
+        "subtitle": "Permanently delete your account and all data",
+        "deleteAccount": "Delete Account"
+      }
+    },
+    "language": {
+      "title": "Language",
+      "subtitle": "Choose your preferred language",
+      "current": "Current language",
+      "comingSoon": "More languages coming soon"
+    },
+    "disclaimer": {
+      "title": "Important Disclaimer",
+      "content1": "This app provides guided self-care information for recovery and mobility purposes. It is not intended to be a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.",
+      "content2": "Never disregard professional medical advice or delay in seeking it because of something you have read or experienced through this app. If you think you may have a medical emergency, call your doctor or emergency services immediately."
+    }
+  },
+  "sidebar": {
+    "disclaimer": "This is guided self-care, not medical treatment. Consult a healthcare professional for medical advice."
+  },
+  "exercises": {
+    "nameKey": "name",
+    "descriptionKey": "description",
+    "cuesKey": "cues",
+    "defaultCue": "Follow the movement pattern shown",
+    "setsCompleted": "{completed}/{target} sets",
+    "catalog": {
+      "catCowStretch": {
+        "name": "Cat-Cow Stretch",
+        "description": "A gentle flow between two poses that warms up the spine and stretches the back muscles.",
+        "cues": ["Start on hands and knees", "Arch back up like a cat", "Drop belly down, look up", "Move slowly between positions"]
+      },
+      "hipCircles": {
+        "name": "Hip Circles",
+        "description": "Circular movements to improve hip mobility and loosen tight muscles around the pelvis.",
+        "cues": ["Stand with feet hip-width apart", "Make slow circles with hips", "Keep upper body stable", "Reverse direction"]
+      },
+      "childsPose": {
+        "name": "Child's Pose",
+        "description": "A resting pose that gently stretches the lower back, hips, and thighs.",
+        "cues": ["Kneel on the floor", "Sit back on heels", "Reach arms forward", "Rest forehead on ground"]
+      },
+      "birdDog": {
+        "name": "Bird Dog",
+        "description": "A core stability exercise that strengthens the back and improves balance.",
+        "cues": ["Start on hands and knees", "Extend opposite arm and leg", "Keep back flat", "Hold briefly, then switch"]
+      },
+      "shoulderRolls": {
+        "name": "Shoulder Rolls",
+        "description": "Simple circular movements to release tension in the shoulders and upper back.",
+        "cues": ["Relax arms at sides", "Roll shoulders forward", "Then roll backwards", "Keep movements smooth"]
+      },
+      "threadTheNeedle": {
+        "name": "Thread the Needle",
+        "description": "A rotational stretch that opens up the thoracic spine and shoulders.",
+        "cues": ["Start on hands and knees", "Thread one arm under body", "Rotate torso", "Feel stretch in upper back"]
+      },
+      "kneeToChest": {
+        "name": "Knee to Chest",
+        "description": "A gentle stretch for the lower back and hips.",
+        "cues": ["Lie on your back", "Pull one knee to chest", "Hold gently", "Switch legs"]
+      },
+      "pelvicTilts": {
+        "name": "Pelvic Tilts",
+        "description": "Subtle movements to mobilize the lower back and strengthen core stability.",
+        "cues": ["Lie on back, knees bent", "Flatten lower back to floor", "Then arch slightly", "Move slowly"]
+      },
+      "standingQuadStretch": {
+        "name": "Standing Quad Stretch",
+        "description": "A classic stretch for the front of the thigh.",
+        "cues": ["Stand on one leg", "Pull foot toward buttock", "Keep knees together", "Hold for balance"]
+      },
+      "supineTwist": {
+        "name": "Supine Twist",
+        "description": "A relaxing twist that stretches the spine and releases tension.",
+        "cues": ["Lie on your back", "Drop knees to one side", "Keep shoulders flat", "Look opposite direction"]
+      }
+    }
+  },
+  "formats": {
+    "date": {
+      "short": "{month}/{day}/{year}",
+      "medium": "{month} {day}, {year}",
+      "long": "{weekday}, {month} {day}, {year}",
+      "relative": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "daysAgo": "{count} days ago"
+      }
+    },
+    "time": {
+      "short": "{hour}:{minute}",
+      "withPeriod": "{hour}:{minute} {period}"
+    },
+    "number": {
+      "decimal": "{value}",
+      "percent": "{value}%",
+      "compact": "{value}"
+    }
+  },
+  "accessibility": {
+    "toggleTheme": "Toggle theme",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navigation": "Navigation",
+    "mainContent": "Main content",
+    "quickNavigation": "Quick navigation",
+    "mainNavigation": "Main navigation",
+    "skipToContent": "Skip to content",
+    "skipToNav": "Skip to navigation"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "networkError": "Check your connection and try again.",
+    "loadFailed": "Couldn't load that. Try again?",
+    "saveFailed": "Couldn't save. Try again?",
+    "notFound": "The requested resource was not found.",
+    "unauthorized": "Please sign in to access this feature.",
+    "forbidden": "You don't have permission to access this resource.",
+    "validation": "Please check your input and try again.",
+    "server": "Server error. Please try again later.",
+    "timeout": "Request timed out. Please try again.",
+    "offline": "You're offline. Some features may be unavailable.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "deleteFailed": "Failed to delete. Please try again.",
+    "fileTooLarge": "File is too large. Maximum size is {size}.",
+    "invalidFormat": "Invalid file format. Supported formats: {formats}.",
+    "form": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "minLength": "Must be at least {min} characters",
+      "maxLength": "Must be no more than {max} characters",
+      "number": "Please enter a valid number",
+      "positiveNumber": "Please enter a positive number",
+      "date": "Please enter a valid date",
+      "dateRange": "End date must be after start date"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Install App",
+      "description": "Install Recovery for quick access and offline use",
+      "button": "Install",
+      "dismiss": "Not now"
+    },
+    "notification": {
+      "title": "Enable Notifications",
+      "description": "Get reminders for your recovery sessions",
+      "button": "Enable",
+      "dismiss": "Maybe later"
+    },
+    "offline": {
+      "title": "You're Offline",
+      "description": "Some features may be unavailable until you're back online",
+      "reconnecting": "Reconnecting..."
+    },
+    "update": {
+      "title": "Update Available",
+      "description": "A new version is available. Refresh to update.",
+      "button": "Refresh",
+      "dismiss": "Later"
+    }
+  },
+  "ai": {
+    "assistant": {
+      "title": "AI Assistant",
+      "thinking": "Thinking...",
+      "greeting": "How can I help with your recovery today?",
+      "placeholder": "Ask me anything about your recovery...",
+      "send": "Send",
+      "suggestions": {
+        "focus": "What should I focus on today?",
+        "progress": "Explain my progress this week",
+        "restDay": "Should I take a rest day?",
+        "painQuestion": "Why is my pain getting worse?"
+      }
+    },
+    "insights": {
+      "title": "AI Insights",
+      "dismiss": "Dismiss",
+      "dontShowAgain": "Don't show again",
+      "learnMore": "Learn more"
+    },
+    "presence": {
+      "active": "AI Active",
+      "thinking": "Analyzing...",
+      "ready": "Ready to help"
+    }
+  },
+  "history": {
+    "title": "Session History",
+    "subtitle": "Review your past recovery sessions",
+    "noSessions": "No sessions recorded yet",
+    "startSession": "Start your first session",
+    "viewDetails": "View Details",
+    "deleteSession": "Delete Session",
+    "confirmDelete": "Are you sure you want to delete this session?",
+    "sessionDeleted": "Session deleted successfully",
+    "session": "Session",
+    "date": "Date",
+    "duration": "Duration",
+    "exercises": "Exercises",
+    "painBefore": "Pain Before",
+    "painAfter": "Pain After",
+    "painReduction": "Pain Reduction",
+    "filter": {
+      "all": "All Sessions",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "custom": "Custom Range"
+    },
+    "sort": {
+      "newest": "Newest First",
+      "oldest": "Oldest First",
+      "longestDuration": "Longest Duration",
+      "mostPainReduction": "Most Pain Reduction"
+    }
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{count} minutes ago",
+    "hoursAgo": "{count} hours ago",
+    "daysAgo": "{count} days ago",
+    "weeksAgo": "{count} weeks ago",
+    "monthsAgo": "{count} months ago",
+    "inMinutes": "in {count} minutes",
+    "inHours": "in {count} hours",
+    "inDays": "in {count} days"
+  },
+  "units": {
+    "minutes": "{count} minutes",
+    "minutesShort": "{count} min",
+    "hours": "{count} hours",
+    "hoursShort": "{count} hr",
+    "days": "{count} days",
+    "sessions": "{count} sessions",
+    "exercises": "{count} exercises",
+    "sets": "{count} sets",
+    "reps": "{count} reps",
+    "points": "{count} points"
+  },
+  "locale": {
+    "switcher": {
+      "title": "Language",
+      "ariaLabel": "Select language",
+      "current": "Current: {language}"
+    },
+    "languages": {
+      "en": "English",
+      "es": "Spanish",
+      "fr": "French",
+      "de": "German",
+      "ar": "Arabic",
+      "he": "Hebrew",
+      "ja": "Japanese",
+      "zh": "Chinese",
+      "pt": "Portuguese"
+    },
+    "nativeNames": {
+      "en": "English",
+      "es": "Espanol",
+      "fr": "Francais",
+      "de": "Deutsch",
+      "ar": "Arabic",
+      "he": "Hebrew",
+      "ja": "Japanese",
+      "zh": "Chinese",
+      "pt": "Portugues"
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "name": "body-recovery-app",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "build:web": "turbo run build --filter=@app/web...",
+    "build:packages": "turbo run build --filter='./packages/*'",
+    "dev": "turbo run dev",
+    "dev:mobile": "turbo run dev --filter=@app/mobile",
+    "dev:web": "turbo run dev --filter=@app/web",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:watch": "turbo run test -- --watch",
+    "test:coverage": "turbo run test -- --coverage",
+    "test:ci": "turbo run test -- --coverage --reporter=verbose",
+    "clean": "turbo run clean && rm -rf node_modules .turbo",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "vercel:build": "turbo run build --filter=@app/web...",
+    "vercel:dev": "vercel dev",
+    "vercel:pull": "vercel pull --yes",
+    "vercel:deploy": "vercel deploy",
+    "vercel:deploy:prod": "vercel deploy --prod",
+    "ci": "pnpm format:check && pnpm typecheck && pnpm lint && pnpm test && pnpm build",
+    "ci:quick": "pnpm format:check && pnpm typecheck && pnpm lint",
+    "ci:full": "pnpm format:check && pnpm typecheck && pnpm lint && pnpm test:coverage && pnpm build",
+    "deploy:preview": "vercel deploy",
+    "bundle:analyze": "ANALYZE=true turbo run build --filter=@app/web",
+    "lighthouse": "lhci autorun",
+    "lighthouse:ci": "lhci autorun --config=lighthouserc.js",
+    "release": "echo 'Releases are handled by GitHub Actions'",
+    "precommit": "lint-staged",
+    "commitlint": "commitlint --edit",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@lhci/cli": "^0.13.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.0",
+    "eslint-plugin-import": "^2.29.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.2.0",
+    "next": "15.1.0",
+    "prettier": "^3.2.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.4.0",
+    "vercel": "^39.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{js,jsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write --prose-wrap=always"
+    ],
+    "package.json": [
+      "prettier --write"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+# Vercel Ignore File
+# Files and folders to exclude from deployment
+
+# Mobile app (deployed separately via EAS)
+apps/mobile/
+
+# Development files
+.vscode/
+.idea/
+*.log
+*.local
+
+# Test files
+**/__tests__/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+coverage/
+jest.config.js
+
+# Documentation (keep ops/ for reference)
+docs/
+
+# Node modules (Vercel installs fresh)
+node_modules/
+**/node_modules/
+
+# Build artifacts (rebuilt on Vercel)
+dist/
+.next/
+.turbo/
+.expo/
+
+# Environment files (use Vercel env vars)
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~

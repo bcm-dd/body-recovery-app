@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="bgGrad128" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#818cf8"/>
+    </linearGradient>
+    <filter id="glow128" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <circle cx="64" cy="64" r="58" fill="url(#bgGrad128)"/>
+  <g fill="white" filter="url(#glow128)">
+    <circle cx="64" cy="35" r="9"/>
+    <path d="M64 47 L64 77" stroke="white" stroke-width="5" stroke-linecap="round"/>
+    <path d="M64 55 L45 44 L36 50" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M64 55 L83 44 L92 50" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M64 77 L50 100" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M64 77 L78 100" stroke="white" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M30 87 L43 87 L50 77 L57 97 L64 84 L70 90 L73 87 L98 87"
+          stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.8"/>
+  </g>
+</svg>

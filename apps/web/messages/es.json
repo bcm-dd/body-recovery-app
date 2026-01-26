@@ -1,0 +1,393 @@
+{
+  "_meta": {
+    "language": "Spanish",
+    "nativeName": "Espanol",
+    "code": "es",
+    "direction": "ltr",
+    "status": "placeholder",
+    "lastUpdated": "2026-01-25",
+    "translationProgress": 0
+  },
+  "common": {
+    "appName": "Recovery",
+    "tagline": "[ES] Your body recovery companion",
+    "premium": "Premium",
+    "new": "Nuevo",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "saveChanges": "Guardar cambios",
+    "reset": "Restablecer",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "back": "Atras",
+    "next": "Siguiente",
+    "done": "Hecho",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "submit": "Enviar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "clear": "Limpiar",
+    "apply": "Aplicar",
+    "viewAll": "Ver todo",
+    "seeMore": "Ver mas",
+    "showLess": "Ver menos",
+    "learnMore": "Mas informacion",
+    "getStarted": "Comenzar",
+    "continueText": "Continuar",
+    "skip": "Omitir",
+    "retry": "Reintentar",
+    "areas": "{count} areas",
+    "noChange": "Sin cambios",
+    "of": "de {total}",
+    "days": "{count} dias",
+    "minutes": "{count} min",
+    "percentage": "{value}%",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "all": "Todo",
+    "none": "Ninguno",
+    "yes": "Si",
+    "no": "No",
+    "ok": "OK",
+    "or": "o",
+    "and": "y",
+    "required": "Requerido",
+    "optional": "Opcional"
+  },
+  "nav": {
+    "dashboard": "[ES] Dashboard",
+    "bodyMap": "[ES] Body Map",
+    "progress": "[ES] Progress",
+    "history": "[ES] History",
+    "settings": "[ES] Settings",
+    "getMobileApp": "[ES] Get Mobile App",
+    "lightMode": "[ES] Light Mode",
+    "darkMode": "[ES] Dark Mode"
+  },
+  "home": {
+    "greetingMorning": "[ES] Good morning",
+    "greetingAfternoon": "[ES] Good afternoon",
+    "greetingEvening": "[ES] Good evening",
+    "recoveryProgressing": "[ES] Your recovery is progressing well.",
+    "gentleRecovery": "[ES] Let's focus on gentle recovery today.",
+    "weeklySummary": "[ES] Here's your recovery summary for this week.",
+    "sessionsThisWeek": "[ES] Sessions This Week",
+    "ofRecommended": "[ES] of 7 recommended",
+    "completionRate": "[ES] Completion Rate",
+    "exercisesCompleted": "[ES] exercises completed",
+    "avgPainReduction": "[ES] Avg Pain Reduction",
+    "pointsPerSession": "[ES] points per session",
+    "totalTime": "[ES] Total Time",
+    "minutesThisWeek": "[ES] minutes this week",
+    "recentSessions": "[ES] Recent Sessions",
+    "personalizedInsights": "[ES] Personalized Insights",
+    "bodyStatus": "[ES] Body Status",
+    "areasNeedingAttention": "[ES] Areas needing attention",
+    "updateBodyMap": "[ES] Update Body Map",
+    "mobileApp": "[ES] Mobile App",
+    "mobileAppDescription": "[ES] Best for daily check-ins and workouts",
+    "downloadApp": "[ES] Download for iOS/Android",
+    "sessionDate": "{weekday}, {month} {day}",
+    "sessionSummary": "{duration} min - {completed}/{total} [ES] exercises",
+    "painReduced": "[ES] Pain -{reduction}",
+    "painUnchanged": "[ES] Pain unchanged",
+    "painRange": "{before} [ES] to {after}"
+  },
+  "body": {
+    "title": "[ES] Body Map",
+    "subtitle": "[ES] Tap on any region to update your pain level.",
+    "selectedRegion": "[ES] Selected Region",
+    "currentLevel": "[ES] Current Level",
+    "decrease": "[ES] Decrease",
+    "increase": "[ES] Increase",
+    "painLevelEditor": "[ES] Pain Level Editor",
+    "clickToEdit": "[ES] Click on a body region to edit its pain level",
+    "changeHistory": "[ES] Change History",
+    "noChangesMade": "[ES] No changes made yet. Select a region and adjust the pain level.",
+    "summary": "[ES] Summary",
+    "activeAreas": "[ES] Active Areas",
+    "avgPainLevel": "[ES] Avg Pain Level",
+    "highestPain": "[ES] Highest Pain",
+    "painFreeAreas": "[ES] {percentage}% pain-free areas",
+    "smartTips": "[ES] Smart Tips",
+    "legend": {
+      "noPain": "[ES] No pain",
+      "mild": "[ES] Mild (1-3)",
+      "moderate": "[ES] Moderate (4-6)",
+      "severe": "[ES] Severe (7-10)"
+    },
+    "painLabels": {
+      "none": "[ES] No pain",
+      "mild": "[ES] Mild",
+      "moderate": "[ES] Moderate",
+      "severe": "[ES] Severe"
+    },
+    "regions": {
+      "head": "[ES] Head",
+      "neck": "[ES] Neck",
+      "leftShoulder": "[ES] Left Shoulder",
+      "rightShoulder": "[ES] Right Shoulder",
+      "leftArm": "[ES] Left Arm",
+      "rightArm": "[ES] Right Arm",
+      "chest": "[ES] Chest",
+      "upperBack": "[ES] Upper Back",
+      "lowerBack": "[ES] Lower Back",
+      "abdomen": "[ES] Abdomen",
+      "leftHip": "[ES] Left Hip",
+      "rightHip": "[ES] Right Hip",
+      "leftThigh": "[ES] Left Thigh",
+      "rightThigh": "[ES] Right Thigh",
+      "leftKnee": "[ES] Left Knee",
+      "rightKnee": "[ES] Right Knee",
+      "leftCalf": "[ES] Left Calf",
+      "rightCalf": "[ES] Right Calf",
+      "leftAnkle": "[ES] Left Ankle",
+      "rightAnkle": "[ES] Right Ankle"
+    }
+  },
+  "progress": {
+    "title": "[ES] Progress",
+    "subtitle": "[ES] Track your recovery journey and pain trends over time.",
+    "exportData": "[ES] Export Data",
+    "dateRanges": {
+      "7d": "7d",
+      "14d": "14d",
+      "30d": "30d",
+      "90d": "90d"
+    },
+    "averagePainLevel": "[ES] Average Pain Level",
+    "outOf10": "[ES] out of 10",
+    "painTrend": "[ES] Pain Trend",
+    "decrease": "[ES] decrease",
+    "increase": "[ES] increase",
+    "vsStartOfPeriod": "[ES] vs start of period",
+    "sessionsCompleted": "[ES] Sessions Completed",
+    "ofDays": "[ES] of {days} days ({percentage}%)",
+    "activePainAreas": "[ES] Active Pain Areas",
+    "regionsNeedAttention": "[ES] regions need attention",
+    "painTrendOverTime": "[ES] Pain Trend Over Time",
+    "dailyAveragePainLevel": "[ES] Daily average pain level",
+    "painByRegion": "[ES] Pain by Region",
+    "currentVsPrevious": "[ES] Current vs previous period",
+    "regionBreakdown": "[ES] Region-by-Region Breakdown",
+    "regionBreakdownDescription": "[ES] Detailed view of pain levels across all tracked body regions",
+    "tableHeaders": {
+      "region": "[ES] Region",
+      "currentLevel": "[ES] Current Level",
+      "previousLevel": "[ES] Previous Level",
+      "change": "[ES] Change",
+      "status": "[ES] Status"
+    },
+    "status": {
+      "improving": "[ES] Improving",
+      "worsening": "[ES] Worsening",
+      "stable": "[ES] Stable"
+    },
+    "current": "[ES] Current",
+    "previous": "[ES] Previous"
+  },
+  "settings": {
+    "title": "[ES] Settings",
+    "subtitle": "[ES] Manage your account and preferences",
+    "savedSuccessfully": "[ES] Settings saved successfully",
+    "sections": {
+      "profile": "[ES] Profile",
+      "preferences": "[ES] Preferences",
+      "interactions": "[ES] Interactions",
+      "notifications": "[ES] Notifications",
+      "data": "[ES] Data & Privacy"
+    },
+    "profile": {
+      "title": "[ES] Profile Information",
+      "subtitle": "[ES] Update your personal information",
+      "fullName": "[ES] Full Name",
+      "fullNamePlaceholder": "[ES] Enter your name",
+      "email": "[ES] Email Address",
+      "emailPlaceholder": "[ES] Enter your email",
+      "saveChanges": "[ES] Save Changes"
+    },
+    "preferences": {
+      "recovery": {
+        "title": "[ES] Recovery Preferences",
+        "subtitle": "[ES] Customize your recovery experience",
+        "sessionDuration": "[ES] Preferred Session Duration",
+        "reminderTime": "[ES] Daily Reminder Time"
+      },
+      "appearance": {
+        "title": "[ES] Appearance",
+        "subtitle": "[ES] Customize how the app looks",
+        "darkMode": "[ES] Dark Mode",
+        "darkModeDescription": "[ES] Use dark theme for the interface"
+      },
+      "durations": {
+        "10min": "10 minutos",
+        "15min": "15 minutos",
+        "20min": "20 minutos",
+        "30min": "30 minutos",
+        "45min": "45 minutos"
+      }
+    },
+    "interactions": {
+      "soundHaptics": {
+        "title": "[ES] Sound & Haptics",
+        "subtitle": "[ES] Customize audio and tactile feedback",
+        "uiSounds": "[ES] UI Sounds",
+        "uiSoundsDescription": "[ES] Subtle audio feedback for interactions",
+        "hapticFeedback": "[ES] Haptic Feedback",
+        "hapticDescription": "[ES] Tactile vibration on touch interactions",
+        "testFeedback": "[ES] Test Feedback",
+        "tap": "[ES] Tap",
+        "success": "[ES] Success",
+        "warning": "[ES] Warning",
+        "complete": "[ES] Complete"
+      },
+      "animations": {
+        "title": "[ES] Animation Preferences",
+        "subtitle": "[ES] Animations respect system preferences",
+        "tip": "[ES] Tip:",
+        "tipContent": "[ES] To reduce or disable animations, enable \"Reduce motion\" in your device's accessibility settings."
+      }
+    },
+    "notifications": {
+      "title": "[ES] Notification Settings",
+      "subtitle": "[ES] Choose how you want to receive notifications",
+      "email": "[ES] Email Notifications",
+      "emailDescription": "[ES] Receive session reminders via email",
+      "push": "[ES] Push Notifications",
+      "pushDescription": "[ES] Receive push notifications on your devices",
+      "weeklyReport": "[ES] Weekly Report",
+      "weeklyReportDescription": "[ES] Get a weekly summary of your progress"
+    },
+    "data": {
+      "export": {
+        "title": "[ES] Export Your Data",
+        "subtitle": "[ES] Download all your data in JSON format",
+        "button": "[ES] Export All Data"
+      },
+      "danger": {
+        "title": "[ES] Danger Zone",
+        "subtitle": "[ES] Permanently delete your account and all data",
+        "deleteAccount": "[ES] Delete Account"
+      }
+    },
+    "language": {
+      "title": "[ES] Language",
+      "subtitle": "[ES] Choose your preferred language",
+      "current": "[ES] Current language",
+      "comingSoon": "[ES] More languages coming soon"
+    },
+    "disclaimer": {
+      "title": "[ES] Important Disclaimer",
+      "content1": "[ES] This app provides guided self-care information for recovery and mobility purposes. It is not intended to be a substitute for professional medical advice, diagnosis, or treatment.",
+      "content2": "[ES] Never disregard professional medical advice or delay in seeking it because of something you have read or experienced through this app."
+    }
+  },
+  "sidebar": {
+    "disclaimer": "[ES] This is guided self-care, not medical treatment. Consult a healthcare professional for medical advice."
+  },
+  "exercises": {
+    "nameKey": "name",
+    "descriptionKey": "description",
+    "cuesKey": "cues",
+    "defaultCue": "[ES] Follow the movement pattern shown",
+    "setsCompleted": "{completed}/{target} [ES] sets",
+    "catalog": {
+      "catCowStretch": {
+        "name": "[ES] Cat-Cow Stretch",
+        "description": "[ES] A gentle flow between two poses that warms up the spine.",
+        "cues": ["[ES] Start on hands and knees", "[ES] Arch back up like a cat", "[ES] Drop belly down, look up"]
+      }
+    }
+  },
+  "formats": {
+    "date": {
+      "short": "{day}/{month}/{year}",
+      "medium": "{day} {month}, {year}",
+      "long": "{weekday}, {day} de {month} de {year}",
+      "relative": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "daysAgo": "Hace {count} dias"
+      }
+    },
+    "time": {
+      "short": "{hour}:{minute}",
+      "withPeriod": "{hour}:{minute}"
+    },
+    "number": {
+      "decimal": "{value}",
+      "percent": "{value}%",
+      "compact": "{value}"
+    }
+  },
+  "accessibility": {
+    "toggleTheme": "[ES] Toggle theme",
+    "openMenu": "[ES] Open menu",
+    "closeMenu": "[ES] Close menu",
+    "navigation": "[ES] Navigation",
+    "mainContent": "[ES] Main content"
+  },
+  "errors": {
+    "generic": "[ES] Something went wrong. Please try again.",
+    "networkError": "[ES] Check your connection and try again.",
+    "loadFailed": "[ES] Couldn't load that. Try again?",
+    "saveFailed": "[ES] Couldn't save. Try again?",
+    "notFound": "[ES] The requested resource was not found.",
+    "offline": "[ES] You're offline. Some features may be unavailable.",
+    "form": {
+      "required": "[ES] This field is required",
+      "email": "[ES] Please enter a valid email address"
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "[ES] Install App",
+      "description": "[ES] Install Recovery for quick access and offline use",
+      "button": "[ES] Install",
+      "dismiss": "[ES] Not now"
+    },
+    "notification": {
+      "title": "[ES] Enable Notifications",
+      "description": "[ES] Get reminders for your recovery sessions",
+      "button": "[ES] Enable",
+      "dismiss": "[ES] Maybe later"
+    },
+    "offline": {
+      "title": "[ES] You're Offline",
+      "description": "[ES] Some features may be unavailable",
+      "reconnecting": "[ES] Reconnecting..."
+    },
+    "update": {
+      "title": "[ES] Update Available",
+      "description": "[ES] A new version is available.",
+      "button": "[ES] Refresh",
+      "dismiss": "[ES] Later"
+    }
+  },
+  "ai": {
+    "assistant": {
+      "title": "[ES] AI Assistant",
+      "thinking": "[ES] Thinking...",
+      "greeting": "[ES] How can I help with your recovery today?",
+      "placeholder": "[ES] Ask me anything about your recovery..."
+    },
+    "insights": {
+      "title": "[ES] AI Insights",
+      "dismiss": "[ES] Dismiss",
+      "dontShowAgain": "[ES] Don't show again"
+    }
+  },
+  "locale": {
+    "switcher": {
+      "title": "[ES] Language",
+      "ariaLabel": "[ES] Select language",
+      "current": "[ES] Current: {language}"
+    }
+  }
+}

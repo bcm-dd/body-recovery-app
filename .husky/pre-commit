@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+# Pre-commit hook
+# Runs lint-staged to check and format staged files
+# Designed to be fast (< 30 seconds for most commits)
+
+set -e
+
+echo "Running pre-commit checks..."
+
+# Run lint-staged (includes eslint --fix and prettier --write)
+pnpm exec lint-staged
+
+# Run type check only if TypeScript files are staged
+# Uses tsc --noEmit with incremental compilation for speed
+STAGED_TS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+
+if [ -n "$STAGED_TS_FILES" ]; then
+  echo "Running type check on staged TypeScript files..."
+  # Use Turbo for cached type checking
+  pnpm typecheck
+fi
+
+echo "Pre-commit checks passed!"

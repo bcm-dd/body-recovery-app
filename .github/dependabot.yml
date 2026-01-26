@@ -1,0 +1,106 @@
+# Dependabot configuration
+# @see https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # Root package.json dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    labels:
+      - "dependencies"
+      - "automated"
+    reviewers:
+      - "body-recovery-app/core-team"
+    groups:
+      # Group all patch updates together for auto-merge
+      patch-updates:
+        applies-to: version-updates
+        update-types:
+          - "patch"
+      # Group minor updates for dev dependencies
+      minor-dev-updates:
+        applies-to: version-updates
+        dependency-type: "development"
+        update-types:
+          - "minor"
+      # Group TypeScript-related updates
+      typescript:
+        patterns:
+          - "typescript"
+          - "@typescript-eslint/*"
+          - "@types/*"
+      # Group ESLint-related updates
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+      # Group build tools
+      build-tools:
+        patterns:
+          - "turbo"
+          - "vercel"
+          - "husky"
+          - "lint-staged"
+      # Group testing tools
+      testing:
+        patterns:
+          - "vitest"
+          - "jest"
+          - "@testing-library/*"
+      # Group React ecosystem
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-native*"
+          - "@types/react*"
+      # Group Next.js ecosystem
+      nextjs:
+        patterns:
+          - "next"
+          - "@next/*"
+      # Group Tamagui
+      tamagui:
+        patterns:
+          - "tamagui"
+          - "@tamagui/*"
+    ignore:
+      # Ignore major version updates for React (manual upgrade needed)
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      # Ignore major version updates for Next.js (manual upgrade needed)
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci(deps)"
+    labels:
+      - "ci"
+      - "dependencies"
+      - "automated"
+    reviewers:
+      - "body-recovery-app/devops-team"
+    groups:
+      # Group all GitHub Actions updates
+      github-actions:
+        patterns:
+          - "*"
