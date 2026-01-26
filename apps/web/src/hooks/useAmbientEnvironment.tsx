@@ -77,6 +77,20 @@ export function useAmbientEnvironment(
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const startStateRef = useRef<EnvironmentState>(DEFAULT_ENVIRONMENT);
+  const microEffectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Refs for current values to avoid stale closures
+  const isTransitioningRef = useRef(false);
+  const targetStateRef = useRef<EnvironmentState>(DEFAULT_ENVIRONMENT);
+
+  // Keep refs in sync
+  useEffect(() => {
+    isTransitioningRef.current = isTransitioning;
+  }, [isTransitioning]);
+
+  useEffect(() => {
+    targetStateRef.current = targetState;
+  }, [targetState]);
 
   // Calculate target environment based on context
   const calculatedEnvironment = useMemo(() => {
@@ -121,20 +135,26 @@ export function useAmbientEnvironment(
     []
   );
 
+  // Track current environment state in ref to avoid dependency issues
+  const environmentStateRef = useRef(environmentState);
+  environmentStateRef.current = environmentState;
+
   // Update environment when context changes
   useEffect(() => {
     if (!enabled) return;
 
+    const currentState = environmentStateRef.current;
+
     // Check if significant change
     const significantChange =
-      Math.abs(calculatedEnvironment.colorTemperature - environmentState.colorTemperature) > 200 ||
-      Math.abs(calculatedEnvironment.brightness - environmentState.brightness) > 0.1 ||
-      Math.abs(calculatedEnvironment.saturation - environmentState.saturation) > 0.1;
+      Math.abs(calculatedEnvironment.colorTemperature - currentState.colorTemperature) > 200 ||
+      Math.abs(calculatedEnvironment.brightness - currentState.brightness) > 0.1 ||
+      Math.abs(calculatedEnvironment.saturation - currentState.saturation) > 0.1;
 
     if (significantChange) {
-      animateTransition(environmentState, calculatedEnvironment, transitionDuration);
+      animateTransition(currentState, calculatedEnvironment, transitionDuration);
     }
-  }, [calculatedEnvironment, enabled]);
+  }, [calculatedEnvironment, enabled, animateTransition, transitionDuration]);
 
   // Periodic subtle updates
   useEffect(() => {
@@ -175,11 +195,14 @@ export function useAmbientEnvironment(
     };
   }, [environmentState.cssVariables, enabled]);
 
-  // Cleanup animation on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+      }
+      if (microEffectTimeoutRef.current) {
+        clearTimeout(microEffectTimeoutRef.current);
       }
     };
   }, []);
@@ -197,25 +220,37 @@ export function useAmbientEnvironment(
   );
 
   const applyWarmth = useCallback(() => {
+    // Clear any pending micro-effect timeout
+    if (microEffectTimeoutRef.current) {
+      clearTimeout(microEffectTimeoutRef.current);
+    }
+
     const warmed = applyMicroWarmth(environmentState);
     setEnvironmentState(warmed);
-    // Revert after short duration
-    setTimeout(() => {
-      if (!isTransitioning) {
-        setEnvironmentState(targetState);
+
+    // Revert after short duration - use refs to avoid stale closures
+    microEffectTimeoutRef.current = setTimeout(() => {
+      if (!isTransitioningRef.current) {
+        setEnvironmentState(targetStateRef.current);
       }
     }, 1500);
-  }, [environmentState, targetState, isTransitioning]);
+  }, [environmentState]);
 
   const applyCoolness = useCallback(() => {
+    // Clear any pending micro-effect timeout
+    if (microEffectTimeoutRef.current) {
+      clearTimeout(microEffectTimeoutRef.current);
+    }
+
     const cooled = applyMicroCool(environmentState);
     setEnvironmentState(cooled);
-    setTimeout(() => {
-      if (!isTransitioning) {
-        setEnvironmentState(targetState);
+
+    microEffectTimeoutRef.current = setTimeout(() => {
+      if (!isTransitioningRef.current) {
+        setEnvironmentState(targetStateRef.current);
       }
     }, 1500);
-  }, [environmentState, targetState, isTransitioning]);
+  }, [environmentState]);
 
   const soften = useCallback(() => {
     const softened = applySoften(environmentState);

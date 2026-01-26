@@ -14,7 +14,6 @@ import type {
   EnvironmentContext,
   TimeOfDay,
   TrendDirection,
-  RecoveryStatus,
   LastSession,
   ApparentState,
   EngagementState,
@@ -59,10 +58,7 @@ export function buildTemporalContext(
   );
   const lastSession = sortedSessions[0];
   const daysSinceLastSession = lastSession
-    ? Math.floor(
-        (now.getTime() - new Date(lastSession.date).getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
+    ? Math.floor((now.getTime() - new Date(lastSession.date).getTime()) / (1000 * 60 * 60 * 24))
     : -1;
 
   // Calculate streak
@@ -78,9 +74,7 @@ export function buildTemporalContext(
     isWeekend: day === 0 || day === 6,
     daysSinceLastSession,
     daysSinceLastAppOpen: lastAppOpen
-      ? Math.floor(
-          (now.getTime() - lastAppOpen.getTime()) / (1000 * 60 * 60 * 24)
-        )
+      ? Math.floor((now.getTime() - lastAppOpen.getTime()) / (1000 * 60 * 60 * 24))
       : 0,
     currentStreak: streak,
     typicalSessionTime: typicalTime,
@@ -185,11 +179,8 @@ export function buildBodyContext(
       : 0;
 
   // Find highest pain region
-  const sortedByPain = [...bodyRegions].sort(
-    (a, b) => b.painLevel - a.painLevel
-  );
-  const highestPainRegion =
-    sortedByPain[0]?.painLevel > 0 ? sortedByPain[0].name : null;
+  const sortedByPain = [...bodyRegions].sort((a, b) => b.painLevel - a.painLevel);
+  const highestPainRegion = sortedByPain[0]?.painLevel > 0 ? sortedByPain[0].name : null;
 
   // Calculate pain trend
   const painTrend = calculatePainTrend(sessions);
@@ -198,11 +189,8 @@ export function buildBodyContext(
   const readinessFactors = buildReadinessFactors(healthData, bodyRegions);
 
   // Calculate readiness score
-  const readinessScore = healthData?.readinessScore ?? calculateReadinessScore(
-    sessions,
-    bodyRegions,
-    readinessFactors
-  );
+  const readinessScore =
+    healthData?.readinessScore ?? calculateReadinessScore(sessions, bodyRegions, readinessFactors);
 
   // Find active constraints
   const constraints = bodyRegions
@@ -215,16 +203,14 @@ export function buildBodyContext(
         r.painLevel >= 8
           ? ('severe' as const)
           : r.painLevel >= 6
-          ? ('moderate' as const)
-          : ('mild' as const),
+            ? ('moderate' as const)
+            : ('mild' as const),
     }));
 
   // Body model last updated
   const lastUpdated =
     bodyRegions.length > 0
-      ? new Date(
-          Math.max(...bodyRegions.map((r) => new Date(r.lastUpdated).getTime()))
-        )
+      ? new Date(Math.max(...bodyRegions.map((r) => new Date(r.lastUpdated).getTime())))
       : null;
 
   return {
@@ -239,22 +225,18 @@ export function buildBodyContext(
   };
 }
 
-function calculatePainTrend(
-  sessions: SessionDataInput[]
-): 'improving' | 'stable' | 'worsening' {
+function calculatePainTrend(sessions: SessionDataInput[]): 'improving' | 'stable' | 'worsening' {
   if (sessions.length < 2) return 'stable';
 
-  const recentSessions = sessions.slice(0, 5);
+  const recentSlice = sessions.slice(0, 5);
   const olderSessions = sessions.slice(5, 10);
 
   if (olderSessions.length === 0) return 'stable';
 
   const recentAvg =
-    recentSessions.reduce((acc, s) => acc + (s.painAfter ?? 0), 0) /
-    recentSessions.length;
+    recentSlice.reduce((acc, s) => acc + (s.painAfter ?? 0), 0) / recentSlice.length;
   const olderAvg =
-    olderSessions.reduce((acc, s) => acc + (s.painAfter ?? 0), 0) /
-    olderSessions.length;
+    olderSessions.reduce((acc, s) => acc + (s.painAfter ?? 0), 0) / olderSessions.length;
 
   const difference = olderAvg - recentAvg;
   if (difference > 0.5) return 'improving';
@@ -283,7 +265,7 @@ function buildReadinessFactors(
         : null,
     },
     recovery: {
-      score: Math.min(100, Math.max(0, ((hrvValue / hrvBaseline) * 100))),
+      score: Math.min(100, Math.max(0, (hrvValue / hrvBaseline) * 100)),
       hrvTrend: hrvValue > hrvBaseline ? 'up' : hrvValue < hrvBaseline ? 'down' : 'stable',
     },
     load: {
@@ -327,8 +309,7 @@ function calculateReadinessScore(
 
   // Recent activity factor
   const recentSessions = sessions.filter(
-    (s) =>
-      new Date(s.date).getTime() > Date.now() - 3 * 24 * 60 * 60 * 1000
+    (s) => new Date(s.date).getTime() > Date.now() - 3 * 24 * 60 * 60 * 1000
   );
   if (recentSessions.length === 0) {
     score -= 5; // Been inactive
@@ -343,19 +324,10 @@ function calculateReadinessScore(
 // BEHAVIORAL CONTEXT
 // ============================================
 
-export function buildBehavioralContext(
-  sessions: SessionDataInput[]
-): BehavioralContext {
-  const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const recentSessions = sessions.filter(
-    (s) => new Date(s.date).getTime() >= oneWeekAgo
-  );
-
+export function buildBehavioralContext(sessions: SessionDataInput[]): BehavioralContext {
   // Calculate average sessions per week
   const fourWeeksAgo = Date.now() - 28 * 24 * 60 * 60 * 1000;
-  const monthSessions = sessions.filter(
-    (s) => new Date(s.date).getTime() >= fourWeeksAgo
-  );
+  const monthSessions = sessions.filter((s) => new Date(s.date).getTime() >= fourWeeksAgo);
   const avgSessionsPerWeek = monthSessions.length / 4;
 
   // Find preferred days
@@ -371,9 +343,7 @@ export function buildBehavioralContext(
 
   // Average session duration
   const avgDuration =
-    sessions.length > 0
-      ? sessions.reduce((acc, s) => acc + s.duration, 0) / sessions.length
-      : 15;
+    sessions.length > 0 ? sessions.reduce((acc, s) => acc + s.duration, 0) / sessions.length : 15;
 
   // Last session
   const sortedSessions = [...sessions].sort(
@@ -425,18 +395,12 @@ export function buildBehavioralContext(
   };
 }
 
-function calculateRecoveryVelocity(
-  sessions: SessionDataInput[]
-): 'fast' | 'moderate' | 'slow' {
+function calculateRecoveryVelocity(sessions: SessionDataInput[]): 'fast' | 'moderate' | 'slow' {
   if (sessions.length < 5) return 'moderate';
 
   const avgPainReduction =
-    sessions
-      .slice(0, 10)
-      .reduce(
-        (acc, s) => acc + ((s.painBefore ?? 0) - (s.painAfter ?? 0)),
-        0
-      ) / Math.min(10, sessions.length);
+    sessions.slice(0, 10).reduce((acc, s) => acc + ((s.painBefore ?? 0) - (s.painAfter ?? 0)), 0) /
+    Math.min(10, sessions.length);
 
   if (avgPainReduction >= 2) return 'fast';
   if (avgPainReduction >= 0.5) return 'moderate';
@@ -472,30 +436,22 @@ function determineBestTimeForRecovery(
 
   const avgReductions = {
     morning:
-      timeSlots.morning.count > 2
-        ? timeSlots.morning.painReduction / timeSlots.morning.count
-        : -1,
+      timeSlots.morning.count > 2 ? timeSlots.morning.painReduction / timeSlots.morning.count : -1,
     afternoon:
       timeSlots.afternoon.count > 2
         ? timeSlots.afternoon.painReduction / timeSlots.afternoon.count
         : -1,
     evening:
-      timeSlots.evening.count > 2
-        ? timeSlots.evening.painReduction / timeSlots.evening.count
-        : -1,
+      timeSlots.evening.count > 2 ? timeSlots.evening.painReduction / timeSlots.evening.count : -1,
   };
 
-  const best = Object.entries(avgReductions).reduce((a, b) =>
-    b[1] > a[1] ? b : a
-  );
+  const best = Object.entries(avgReductions).reduce((a, b) => (b[1] > a[1] ? b : a));
 
   if (best[1] <= 0) return 'unknown';
   return best[0] as 'morning' | 'afternoon' | 'evening';
 }
 
-function analyzeRestDayImpact(
-  sessions: SessionDataInput[]
-): 'positive' | 'neutral' | 'negative' {
+function analyzeRestDayImpact(sessions: SessionDataInput[]): 'positive' | 'neutral' | 'negative' {
   if (sessions.length < 7) return 'neutral';
 
   const sortedSessions = [...sessions].sort(
@@ -509,8 +465,7 @@ function analyzeRestDayImpact(
     const prev = sortedSessions[i - 1];
     const curr = sortedSessions[i];
     const daysBetween = Math.floor(
-      (new Date(curr.date).getTime() - new Date(prev.date).getTime()) /
-        (1000 * 60 * 60 * 24)
+      (new Date(curr.date).getTime() - new Date(prev.date).getTime()) / (1000 * 60 * 60 * 24)
     );
 
     if (daysBetween >= 2) {
@@ -543,10 +498,12 @@ function findPeakMotivationDays(sessions: SessionDataInput[]): string[] {
   sessions.slice(0, 30).forEach((s) => {
     const day = new Date(s.date).toLocaleDateString('en-US', { weekday: 'long' });
     const completionRate =
-      s.exercises.filter((e) => e.setsCompleted >= e.setsTarget).length /
-      (s.exercises.length || 1);
-    dayStats[day].count++;
-    dayStats[day].completion += completionRate;
+      s.exercises.filter((e) => e.setsCompleted >= e.setsTarget).length / (s.exercises.length || 1);
+    // Validate day is a known weekday before accessing
+    if (day in dayStats) {
+      dayStats[day].count++;
+      dayStats[day].completion += completionRate;
+    }
   });
 
   const avgPerDay = sessions.slice(0, 30).length / 7;
@@ -582,16 +539,11 @@ export function buildSessionContext(
 ): SessionContext | null {
   if (!activeWorkout) return null;
 
-  const currentExercise =
-    activeWorkout.exercises[activeWorkout.currentExerciseIndex] ?? null;
+  const currentExercise = activeWorkout.exercises[activeWorkout.currentExerciseIndex] ?? null;
   const exercisesCompleted = activeWorkout.currentExerciseIndex;
-  const exercisesRemaining =
-    activeWorkout.exercises.length - activeWorkout.currentExerciseIndex;
+  const exercisesRemaining = activeWorkout.exercises.length - activeWorkout.currentExerciseIndex;
 
-  const totalSets = activeWorkout.exercises.reduce(
-    (acc, e) => acc + e.targetSets,
-    0
-  );
+  const totalSets = activeWorkout.exercises.reduce((acc, e) => acc + e.targetSets, 0);
 
   // Infer apparent states
   const apparentFatigue = inferFatigue(
@@ -604,10 +556,7 @@ export function buildSessionContext(
     activeWorkout.videoViews,
     activeWorkout.skips
   );
-  const apparentPace = inferPace(
-    activeWorkout.restTimeTaken,
-    activeWorkout.prescribedRestTime
-  );
+  const apparentPace = inferPace(activeWorkout.restTimeTaken, activeWorkout.prescribedRestTime);
 
   return {
     isActive: true,
@@ -664,10 +613,7 @@ function inferEngagement(
   return 'focused';
 }
 
-function inferPace(
-  restTimes: number[],
-  prescribedRest: number
-): PaceState {
+function inferPace(restTimes: number[], prescribedRest: number): PaceState {
   if (restTimes.length < 2) return 'normal';
 
   const avgRest = restTimes.reduce((a, b) => a + b, 0) / restTimes.length;
@@ -684,8 +630,7 @@ function inferPace(
 
 export function buildEnvironmentContext(): EnvironmentContext {
   // In a real app, this would detect actual device state
-  const isOnline =
-    typeof navigator !== 'undefined' ? navigator.onLine : true;
+  const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
   return {
     likelyLocation: 'unknown',
@@ -712,9 +657,7 @@ export interface ContextBuilderInput {
   lastAppOpen?: Date;
 }
 
-export function buildFullAmbientContext(
-  input: ContextBuilderInput
-): FullAmbientContext {
+export function buildFullAmbientContext(input: ContextBuilderInput): FullAmbientContext {
   return {
     temporal: buildTemporalContext(input.sessions, input.lastAppOpen),
     body: buildBodyContext(input.bodyRegions, input.sessions, input.healthData),

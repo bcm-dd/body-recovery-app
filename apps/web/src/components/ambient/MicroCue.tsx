@@ -9,8 +9,14 @@
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import type { MicroCue, MicroCueVisual, VisualEffect, VisualElement } from '../../lib/ambient-ai/types';
-import { hapticCustom, hapticTap, hapticSuccess } from '../../lib/haptics';
+
+import type {
+  MicroCue,
+  MicroCueVisual,
+  VisualEffect,
+  VisualElement,
+} from '../../lib/ambient-ai/types';
+import { hapticCustom } from '../../lib/haptics';
 
 // ============================================
 // PREDEFINED MICRO-CUES
@@ -132,9 +138,7 @@ function triggerHaptic(pattern: string, intensity: number): void {
   if (typeof hapticPattern === 'number') {
     hapticCustom(Math.round(hapticPattern * intensity));
   } else {
-    const scaled = hapticPattern.map((v, i) =>
-      i % 2 === 0 ? Math.round(v * intensity) : v
-    );
+    const scaled = hapticPattern.map((v, i) => (i % 2 === 0 ? Math.round(v * intensity) : v));
     hapticCustom(scaled);
   }
 }
@@ -219,10 +223,11 @@ export function MicroCueOverlay({ cue, onComplete }: MicroCueOverlayProps) {
     if (cue.visual) {
       setIsActive(true);
       startTimeRef.current = performance.now();
+      // Capture duration at start to avoid null assertion in closure
+      const duration = cue.visual.duration;
 
       const animate = (currentTime: number) => {
         const elapsed = currentTime - startTimeRef.current;
-        const duration = cue.visual!.duration;
         const newProgress = Math.min(elapsed / duration, 1);
 
         setProgress(newProgress);
@@ -279,12 +284,30 @@ interface UseMicroCueReturn {
   triggerPreset: (presetName: keyof typeof MICRO_CUES) => void;
   currentCue: MicroCue | null;
   isActive: boolean;
+  /** Internal: called when animation completes */
+  _onComplete: () => void;
 }
 
 export function useMicroCue(): UseMicroCueReturn {
   const [currentCue, setCurrentCue] = useState<MicroCue | null>(null);
   const [isActive, setIsActive] = useState(false);
   const queueRef = useRef<MicroCue[]>([]);
+  const isActiveRef = useRef(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const processQueue = useCallback(() => {
     if (queueRef.current.length === 0) {
@@ -292,33 +315,44 @@ export function useMicroCue(): UseMicroCueReturn {
       return;
     }
 
-    const nextCue = queueRef.current.shift()!;
-    setCurrentCue(nextCue);
-    setIsActive(true);
-  }, []);
-
-  const trigger = useCallback((cue: MicroCue) => {
-    queueRef.current.push(cue);
-    if (!isActive) {
-      processQueue();
+    const nextCue = queueRef.current.shift();
+    if (nextCue) {
+      setCurrentCue(nextCue);
+      setIsActive(true);
     }
-  }, [isActive, processQueue]);
-
-  const triggerPreset = useCallback((presetName: keyof typeof MICRO_CUES) => {
-    trigger(MICRO_CUES[presetName]);
-  }, [trigger]);
+  }, []);
 
   const handleComplete = useCallback(() => {
     setCurrentCue(null);
-    // Small delay before next cue
-    setTimeout(processQueue, 200);
+    // Small delay before next cue - tracked for cleanup
+    timeoutRef.current = setTimeout(processQueue, 200);
   }, [processQueue]);
+
+  const trigger = useCallback(
+    (cue: MicroCue) => {
+      queueRef.current.push(cue);
+      // Use ref to avoid stale closure
+      if (!isActiveRef.current) {
+        processQueue();
+      }
+    },
+    [processQueue]
+  );
+
+  const triggerPreset = useCallback(
+    (presetName: keyof typeof MICRO_CUES) => {
+      trigger(MICRO_CUES[presetName]);
+    },
+    [trigger]
+  );
 
   return {
     trigger,
     triggerPreset,
     currentCue,
     isActive,
+    // Expose handleComplete so components can call it when animation finishes
+    _onComplete: handleComplete,
   };
 }
 
@@ -356,10 +390,11 @@ export function MicroCueContainer({
 
     setIsActive(true);
     startTimeRef.current = performance.now();
+    // Capture duration at start to avoid null assertion in closure
+    const duration = cue.visual.duration;
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTimeRef.current;
-      const duration = cue.visual!.duration;
       const newProgress = Math.min(elapsed / duration, 1);
 
       setProgress(newProgress);
@@ -382,15 +417,10 @@ export function MicroCueContainer({
     };
   }, [cue, onComplete]);
 
-  const styles = cue?.visual
-    ? getVisualEffectStyles(cue.visual, isActive, progress)
-    : {};
+  const styles = cue?.visual ? getVisualEffectStyles(cue.visual, isActive, progress) : {};
 
   return (
-    <div
-      className={`transition-all duration-300 ${className}`}
-      style={styles}
-    >
+    <div className={`transition-all duration-300 ${className}`} style={styles}>
       {children}
     </div>
   );

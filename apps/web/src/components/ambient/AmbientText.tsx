@@ -16,8 +16,14 @@
  * - "rest" - On recovery days
  */
 
-import { useEffect, useState, useRef } from 'react';
-import type { AmbientText, AmbientWord, AmbientTextPosition, AmbientTextAnimation } from '../../lib/ambient-ai/types';
+import { useEffect, useState, useRef, useCallback } from 'react';
+
+import type {
+  AmbientText,
+  AmbientWord,
+  AmbientTextPosition,
+  AmbientTextAnimation,
+} from '../../lib/ambient-ai/types';
 
 // ============================================
 // AMBIENT TEXT PRESETS
@@ -106,15 +112,16 @@ const getAnimationStyle = (
   baseOpacity: number
 ): { opacity: number; transform: string } => {
   switch (animation) {
-    case 'fade_in_out':
+    case 'fade_in_out': {
       // Smooth sine wave fade
       const fadeOpacity = baseOpacity * Math.sin(progress * Math.PI);
       return {
         opacity: fadeOpacity,
         transform: 'translateY(0)',
       };
+    }
 
-    case 'breathe':
+    case 'breathe': {
       // Breathing effect - slower, more organic
       const breathePhase = Math.sin(progress * Math.PI);
       const breatheOpacity = baseOpacity * 0.5 + baseOpacity * 0.5 * breathePhase;
@@ -123,8 +130,9 @@ const getAnimationStyle = (
         opacity: breatheOpacity,
         transform: `scale(${breatheScale})`,
       };
+    }
 
-    case 'drift':
+    case 'drift': {
       // Gentle upward drift while fading
       const driftOpacity = baseOpacity * Math.sin(progress * Math.PI);
       const driftY = -20 * progress;
@@ -132,6 +140,7 @@ const getAnimationStyle = (
         opacity: driftOpacity,
         transform: `translateY(${driftY}px)`,
       };
+    }
 
     default:
       return {
@@ -354,7 +363,16 @@ export function useAmbientText(): UseAmbientTextReturn {
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const show = (text: AmbientText) => {
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const show = useCallback((text: AmbientText) => {
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -368,23 +386,26 @@ export function useAmbientText(): UseAmbientTextReturn {
       setIsVisible(false);
       setCurrentText(null);
     }, text.duration + 500); // Small buffer for animation
-  };
+  }, []);
 
-  const showWord = (word: AmbientWord, options?: Partial<AmbientText>) => {
-    const preset = AMBIENT_TEXT_PRESETS[word];
-    show({
-      ...preset,
-      ...options,
-    });
-  };
+  const showWord = useCallback(
+    (word: AmbientWord, options?: Partial<AmbientText>) => {
+      const preset = AMBIENT_TEXT_PRESETS[word];
+      show({
+        ...preset,
+        ...options,
+      });
+    },
+    [show]
+  );
 
-  const hide = () => {
+  const hide = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     setIsVisible(false);
     setCurrentText(null);
-  };
+  }, []);
 
   return {
     show,
@@ -413,8 +434,27 @@ export function useAmbientTextQueue(): UseAmbientTextQueueReturn {
   const [isVisible, setIsVisible] = useState(false);
   const queueRef = useRef<AmbientText[]>([]);
   const isProcessingRef = useRef(false);
+  const timeoutsRef = useRef<Set<NodeJS.Timeout>>(new Set());
 
-  const processQueue = () => {
+  // Helper to create tracked timeouts
+  const createTimeout = useCallback((fn: () => void, delay: number) => {
+    const id = setTimeout(() => {
+      timeoutsRef.current.delete(id);
+      fn();
+    }, delay);
+    timeoutsRef.current.add(id);
+    return id;
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach((id) => clearTimeout(id));
+      timeoutsRef.current.clear();
+    };
+  }, []);
+
+  const processQueue = useCallback(() => {
     if (queueRef.current.length === 0) {
       isProcessingRef.current = false;
       setCurrentText(null);
@@ -423,38 +463,48 @@ export function useAmbientTextQueue(): UseAmbientTextQueueReturn {
     }
 
     isProcessingRef.current = true;
-    const nextText = queueRef.current.shift()!;
+    const nextText = queueRef.current.shift();
+    if (!nextText) return;
+
     setCurrentText(nextText);
     setIsVisible(true);
 
     // Schedule next after duration + gap
-    setTimeout(() => {
+    createTimeout(() => {
       setIsVisible(false);
-      setTimeout(processQueue, 500); // Gap between texts
+      createTimeout(processQueue, 500); // Gap between texts
     }, nextText.duration);
-  };
+  }, [createTimeout]);
 
-  const queue = (text: AmbientText) => {
-    queueRef.current.push(text);
-    if (!isProcessingRef.current) {
-      processQueue();
-    }
-  };
+  const queue = useCallback(
+    (text: AmbientText) => {
+      queueRef.current.push(text);
+      if (!isProcessingRef.current) {
+        processQueue();
+      }
+    },
+    [processQueue]
+  );
 
-  const queueWord = (word: AmbientWord, options?: Partial<AmbientText>) => {
-    const preset = AMBIENT_TEXT_PRESETS[word];
-    queue({
-      ...preset,
-      ...options,
-    });
-  };
+  const queueWord = useCallback(
+    (word: AmbientWord, options?: Partial<AmbientText>) => {
+      const preset = AMBIENT_TEXT_PRESETS[word];
+      queue({
+        ...preset,
+        ...options,
+      });
+    },
+    [queue]
+  );
 
-  const clear = () => {
+  const clear = useCallback(() => {
     queueRef.current = [];
+    timeoutsRef.current.forEach((id) => clearTimeout(id));
+    timeoutsRef.current.clear();
     setCurrentText(null);
     setIsVisible(false);
     isProcessingRef.current = false;
-  };
+  }, []);
 
   return {
     queue,

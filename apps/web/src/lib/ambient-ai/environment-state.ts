@@ -5,12 +5,7 @@
  * Controls the visual atmosphere of the app based on context.
  */
 
-import type {
-  FullAmbientContext,
-  EnvironmentState,
-  AmbientMotion,
-  TimeOfDay,
-} from './types';
+import type { FullAmbientContext, EnvironmentState, AmbientMotion, TimeOfDay } from './types';
 
 // ============================================
 // COLOR TEMPERATURE PRESETS
@@ -23,7 +18,6 @@ import type {
  * 6500K = Cool (daylight)
  */
 const TEMPERATURE_WARM = 2700;
-const TEMPERATURE_NEUTRAL = 4000;
 const TEMPERATURE_COOL = 6500;
 
 // ============================================
@@ -108,10 +102,7 @@ function getBaseEnvironmentForTimeOfDay(timeOfDay: TimeOfDay): EnvironmentState 
 // READINESS ADJUSTMENTS
 // ============================================
 
-function adjustForReadiness(
-  state: EnvironmentState,
-  readinessScore: number
-): EnvironmentState {
+function adjustForReadiness(state: EnvironmentState, readinessScore: number): EnvironmentState {
   // High readiness (70-100): Energizing
   if (readinessScore >= 70) {
     return {
@@ -232,34 +223,17 @@ function adjustForPainLevel(
 // CSS VARIABLE GENERATION
 // ============================================
 
-/**
- * Convert color temperature to RGB shift
- * Approximation of color temperature effect
- */
-function temperatureToRGBShift(temperature: number): { r: number; g: number; b: number } {
-  // Normalize to 0-1 range (2700K to 6500K)
-  const normalized = (temperature - 2700) / (6500 - 2700);
-
-  // Warm = more red/orange, less blue
-  // Cool = less red, more blue
-  return {
-    r: 1.0 - normalized * 0.15, // Slightly less red when cool
-    g: 1.0,
-    b: 0.7 + normalized * 0.3, // More blue when cool
-  };
-}
-
 function generateCSSVariables(state: EnvironmentState): Record<string, string> {
-  const rgbShift = temperatureToRGBShift(state.colorTemperature);
-
   // Base colors adjusted by temperature
-  const warmOverlay = state.colorTemperature < 4000
-    ? `rgba(255, 200, 150, ${(4000 - state.colorTemperature) / 5000 * 0.1})`
-    : 'transparent';
+  const warmOverlay =
+    state.colorTemperature < 4000
+      ? `rgba(255, 200, 150, ${((4000 - state.colorTemperature) / 5000) * 0.1})`
+      : 'transparent';
 
-  const coolOverlay = state.colorTemperature > 5000
-    ? `rgba(180, 200, 255, ${(state.colorTemperature - 5000) / 3000 * 0.08})`
-    : 'transparent';
+  const coolOverlay =
+    state.colorTemperature > 5000
+      ? `rgba(180, 200, 255, ${((state.colorTemperature - 5000) / 3000) * 0.08})`
+      : 'transparent';
 
   return {
     '--ambient-brightness': state.brightness.toString(),
@@ -344,9 +318,7 @@ export const ENVIRONMENT_PRESETS = {
 // MAIN ENVIRONMENT CALCULATOR
 // ============================================
 
-export function calculateEnvironmentState(
-  context: FullAmbientContext
-): EnvironmentState {
+export function calculateEnvironmentState(context: FullAmbientContext): EnvironmentState {
   // Start with base environment for time of day
   let state = getBaseEnvironmentForTimeOfDay(context.temporal.timeOfDay);
 
@@ -359,11 +331,7 @@ export function calculateEnvironmentState(
   }
 
   // Adjust for pain levels
-  state = adjustForPainLevel(
-    state,
-    context.body.averagePainLevel,
-    context.body.painTrend
-  );
+  state = adjustForPainLevel(state, context.body.averagePainLevel, context.body.painTrend);
 
   // Generate CSS variables
   state.cssVariables = generateCSSVariables(state);
@@ -424,49 +392,42 @@ export function interpolateEnvironment(
  * Subtle warmth effect (e.g., after good set)
  */
 export function applyMicroWarmth(state: EnvironmentState): EnvironmentState {
-  return {
+  const warmed: EnvironmentState = {
     ...state,
     colorTemperature: state.colorTemperature - 100,
     brightness: Math.min(state.brightness + 0.03, 1.0),
-    cssVariables: generateCSSVariables({
-      ...state,
-      colorTemperature: state.colorTemperature - 100,
-      brightness: Math.min(state.brightness + 0.03, 1.0),
-    }),
+    cssVariables: {},
   };
+  warmed.cssVariables = generateCSSVariables(warmed);
+  return warmed;
 }
 
 /**
  * Subtle cooling effect (e.g., rest period)
  */
 export function applyMicroCool(state: EnvironmentState): EnvironmentState {
-  return {
+  const cooled: EnvironmentState = {
     ...state,
     colorTemperature: state.colorTemperature + 100,
     brightness: Math.max(state.brightness - 0.02, 0.5),
-    cssVariables: generateCSSVariables({
-      ...state,
-      colorTemperature: state.colorTemperature + 100,
-      brightness: Math.max(state.brightness - 0.02, 0.5),
-    }),
+    cssVariables: {},
   };
+  cooled.cssVariables = generateCSSVariables(cooled);
+  return cooled;
 }
 
 /**
  * Soften effect (e.g., when user seems to be struggling)
  */
 export function applySoften(state: EnvironmentState): EnvironmentState {
-  return {
+  const softened: EnvironmentState = {
     ...state,
     brightness: Math.max(state.brightness - 0.1, 0.5),
     saturation: Math.max(state.saturation - 0.1, 0.6),
     animationSpeed: Math.max(state.animationSpeed - 0.15, 0.5),
     ambientMotion: 'breathing',
-    cssVariables: generateCSSVariables({
-      ...state,
-      brightness: Math.max(state.brightness - 0.1, 0.5),
-      saturation: Math.max(state.saturation - 0.1, 0.6),
-      animationSpeed: Math.max(state.animationSpeed - 0.15, 0.5),
-    }),
+    cssVariables: {},
   };
+  softened.cssVariables = generateCSSVariables(softened);
+  return softened;
 }

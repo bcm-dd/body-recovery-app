@@ -24,7 +24,24 @@ import React, {
   useRef,
 } from 'react';
 
-// Types
+import { AmbientTextDisplay, useAmbientText, AMBIENT_TEXT_PRESETS } from './AmbientText';
+import { GentlePromptDisplay, useGentlePromptQueue } from './GentlePrompt';
+import type { MICRO_CUES } from './MicroCue';
+import { MicroCueOverlay, useMicroCue } from './MicroCue';
+import { useAmbientEnvironment, EnvironmentOverlay } from '../../hooks/useAmbientEnvironment';
+import {
+  buildFullAmbientContext,
+  type SessionDataInput,
+  type BodyRegionInput,
+  type HealthDataInput,
+  type ActiveWorkoutInput,
+} from '../../lib/ambient-ai/context-builder';
+import {
+  evaluateIntervention,
+  detectDistress,
+  getDistressResponse,
+  defaultUserPreferences,
+} from '../../lib/ambient-ai/intervention-engine';
 import type {
   FullAmbientContext,
   EnvironmentState,
@@ -37,30 +54,34 @@ import type {
   AmbientWord,
 } from '../../lib/ambient-ai/types';
 
-// Context building
-import {
-  buildFullAmbientContext,
-  type SessionDataInput,
-  type BodyRegionInput,
-  type HealthDataInput,
-  type ActiveWorkoutInput,
-} from '../../lib/ambient-ai/context-builder';
+// ============================================
+// TYPE GUARDS
+// ============================================
 
-// Intervention engine
-import {
-  evaluateIntervention,
-  detectDistress,
-  getDistressResponse,
-  defaultUserPreferences,
-} from '../../lib/ambient-ai/intervention-engine';
+/**
+ * Type guard for AmbientWord - validates that a string is a valid ambient word
+ */
+function isAmbientWord(word: string): word is AmbientWord {
+  return word in AMBIENT_TEXT_PRESETS;
+}
 
-// Environment
-import { useAmbientEnvironment, EnvironmentOverlay } from '../../hooks/useAmbientEnvironment';
+/** Valid environment preset names */
+const VALID_PRESETS = [
+  'recovery',
+  'energizing',
+  'focused',
+  'restDay',
+  'celebration',
+  'concern',
+] as const;
+type EnvironmentPresetName = (typeof VALID_PRESETS)[number];
 
-// Expression components
-import { MicroCueOverlay, useMicroCue, MICRO_CUES } from './MicroCue';
-import { AmbientTextDisplay, useAmbientText, AMBIENT_TEXT_PRESETS } from './AmbientText';
-import { GentlePromptDisplay, useGentlePromptQueue, COMMON_PROMPTS } from './GentlePrompt';
+/**
+ * Type guard for environment presets
+ */
+function isValidPreset(preset: string): preset is EnvironmentPresetName {
+  return VALID_PRESETS.includes(preset as EnvironmentPresetName);
+}
 
 // ============================================
 // CONTEXT TYPE
@@ -194,11 +215,7 @@ export function AmbientAIProvider({
   } = useMicroCue();
 
   // Ambient text
-  const {
-    show: showAmbientText,
-    showWord: showAmbientWord,
-    currentText,
-  } = useAmbientText();
+  const { show: showAmbientText, showWord: showAmbientWord, currentText } = useAmbientText();
 
   // Gentle prompts
   const {
@@ -208,11 +225,11 @@ export function AmbientAIProvider({
     handleDismiss: dismissPrompt,
   } = useGentlePromptQueue({
     minDelayBetweenPrompts: 30000, // 30 seconds between prompts
-    onAction: (action, promptId) => {
-      onAction?.(action, promptId);
+    onAction: (action, id) => {
+      onAction?.(action, id);
       setLastPromptTime(new Date());
     },
-    onDismiss: (promptId) => {
+    onDismiss: (_id) => {
       setLastPromptTime(new Date());
     },
   });
@@ -231,15 +248,15 @@ export function AmbientAIProvider({
             setEnvironmentPreset('recovery');
           } else if (decision.action === 'set_environment_energizing') {
             setEnvironmentPreset('energizing');
-          } else if (decision.action === 'soften_environment' || decision.action === 'soften_and_simplify') {
+          } else if (
+            decision.action === 'soften_environment' ||
+            decision.action === 'soften_and_simplify'
+          ) {
             softenEnvironment();
           }
-          // Show ambient text if provided
-          if (decision.message) {
-            const word = decision.message as AmbientWord;
-            if (AMBIENT_TEXT_PRESETS[word]) {
-              showAmbientWord(word);
-            }
+          // Show ambient text if provided - use type guard
+          if (decision.message && isAmbientWord(decision.message)) {
+            showAmbientWord(decision.message);
           }
           break;
 
@@ -251,12 +268,9 @@ export function AmbientAIProvider({
             softenEnvironment();
             triggerMicroCuePreset('soften');
           }
-          // Show ambient text if provided
-          if (decision.message) {
-            const word = decision.message as AmbientWord;
-            if (AMBIENT_TEXT_PRESETS[word]) {
-              showAmbientWord(word);
-            }
+          // Show ambient text if provided - use type guard
+          if (decision.message && isAmbientWord(decision.message)) {
+            showAmbientWord(decision.message);
           }
           break;
 
@@ -277,11 +291,11 @@ export function AmbientAIProvider({
           if (decision.action) {
             onAction?.(decision.action, decision.reason);
           }
-          // Show ambient text explanation
+          // Show ambient text explanation - extract first word and validate
           if (decision.message) {
-            const word = decision.message.split(' ')[0].toLowerCase() as AmbientWord;
-            if (AMBIENT_TEXT_PRESETS[word]) {
-              showAmbientWord(word);
+            const firstWord = decision.message.split(' ')[0].toLowerCase();
+            if (isAmbientWord(firstWord)) {
+              showAmbientWord(firstWord);
             }
           }
           break;
@@ -317,11 +331,7 @@ export function AmbientAIProvider({
   const triggerCheck = useCallback(() => {
     if (!enabled || !ambientContext) return;
 
-    const decision = evaluateIntervention(
-      ambientContext,
-      lastPromptTime,
-      preferences
-    );
+    const decision = evaluateIntervention(ambientContext, lastPromptTime, preferences);
 
     if (decision.shouldIntervene) {
       processIntervention(decision as InterventionDecision);
@@ -424,8 +434,11 @@ export function AmbientAIProvider({
 
       // Environment
       environmentState,
-      setEnvironmentPreset: (preset: string) =>
-        setEnvironmentPreset(preset as keyof typeof import('../../lib/ambient-ai/environment-state').ENVIRONMENT_PRESETS),
+      setEnvironmentPreset: (preset: string) => {
+        if (isValidPreset(preset)) {
+          setEnvironmentPreset(preset);
+        }
+      },
       applyWarmth,
       applyCoolness,
       softenEnvironment,

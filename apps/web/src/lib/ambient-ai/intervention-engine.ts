@@ -9,13 +9,9 @@ import type {
   FullAmbientContext,
   InterventionDecision,
   NonInterventionDecision,
-  InterventionType,
   Urgency,
-  Intrusiveness,
-  Confidence,
   ConfidenceFactors,
   DistressSignal,
-  DistressType,
   UserPreferences,
 } from './types';
 
@@ -23,10 +19,7 @@ import type {
 // INTERVENTION RULES
 // ============================================
 
-type RuleResult =
-  | InterventionDecision
-  | NonInterventionDecision
-  | null;
+type RuleResult = InterventionDecision | NonInterventionDecision | null;
 
 type InterventionRule = (
   context: FullAmbientContext,
@@ -38,7 +31,7 @@ type InterventionRule = (
  * Rule: Readiness-Based Session Adjustment
  * Before or at session start, if readiness is low, suggest lighter session
  */
-const readinessAdjustmentRule: InterventionRule = (context, lastPromptTime, preferences) => {
+const readinessAdjustmentRule: InterventionRule = (context, _lastPromptTime, preferences) => {
   if (!preferences.enableAutomaticAdjustments) return null;
 
   const { body, session, temporal } = context;
@@ -49,7 +42,8 @@ const readinessAdjustmentRule: InterventionRule = (context, lastPromptTime, pref
   // Low readiness threshold
   if (body.readinessScore < 50 && body.painTrend !== 'improving') {
     // Check if it's around their typical workout time
-    const isTypicalTime = temporal.typicalSessionTime &&
+    const isTypicalTime =
+      temporal.typicalSessionTime &&
       Math.abs(new Date().getHours() - temporal.typicalSessionTime.start) <= 2;
 
     if (isTypicalTime || temporal.daysSinceLastSession === 0) {
@@ -118,10 +112,10 @@ const fatigueDetectionRule: InterventionRule = (context, lastPromptTime, prefere
  * Rule: Pain Pattern Warning
  * If recurring pain in same region over multiple days
  */
-const painPatternRule: InterventionRule = (context, lastPromptTime, preferences) => {
+const painPatternRule: InterventionRule = (context, _lastPromptTime, preferences) => {
   if (!preferences.enableInsightsAndPatterns) return null;
 
-  const { body, temporal } = context;
+  const { body } = context;
 
   // Check for persistent pain
   const recentPain = body.readinessFactors.body.recentPain;
@@ -352,7 +346,7 @@ const dontInterruptFlowRule: NonInterventionRule = (context, _lastPromptTime) =>
  * Don't pile on after pain logged
  */
 const giveSpaceAfterPainRule: NonInterventionRule = (context, _lastPromptTime) => {
-  const { body, behavioral } = context;
+  const { behavioral } = context;
 
   if (
     behavioral.lastSession?.painLogged &&
@@ -366,25 +360,15 @@ const giveSpaceAfterPainRule: NonInterventionRule = (context, _lastPromptTime) =
   return null;
 };
 
-/**
- * Don't be needy - respect user absence
- */
-const respectAbsenceRule: NonInterventionRule = (context, _lastPromptTime) => {
-  const { temporal } = context;
-
-  // If they've been away 3+ days and just opened the app, give them space
-  // (They'll get the welcome back prompt separately)
-  return null;
-};
+// Note: respectAbsenceRule was removed as it was a no-op.
+// User absence is already handled by welcomeBackRule which gives a gentle prompt
+// rather than blocking interventions.
 
 // ============================================
 // CONFIDENCE CALCULATION
 // ============================================
 
-function calculateConfidence(
-  context: FullAmbientContext,
-  insightType: string
-): number {
+function calculateConfidence(context: FullAmbientContext, insightType: string): number {
   const factors: ConfidenceFactors = {
     dataQuality: calculateDataQuality(context),
     patternStrength: calculatePatternStrength(context, insightType),
@@ -393,7 +377,7 @@ function calculateConfidence(
   };
 
   // Weighted average
-  let confidence =
+  const confidence =
     factors.dataQuality * 0.3 +
     factors.patternStrength * 0.4 +
     (factors.recentChange ? -0.1 : 0.1) +
@@ -411,8 +395,7 @@ function calculateDataQuality(context: FullAmbientContext): number {
   // Has body data
   if (context.body.bodyModelLastUpdated) {
     const daysSinceUpdate = Math.floor(
-      (Date.now() - context.body.bodyModelLastUpdated.getTime()) /
-        (1000 * 60 * 60 * 24)
+      (Date.now() - context.body.bodyModelLastUpdated.getTime()) / (1000 * 60 * 60 * 24)
     );
     if (daysSinceUpdate < 1) score += 0.3;
     else if (daysSinceUpdate < 3) score += 0.2;
@@ -428,24 +411,23 @@ function calculateDataQuality(context: FullAmbientContext): number {
   return Math.min(1, score);
 }
 
-function calculatePatternStrength(
-  context: FullAmbientContext,
-  insightType: string
-): number {
+function calculatePatternStrength(context: FullAmbientContext, insightType: string): number {
   switch (insightType) {
-    case 'readiness':
+    case 'readiness': {
       // Higher confidence if readiness is clearly low or high
       const readiness = context.body.readinessScore;
       if (readiness < 30 || readiness > 80) return 0.9;
       if (readiness < 40 || readiness > 70) return 0.7;
       return 0.5;
+    }
 
-    case 'pain_pattern':
+    case 'pain_pattern': {
       // Higher confidence if pain is consistent
       const painCount = context.body.readinessFactors.body.recentPain.length;
       if (painCount >= 5) return 0.9;
       if (painCount >= 3) return 0.7;
       return 0.4;
+    }
 
     default:
       return 0.5;
@@ -469,9 +451,7 @@ function hasRecentChange(context: FullAmbientContext): boolean {
 // DISTRESS DETECTION
 // ============================================
 
-export function detectDistress(
-  context: FullAmbientContext
-): DistressSignal | null {
+export function detectDistress(context: FullAmbientContext): DistressSignal | null {
   const { session } = context;
 
   if (!session?.isActive) return null;
@@ -492,19 +472,14 @@ export function detectDistress(
   }
 
   // Struggling signals
-  if (
-    session.apparentEngagement === 'struggling' &&
-    session.apparentFatigue === 'fatigued'
-  ) {
+  if (session.apparentEngagement === 'struggling' && session.apparentFatigue === 'fatigued') {
     return { type: 'overwhelmed', confidence: 0.65 };
   }
 
   return null;
 }
 
-export function getDistressResponse(
-  signal: DistressSignal
-): InterventionDecision {
+export function getDistressResponse(signal: DistressSignal): InterventionDecision {
   switch (signal.type) {
     case 'stuck':
       return {
@@ -526,8 +501,7 @@ export function getDistressResponse(
         urgency: 'soon',
         intrusiveness: 'noticeable',
         reason: 'User uncertain about form',
-        message:
-          'Want to try a different exercise? Same muscles, different movement.',
+        message: 'Want to try a different exercise? Same muscles, different movement.',
         options: [
           { label: 'Show alternatives', action: 'show_alternatives' },
           { label: "I've got it", action: 'dismiss' },
@@ -607,7 +581,6 @@ const nonInterventionRules: NonInterventionRule[] = [
   dontNagRule,
   dontInterruptFlowRule,
   giveSpaceAfterPainRule,
-  respectAbsenceRule,
 ];
 
 export function evaluateIntervention(

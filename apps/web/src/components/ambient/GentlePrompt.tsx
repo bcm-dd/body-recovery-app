@@ -15,8 +15,9 @@
  * - Positioned to not obstruct primary task
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+
 import type { GentlePrompt, GentlePromptOption } from '../../lib/ambient-ai/types';
 import { hapticTap, hapticSelection } from '../../lib/haptics';
 
@@ -47,6 +48,32 @@ export function GentlePromptDisplay({
   const startXRef = useRef(0);
   const autoHideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Refs for cleanup
+  const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const optionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Define callbacks first (before useEffects that use them)
+  const handleDismiss = useCallback(() => {
+    setIsExiting(true);
+    hapticTap();
+    dismissTimeoutRef.current = setTimeout(() => {
+      onDismiss();
+      setIsExiting(false);
+    }, 300);
+  }, [onDismiss]);
+
+  const handleOptionClick = useCallback(
+    (action: string) => {
+      hapticSelection();
+      setIsExiting(true);
+      optionTimeoutRef.current = setTimeout(() => {
+        onOptionSelect(action);
+        setIsExiting(false);
+      }, 200);
+    },
+    [onOptionSelect]
+  );
+
   // Show animation on mount
   useEffect(() => {
     if (prompt) {
@@ -71,25 +98,16 @@ export function GentlePromptDisplay({
         }
       };
     }
-  }, [prompt, autoHideDelay]);
+  }, [prompt, autoHideDelay, handleDismiss]);
 
-  const handleDismiss = useCallback(() => {
-    setIsExiting(true);
-    hapticTap();
-    setTimeout(() => {
-      onDismiss();
-      setIsExiting(false);
-    }, 300);
-  }, [onDismiss]);
-
-  const handleOptionClick = useCallback((action: string) => {
-    hapticSelection();
-    setIsExiting(true);
-    setTimeout(() => {
-      onOptionSelect(action);
-      setIsExiting(false);
-    }, 200);
-  }, [onOptionSelect]);
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (autoHideTimerRef.current) clearTimeout(autoHideTimerRef.current);
+      if (dismissTimeoutRef.current) clearTimeout(dismissTimeoutRef.current);
+      if (optionTimeoutRef.current) clearTimeout(optionTimeoutRef.current);
+    };
+  }, []);
 
   // Swipe to dismiss handlers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -132,9 +150,7 @@ export function GentlePromptDisplay({
         ${isDragging ? 'transition-none' : ''}
       `}
       style={{
-        transform: isDragging
-          ? `translateX(calc(-50% + ${dragOffset}px))`
-          : undefined,
+        transform: isDragging ? `translateX(calc(-50% + ${dragOffset}px))` : undefined,
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -170,9 +186,7 @@ export function GentlePromptDisplay({
 
         {/* Content */}
         <div className="p-5 pr-10">
-          <p className="text-sm text-foreground leading-relaxed">
-            {prompt.message}
-          </p>
+          <p className="text-sm text-foreground leading-relaxed">{prompt.message}</p>
         </div>
 
         {/* Options */}
@@ -187,9 +201,10 @@ export function GentlePromptDisplay({
                   text-sm font-medium
                   transition-colors
                   focus:outline-none focus:bg-surface
-                  ${option.primary || index === 0
-                    ? 'text-primary hover:bg-primary/5'
-                    : 'text-muted hover:text-foreground hover:bg-surface'
+                  ${
+                    option.primary || index === 0
+                      ? 'text-primary hover:bg-primary/5'
+                      : 'text-muted hover:text-foreground hover:bg-surface'
                   }
                   ${index > 0 ? 'border-l border-border/50' : ''}
                 `}
@@ -230,6 +245,29 @@ export function InlineGentlePrompt({
 }: InlineGentlePromptProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
+  const dismissTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const optionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleDismiss = useCallback(() => {
+    setIsExiting(true);
+    hapticTap();
+    dismissTimeoutRef.current = setTimeout(() => {
+      onDismiss();
+      setIsExiting(false);
+    }, 300);
+  }, [onDismiss]);
+
+  const handleOptionClick = useCallback(
+    (action: string) => {
+      hapticSelection();
+      setIsExiting(true);
+      optionTimeoutRef.current = setTimeout(() => {
+        onOptionSelect(action);
+        setIsExiting(false);
+      }, 200);
+    },
+    [onOptionSelect]
+  );
 
   useEffect(() => {
     if (prompt) {
@@ -241,23 +279,13 @@ export function InlineGentlePrompt({
     }
   }, [prompt]);
 
-  const handleDismiss = useCallback(() => {
-    setIsExiting(true);
-    hapticTap();
-    setTimeout(() => {
-      onDismiss();
-      setIsExiting(false);
-    }, 300);
-  }, [onDismiss]);
-
-  const handleOptionClick = useCallback((action: string) => {
-    hapticSelection();
-    setIsExiting(true);
-    setTimeout(() => {
-      onOptionSelect(action);
-      setIsExiting(false);
-    }, 200);
-  }, [onOptionSelect]);
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (dismissTimeoutRef.current) clearTimeout(dismissTimeoutRef.current);
+      if (optionTimeoutRef.current) clearTimeout(optionTimeoutRef.current);
+    };
+  }, []);
 
   if (!prompt) return null;
 
@@ -276,9 +304,7 @@ export function InlineGentlePrompt({
     >
       <div className="flex items-start gap-3 p-4">
         <div className="flex-1">
-          <p className="text-sm text-foreground leading-relaxed">
-            {prompt.message}
-          </p>
+          <p className="text-sm text-foreground leading-relaxed">{prompt.message}</p>
 
           {/* Inline options */}
           {prompt.options.length > 0 && (
@@ -293,16 +319,15 @@ export function InlineGentlePrompt({
                     text-xs font-medium
                     transition-colors
                     focus:outline-none focus:ring-2 focus:ring-primary/50
-                    ${option.primary || index === 0
-                      ? 'bg-primary/10 text-primary hover:bg-primary/20'
-                      : 'bg-surface text-muted hover:text-foreground hover:bg-surface/80'
+                    ${
+                      option.primary || index === 0
+                        ? 'bg-primary/10 text-primary hover:bg-primary/20'
+                        : 'bg-surface text-muted hover:text-foreground hover:bg-surface/80'
                     }
                   `}
                 >
                   {option.label}
-                  {(option.primary || index === 0) && (
-                    <ChevronRight className="w-3 h-3" />
-                  )}
+                  {(option.primary || index === 0) && <ChevronRight className="w-3 h-3" />}
                 </button>
               ))}
             </div>
@@ -350,6 +375,20 @@ interface UseGentlePromptOptions {
 export function useGentlePrompt(options?: UseGentlePromptOptions): UseGentlePromptReturn {
   const [currentPrompt, setCurrentPrompt] = useState<GentlePrompt | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Use refs for options to avoid recreating callbacks
+  const onActionRef = useRef(options?.onAction);
+  const onDismissRef = useRef(options?.onDismiss);
+  onActionRef.current = options?.onAction;
+  onDismissRef.current = options?.onDismiss;
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    };
+  }, []);
 
   const show = useCallback((prompt: GentlePrompt) => {
     setCurrentPrompt(prompt);
@@ -358,22 +397,25 @@ export function useGentlePrompt(options?: UseGentlePromptOptions): UseGentleProm
 
   const hide = useCallback(() => {
     setIsVisible(false);
-    setTimeout(() => setCurrentPrompt(null), 300);
+    hideTimeoutRef.current = setTimeout(() => setCurrentPrompt(null), 300);
   }, []);
 
-  const handleOptionSelect = useCallback((action: string) => {
-    if (currentPrompt) {
-      options?.onAction?.(action, currentPrompt.id);
-    }
-    hide();
-  }, [currentPrompt, options, hide]);
+  const handleOptionSelect = useCallback(
+    (action: string) => {
+      if (currentPrompt) {
+        onActionRef.current?.(action, currentPrompt.id);
+      }
+      hide();
+    },
+    [currentPrompt, hide]
+  );
 
   const handleDismiss = useCallback(() => {
     if (currentPrompt) {
-      options?.onDismiss?.(currentPrompt.id);
+      onDismissRef.current?.(currentPrompt.id);
     }
     hide();
-  }, [currentPrompt, options, hide]);
+  }, [currentPrompt, hide]);
 
   return {
     show,
@@ -413,10 +455,37 @@ export function useGentlePromptQueue(
   const [isVisible, setIsVisible] = useState(false);
   const queueRef = useRef<GentlePrompt[]>([]);
   const lastPromptTimeRef = useRef<number>(0);
+  const timeoutsRef = useRef<Set<NodeJS.Timeout>>(new Set());
+
+  // Use refs for options to avoid recreating callbacks
+  const onActionRef = useRef(options?.onAction);
+  const onDismissRef = useRef(options?.onDismiss);
+  const minDelayRef = useRef(options?.minDelayBetweenPrompts ?? 5000);
+  onActionRef.current = options?.onAction;
+  onDismissRef.current = options?.onDismiss;
+  minDelayRef.current = options?.minDelayBetweenPrompts ?? 5000;
+
+  // Helper to create tracked timeouts
+  const createTimeout = useCallback((fn: () => void, delay: number) => {
+    const id = setTimeout(() => {
+      timeoutsRef.current.delete(id);
+      fn();
+    }, delay);
+    timeoutsRef.current.add(id);
+    return id;
+  }, []);
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach((id) => clearTimeout(id));
+      timeoutsRef.current.clear();
+    };
+  }, []);
 
   const processNext = useCallback(() => {
     const now = Date.now();
-    const minDelay = options?.minDelayBetweenPrompts ?? 5000;
+    const minDelay = minDelayRef.current;
 
     if (queueRef.current.length === 0) {
       setCurrentPrompt(null);
@@ -426,51 +495,60 @@ export function useGentlePromptQueue(
 
     const timeSinceLastPrompt = now - lastPromptTimeRef.current;
     if (timeSinceLastPrompt < minDelay) {
-      // Wait before showing next prompt
-      setTimeout(processNext, minDelay - timeSinceLastPrompt);
+      createTimeout(processNext, minDelay - timeSinceLastPrompt);
       return;
     }
 
-    const nextPrompt = queueRef.current.shift()!;
-    setCurrentPrompt(nextPrompt);
-    setIsVisible(true);
-    lastPromptTimeRef.current = now;
-  }, [options?.minDelayBetweenPrompts]);
-
-  const queue = useCallback((prompt: GentlePrompt) => {
-    queueRef.current.push(prompt);
-    if (!currentPrompt) {
-      processNext();
+    const nextPrompt = queueRef.current.shift();
+    if (nextPrompt) {
+      setCurrentPrompt(nextPrompt);
+      setIsVisible(true);
+      lastPromptTimeRef.current = now;
     }
-  }, [currentPrompt, processNext]);
+  }, [createTimeout]);
+
+  const queue = useCallback(
+    (prompt: GentlePrompt) => {
+      queueRef.current.push(prompt);
+      if (!currentPrompt) {
+        processNext();
+      }
+    },
+    [currentPrompt, processNext]
+  );
 
   const clear = useCallback(() => {
     queueRef.current = [];
+    timeoutsRef.current.forEach((id) => clearTimeout(id));
+    timeoutsRef.current.clear();
     setCurrentPrompt(null);
     setIsVisible(false);
   }, []);
 
-  const handleOptionSelect = useCallback((action: string) => {
-    if (currentPrompt) {
-      options?.onAction?.(action, currentPrompt.id);
-    }
-    setIsVisible(false);
-    setTimeout(() => {
-      setCurrentPrompt(null);
-      processNext();
-    }, 300);
-  }, [currentPrompt, options, processNext]);
+  const handleOptionSelect = useCallback(
+    (action: string) => {
+      if (currentPrompt) {
+        onActionRef.current?.(action, currentPrompt.id);
+      }
+      setIsVisible(false);
+      createTimeout(() => {
+        setCurrentPrompt(null);
+        processNext();
+      }, 300);
+    },
+    [currentPrompt, processNext, createTimeout]
+  );
 
   const handleDismiss = useCallback(() => {
     if (currentPrompt) {
-      options?.onDismiss?.(currentPrompt.id);
+      onDismissRef.current?.(currentPrompt.id);
     }
     setIsVisible(false);
-    setTimeout(() => {
+    createTimeout(() => {
       setCurrentPrompt(null);
       processNext();
     }, 300);
-  }, [currentPrompt, options, processNext]);
+  }, [currentPrompt, processNext, createTimeout]);
 
   return {
     queue,
@@ -515,7 +593,7 @@ export const COMMON_PROMPTS = {
       'medium'
     ),
 
-  checkIn: (onHurts: string, onResting: string, onDone: string) =>
+  checkIn: (onHurts: string, onResting: string) =>
     createGentlePrompt(
       'check-in',
       'Everything okay?',
